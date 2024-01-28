@@ -1,17 +1,16 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.integrate import solve_ivp
 
 import parametros
-from propulsao_N_estagios import propulsao_N_estagios
-from atm_padrao import atm_padrao
-from aerodinamica_N_estagios import aerodinamica_N_estagios
-from Vrel2Vine import Vrel2Vine
-from long_ECEF2ECI import long_ECEF2ECI
 from RvelPolar2RvelRet import RvelPolar2RvelRet
+from Vrel2Vine import Vrel2Vine
+from aerodinamica_N_estagios import aerodinamica_N_estagios
+from atm_padrao import atm_padrao
 from det_orbita import det_orbita
-from dinamica_foguete import modelo_dinamica_foguete
-
+from dinamica_foguete import dinamica_foguete
+from long_ECEF2ECI import long_ECEF2ECI
+from propulsao_N_estagios import propulsao_N_estagios
 
 # Inicializa os parâmetros
 Re = parametros.Re
@@ -49,7 +48,7 @@ impulso_especico_por_estagio = np.array([251, 271, 315])  # s - Impulso específ
 parametros.impulso_especifico_por_estagio = impulso_especico_por_estagio
 mp[0] = 55290
 parametros.mp[0] = mp[0]
-mp[1] = 11058 # kg - Massa de propelente dos estágios
+mp[1] = 11058  # kg - Massa de propelente dos estágios
 parametros.mp[1] = mp[1]
 parametros.mp = mp
 mp3 = 224.53  # kg - Massa de propelente do terceiro estágio (RD843)
@@ -132,7 +131,7 @@ parametros.Ts3 = Ts3
 TEq2 = 5  # s
 TEq3 = 300  # s
 
-Tq31 = 222.8 #222.8
+Tq31 = 222.8  # 222.8
 parametros.Tq31 = Tq31
 Tq32 = Tq3 - Tq31
 parametros.Tq32 = Tq32
@@ -144,7 +143,6 @@ mp31 = mp3 * Tq31 / Tq3
 parametros.mp31 = mp31
 mp32 = mp3 * Tq32 / Tq3
 parametros.mp32 = mp32
-
 
 ti[0] = 0
 parametros.ti[0] = ti[0]
@@ -169,28 +167,25 @@ parametros.tq[3] = tq[3]
 ts[2] = tq[3] + Ts3
 parametros.ts[2] = ts[2]
 
-
 parametros.ti = ti
 parametros.tq = tq
 parametros.ts = ts
 
 mp[2] = mp31
-parametros.mp[2]= mp[2]
+parametros.mp[2] = mp[2]
 mp[3] = mp32
 parametros.mp[3] = mp[3]
 parametros.mp = mp
 
-
 sinalPhii = parametros.sinalPhii
 achouApogeu = parametros.achouApogeu
-
 
 m0 = np.sum(mp) + np.sum(massa_estrutural_por_estagio) + massa_de_carga_util
 parametros.m0 = m0
 r0 = Re + h0
 
 # Estudo simplificado pela equação de foguete
-mpx = np.array([mp[0],mp[1], mp3])
+mpx = np.array([mp[0], mp[1], mp3])
 ms_mpx_sum = massa_estrutural_por_estagio + mpx
 sigma = massa_estrutural_por_estagio / ms_mpx_sum
 
@@ -224,9 +219,9 @@ print('Velocidades de exaustao - m/s:', ve)
 print('Razao de carga útil total:', lambL)
 print('Impulso de velocidade total ideal - m/s:', Dv)
 
-#TF = float(input('Informe o tempo da simulação (s): '))
-#v0 = float(input('Informe o valor inicial da velocidade relativa (m/s): '))
-#phi0 = float(input('Informe a condição inicial do ângulo de elevação (graus): '))
+# TF = float(input('Informe o tempo da simulação (s): '))
+# v0 = float(input('Informe o valor inicial da velocidade relativa (m/s): '))
+# phi0 = float(input('Informe a condição inicial do ângulo de elevação (graus): '))
 TF = 25000
 v0 = 1
 phi0 = 76.8
@@ -237,7 +232,6 @@ y = np.cos(ingso) / np.cos(delta0)
 if np.abs(y) > 1:
     print('Não eh possivel atingir a inclinacao a partir da latitude inicial. Calculando a menor possivel')
     y = np.sign(y)
-
 
 Ai_f = np.arcsin(y)
 rpgto = Re + 250e3
@@ -251,23 +245,22 @@ print('Condicao inicial de azimute de velocidade relativa (º):')
 print(A0 * 180 / np.pi)
 
 X0 = [v0, A0, phi0, r0, delta0, lon0]
-#X0 = X0.T
+# X0 = X0.T
 options = {
     'rtol': 1e-12,
     'atol': 1e-14,
-    #'max_step': 0.1
+    # 'max_step': 0.1
 }
 
 # Solve the differential equations
-#sol = solve_ivp(dinamica_foguete, [0, TF], X0, method='LSODA', **options)
-sol = solve_ivp(modelo_dinamica_foguete, [0, TF], X0, **options)
+# sol = solve_ivp(dinamica_foguete, [0, TF], X0, method='LSODA', **options)
+sol = solve_ivp(dinamica_foguete, [0, TF], X0, **options)
 t = sol.t  # Redimensiona t para ser uma matriz de coluna
 X = sol.y.T
 
-
-#t = sol.t
-#X = sol.y
-#X = np.transpose(X)
+# t = sol.t
+# X = sol.y
+# X = np.transpose(X)
 
 # Parâmetros da órbita GSO requerida
 print('*** Órbita GSO requerida ***')
@@ -340,7 +333,7 @@ for i in range(N):
 
     # Posição e velocidade inercial no referencial ICP
     rc0, vc0 = RvelPolar2RvelRet(Vi[i], Ai[i], phii[i], r, delta[i], longc[i])
-    R0[i,:] = rc0.T
+    R0[i, :] = rc0.T
 
     # Elementos orbitais
     par_orb = det_orbita(t[i], rc0, vc0, mut)
@@ -351,19 +344,18 @@ for i in range(N):
     inclinacao[i] = par_orb[4]
     om[i] = par_orb[5]
 
-
 # Análise de órbita
 for i in range(N):
     if t[i] > tq[2]:
         break
 
 if inclinacao[-1] > 90:
-    inclinacao[-1] = 180-inclinacao[-1]
+    inclinacao[-1] = 180 - inclinacao[-1]
 
-ifq = i-2
+ifq = i - 2
 tfq = t[ifq]  # Tempo do fim da queima do terceiro estágio
-Vfq = Vi[ifq] * np.ones([1,N])  # Velocidade inercial no fim da queima do terceiro estágio
-hfq = h[ifq] * np.ones([1,N])  # Altitude no fim da queima do terceiro estágio
+Vfq = Vi[ifq] * np.ones([1, N])  # Velocidade inercial no fim da queima do terceiro estágio
+hfq = h[ifq] * np.ones([1, N])  # Altitude no fim da queima do terceiro estágio
 P = 2 * np.pi * np.sqrt((Re + hfq[0][0]) ** 3 / mut)  # Período da órbita obtida
 print('*** Parametros da Orbita Obtida ***')
 print('Velocidade no momento da insercao orbital (km/s):')
@@ -373,11 +365,11 @@ print(hfq[0][0] / 1e3)
 print('Distancia radial no momento da insercao orbital (km):')
 print((hfq[0][0] + Re) / 1e3)
 print('Semi eixo maior (km):')
-print(a[ifq-1] / 1e3)
+print(a[ifq - 1] / 1e3)
 print('Periodo (min): ')
-print(P/60)
-rp = a[ifq-1] * (1 - e[ifq-1])  # Raio do perigeu
-ra = a[ifq-1] * (1 + e[ifq-1])  # Raio do apogeu
+print(P / 60)
+rp = a[ifq - 1] * (1 - e[ifq - 1])  # Raio do perigeu
+ra = a[ifq - 1] * (1 + e[ifq - 1])  # Raio do apogeu
 print('Raio do perigeu (km):')
 print(rp / 1e3)
 print('Raio do apogeu (km):')
@@ -402,12 +394,12 @@ print(vpgto / 1e3)
 print('Velocidade de apogeu da orbita GTO requerida (km/s):')
 vagto = np.sqrt(mut * (2 / ragto - 1 / agto))
 print(vagto / 1e3)
-ar = agto * np.ones([1,N])  # Semi eixo maior da orbita GTO requerida
-Vir = vpgto * np.ones([1,N])  # Velocidade de perigeu da orbita GTO requerida
+ar = agto * np.ones([1, N])  # Semi eixo maior da orbita GTO requerida
+Vir = vpgto * np.ones([1, N])  # Velocidade de perigeu da orbita GTO requerida
 eer = -mut / (2 * ar)  # Energia especifica da orbita GTO requerida
 print('Energia Específica da Órbita GTO Requerida')
-#print(eer)
-eegso = -mut / (2 * agso) * np.ones([1,N])  # Energia especifica da orbita GSO requerida
+# print(eer)
+eegso = -mut / (2 * agso) * np.ones([1, N])  # Energia especifica da orbita GSO requerida
 print('Tempo de espera para disparo do propulsor do 3º estagio apos a separacao do 2º (s):')
 print(TEq3)
 print('Duracao do primeiro disparo do motor do 3º estagio (s):')
@@ -419,7 +411,8 @@ print(ti[3])
 DVgso = vgso - vagto  # Impulso de velocidade requerido para circularizacao da orbita (km/s)
 print('Impulso de velocidade requerido para circularizacao da orbita (km/s):')
 print(DVgso / 1e3)
-mp32 = (m[ifq-1] * np.exp(DVgso / (impulso_especico_por_estagio[2] * g)) - m[ifq - 1]) / np.exp(DVgso / (impulso_especico_por_estagio[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
+mp32 = (m[ifq - 1] * np.exp(DVgso / (impulso_especico_por_estagio[2] * g)) - m[ifq - 1]) / np.exp(
+    DVgso / (impulso_especico_por_estagio[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
 print('Massa de propelente requerida para circularizacao da orbita (kg):')
 print(mp32)
 print('Massa de propelente disponivel para o 3º disparo (kg):')
@@ -456,7 +449,7 @@ plt.ylabel('A (º)')
 
 plt.subplot(233)
 plt.plot(t, phi * 180 / np.pi, linewidth=2)
-plt.plot(tfq, phi[ifq-1] * 180 / np.pi, '*')
+plt.plot(tfq, phi[ifq - 1] * 180 / np.pi, '*')
 plt.grid(True)
 plt.axis('tight')
 plt.xlabel('t (s)')
@@ -465,7 +458,7 @@ plt.ylabel('phi (º)')
 plt.subplot(234)
 plt.plot(t, h / 1e3, linewidth=2)
 plt.plot(t, hfq.T / 1e3, '--')
-plt.plot(tfq, hfq[0][0]/ 1e3, '*')
+plt.plot(tfq, hfq[0][0] / 1e3, '*')
 plt.grid(True)
 plt.axis('tight')
 plt.xlabel('t (s)')
@@ -498,7 +491,7 @@ plt.grid(True)
 plt.xlabel('t (s)')
 plt.ylabel('V_i (m/s)')
 plt.legend(['Velocidade inercial', 'Velocidade de perigeu da órbita GTO requerida',
-             'Velocidade no fim da queima do terceiro estágio'])
+            'Velocidade no fim da queima do terceiro estágio'])
 
 plt.subplot(222)
 plt.plot(t, Ai * 180 / np.pi, linewidth=2)
@@ -509,7 +502,7 @@ plt.ylabel('A_i (º)')
 
 plt.subplot(223)
 plt.plot(t, phii * 180 / np.pi, linewidth=2)
-plt.plot(tfq, phii[ifq-1] * 180 / np.pi, '*')
+plt.plot(tfq, phii[ifq - 1] * 180 / np.pi, '*')
 plt.grid(True)
 plt.axis('tight')
 plt.xlabel('t (s)')
@@ -602,12 +595,12 @@ plt.grid(True)
 plt.xlabel('t (s)')
 plt.ylabel('\u03B5 (J/kg)')
 plt.legend(['Energia específica', 'Energia específica da órbita GTO requerida',
-             'Energia específica da órbita GSO requerida'])
+            'Energia específica da órbita GSO requerida'])
 
 plt.subplot(334)
 plt.plot(t, a / 1e3, linewidth=2)
 plt.plot(t, ar.T / 1e3, '--')
-plt.plot(t, Re * np.ones([N,1]) / 1e3, '-.')
+plt.plot(t, Re * np.ones([N, 1]) / 1e3, '-.')
 plt.grid(True)
 plt.xlabel('t (s)')
 plt.ylabel('a (km)')
@@ -659,22 +652,21 @@ plt.show()
 fig7 = plt.figure(7)
 ax = plt.axes(projection="3d")
 
-u = np.linspace(0, 2*np.pi, 100)
+u = np.linspace(0, 2 * np.pi, 100)
 v = np.linspace(0, np.pi, 100)
-r = Re/1e3
+r = Re / 1e3
 
 x = r * np.outer(np.cos(u), np.sin(v))
 y = r * np.outer(np.sin(u), np.sin(v))
 z = r * np.outer(np.ones(np.size(u)), np.cos(v))
 
 ax.plot_surface(x, y, z, rstride=4, cstride=4)
-ax.plot3D(R0[:, 0]/1e3, R0[:, 1]/1e3, R0[:, 2]/1e3, 'red')
+ax.plot3D(R0[:, 0] / 1e3, R0[:, 1] / 1e3, R0[:, 2] / 1e3, 'red')
 ax = plt.gca()
 ax.set_aspect('equal', adjustable='box')
 ax.set_xlabel('x (km)')
 ax.set_ylabel('y (km)')
 ax.set_zlabel('z (km)')
 
-#Mostra os gráficos
+# Mostra os gráficos
 plt.show()
-

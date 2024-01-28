@@ -1,23 +1,25 @@
-import numpy as np
 import os
-import matplotlib.pyplot as plt
+
+import numpy as np
 from scipy.integrate import solve_ivp
 
 import parametros
-from propulsao_N_estagios import propulsao_N_estagios
-from atm_padrao import atm_padrao
-from aerodinamica_N_estagios import aerodinamica_N_estagios
-from Vrel2Vine import Vrel2Vine
-from long_ECEF2ECI import long_ECEF2ECI
 from RvelPolar2RvelRet import RvelPolar2RvelRet
+from Vrel2Vine import Vrel2Vine
+from aerodinamica_N_estagios import aerodinamica_N_estagios
+from atm_padrao import atm_padrao
 from det_orbita import det_orbita
-from dinamica_foguete import modelo_dinamica_foguete
+from dinamica_foguete import dinamica_foguete
+from long_ECEF2ECI import long_ECEF2ECI
+from propulsao_N_estagios import propulsao_N_estagios
 
 global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fc, mL
 global ms, m0, mp, ti, tq, ts, Isp, h0, l_trilho, tg, agso, Tq3, Tq31, Tq32, Ts3, vgso, mp3
 
+
 def clear_console():
     os.system('cls' if os.name == 'nt' else 'clear')
+
 
 # Parâmetros propulsivos
 Isp = np.array([251, 271, 315])  # s - Impulso específico dos estágios
@@ -184,7 +186,6 @@ while simula == 1:
         print('Não eh possivel atingir a inclinacao a partir da latitude inicial. Calculando a menor possivel')
         y = np.sign(y)
 
-
     Ai_f = np.arcsin(y)
     rpgto = Re + 250e3
     agto = (agso + rpgto) / 2
@@ -204,7 +205,7 @@ while simula == 1:
     }
 
     # Solve the differential equations
-    sol = solve_ivp(modelo_dinamica_foguete, [0, TF], X0, method='LSODA', **options)
+    sol = solve_ivp(dinamica_foguete, [0, TF], X0, method='LSODA', **options)
 
     t = sol.t
     X = sol.y
@@ -310,11 +311,11 @@ print(hfq[0] / 1e3)
 print('Distancia radial no momento da insercao orbital (km):')
 print((hfq[0] + Re) / 1e3)
 print('Semi eixo maior (km):')
-print(a[ifq-1] / 1e3)
+print(a[ifq - 1] / 1e3)
 print('Periodo (min): ')
-print(P/60)
-rp = a[ifq-1] * (1 - e[ifq-1])  # Raio do perigeu
-ra = a[ifq-1] * (1 + e[ifq-1])  # Raio do apogeu
+print(P / 60)
+rp = a[ifq - 1] * (1 - e[ifq - 1])  # Raio do perigeu
+ra = a[ifq - 1] * (1 + e[ifq - 1])  # Raio do apogeu
 print('Raio do perigeu (km):')
 print(rp / 1e3)
 print('Raio do apogeu (km):')
@@ -354,7 +355,8 @@ print(ti[3])
 DVgso = vgso - vagto  # Impulso de velocidade requerido para circularizacao da orbita (km/s)
 print('Impulso de velocidade requerido para circularizacao da orbita (km/s):')
 print(DVgso / 1e3)
-mp32 = (m[ifq] * np.exp(DVgso / (Isp[2] * g)) - m[ifq]) / np.exp(DVgso / (Isp[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
+mp32 = (m[ifq] * np.exp(DVgso / (Isp[2] * g)) - m[ifq]) / np.exp(
+    DVgso / (Isp[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
 print('Massa de propelente requerida para circularizacao da orbita (kg):')
 print(mp32)
 print('Massa de propelente disponivel para o 3º disparo (kg):')
@@ -371,9 +373,6 @@ print('Inclinacao (º):')
 print(inclinacao[-1] * 180 / np.pi)
 
 # Gráficos
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 # Figure 1
 # plt.figure(1)
@@ -616,7 +615,7 @@ from mpl_toolkits.mplot3d import Axes3D
 #
 simula = int(input('Deseja simular novamente? (1) sim (0) nao: '))
 
-#fig = plt.figure(figsize=(12, 8))
-#ax = fig.add_subplot(111)
-#desenha_mapa_trajetoria([delta0 * 180 / np.pi, 2 * lon0 * 180 / np.pi, h0], traj, ax=ax)
-#plt.show()
+# fig = plt.figure(figsize=(12, 8))
+# ax = fig.add_subplot(111)
+# desenha_mapa_trajetoria([delta0 * 180 / np.pi, 2 * lon0 * 180 / np.pi, h0], traj, ax=ax)
+# plt.show()

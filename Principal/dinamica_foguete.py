@@ -1,12 +1,14 @@
 import numpy as np
-from propulsao_N_estagios import propulsao_N_estagios
-from atm_padrao import atm_padrao
-from aerodinamica_N_estagios import aerodinamica_N_estagios
-from grav_axisimetrico import grav_axisimetrico
-import parametros
-from parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
 
-def modelo_dinamica_foguete(t, X):
+import parametros
+from aerodinamica_N_estagios import aerodinamica_N_estagios
+from atm_padrao import atm_padrao
+from grav_axisimetrico import grav_axisimetrico
+from parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
+from propulsao_N_estagios import propulsao_N_estagios
+
+
+def dinamica_foguete(t, X):
     """
     Função para a dinâmica de translação de um foguete com respeito ao referencial PCPF
     Sistema de referência: aerodinâmico
@@ -39,7 +41,7 @@ def modelo_dinamica_foguete(t, X):
     phi = X[2]
     distancia_radial_centro_da_terra = X[3]
     latitude_em_relacao_ao_plano_equatorial = X[4]
-    #lon = X[5]
+    # lon = X[5]
 
     if velocidade < 0:
         velocidade = 0.0001;  # Evita velocidade negativa
@@ -51,11 +53,11 @@ def modelo_dinamica_foguete(t, X):
 
     ## Função para cálculo do modelo atmosférico
     h = distancia_radial_centro_da_terra - Re  # Altitude
-    T, _, _, rho, _, M, _, _, Kn,_,_, R = atm_padrao(h, velocidade, lc, dT)
+    T, _, _, rho, _, M, _, _, Kn, _, _, R = atm_padrao(h, velocidade, lc, dT)
 
     ## Função para cálculo do modelo aerodinâmico
     # Depende da altitude e velocidade
-    D, fy, L = aerodinamica_N_estagios(t, velocidade, h, M, Kn, T, rho,R)
+    D, fy, L = aerodinamica_N_estagios(t, velocidade, h, M, Kn, T, rho, R)
 
     ## Calculo da gravidade
     # Função para cálculo do modelo gravitacional
@@ -66,18 +68,37 @@ def modelo_dinamica_foguete(t, X):
 
     deltap = (velocidade / distancia_radial_centro_da_terra) * np.cos(phi) * np.cos(azimute_vetor_velocidade_relativa)
 
-    lonp = (velocidade * np.cos(phi) * np.sin(azimute_vetor_velocidade_relativa)) / (distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial))
+    lonp = (velocidade * np.cos(phi) * np.sin(azimute_vetor_velocidade_relativa)) / (
+                distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial))
 
     ## Equações de dinâmica de translação
-    Vp = (1 / m) * (ft * np.cos(epsl) * np.cos(mu) - D - m * gc * np.sin(phi) + m * gd * np.cos(phi) * np.cos(azimute_vetor_velocidade_relativa) - \
-        m*we**2*distancia_radial_centro_da_terra*np.cos(latitude_em_relacao_ao_plano_equatorial)*(np.cos(phi)*np.cos(azimute_vetor_velocidade_relativa)*np.sin(latitude_em_relacao_ao_plano_equatorial)-np.sin(phi)*np.cos(latitude_em_relacao_ao_plano_equatorial)))
+    Vp = (1 / m) * (ft * np.cos(epsl) * np.cos(mu) - D - m * gc * np.sin(phi) + m * gd * np.cos(phi) * np.cos(
+        azimute_vetor_velocidade_relativa) - \
+                    m * we ** 2 * distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial) * (
+                                np.cos(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(
+                            latitude_em_relacao_ao_plano_equatorial) - np.sin(phi) * np.cos(
+                            latitude_em_relacao_ao_plano_equatorial)))
     # Vp = (1 / m) * (ft * np.cos(epsl) * np.cos(mu) - D - m * gc * np.sin(phi) + m * gd * np.cos(phi) * np.cos(A) - m * we**2 * r * np.cos(delta) * (np.cos(phi) * np.cos(A) * np.sin(delta) - np.sin(phi) * np.cos(delta)))
-    Ap = (1 / (m * velocidade * (np.cos(phi)))) * (m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) ** 2 * np.sin(azimute_vetor_velocidade_relativa) * np.tan(latitude_em_relacao_ao_plano_equatorial) + ft * np.sin(mu) + fy - m * gd * np.sin(azimute_vetor_velocidade_relativa) + \
-        m * we ** 2 * distancia_radial_centro_da_terra * np.sin(azimute_vetor_velocidade_relativa) * np.sin(latitude_em_relacao_ao_plano_equatorial) * np.cos(latitude_em_relacao_ao_plano_equatorial) - 2 * m * we * velocidade * (np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.cos(latitude_em_relacao_ao_plano_equatorial) - np.cos(phi) * np.sin(latitude_em_relacao_ao_plano_equatorial)));
-     #Ap = (1 / (m * V * np.cos(phi))) * (m * (V**2 / r) * np.cos(phi)**2 * np.sin(A) * np.tan(delta) + ft * np.sin(mu) + fy - m * gd * np.sin(A) + m * we**2 * r * np.sin(A) * np.sin(delta) * np.cos(delta) - 2 * m * we * V * (np.sin(phi) * np.cos(A) * np.cos(delta) - np.cos(phi) * np.sin(delta)))
-    phip = 1 * (1 / (m * velocidade)) * (m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) + ft * np.sin(epsl) * np.cos(mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) \
-        + m * we ** 2 * distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial) * (np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(latitude_em_relacao_ao_plano_equatorial) + np.cos(phi) * np.cos(latitude_em_relacao_ao_plano_equatorial)) + 2 * m * we * velocidade * np.sin(azimute_vetor_velocidade_relativa) * np.cos(latitude_em_relacao_ao_plano_equatorial));
-                      #phip = (1 / (m * V)) * (m * (V**2 / r) * np.cos(phi) + ft * np.sin(epsl) * np.cos(mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(A) + m * we**2 * r * np.cos(delta) * (np.sin(phi) * np.cos(A) * np.sin(delta) + np.cos(phi) * np.cos(delta)) + 2 * m * we * V * np.sin(A) * np.cos(delta))
+    Ap = (1 / (m * velocidade * (np.cos(phi)))) * (
+                m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) ** 2 * np.sin(
+            azimute_vetor_velocidade_relativa) * np.tan(latitude_em_relacao_ao_plano_equatorial) + ft * np.sin(
+            mu) + fy - m * gd * np.sin(azimute_vetor_velocidade_relativa) + \
+                m * we ** 2 * distancia_radial_centro_da_terra * np.sin(azimute_vetor_velocidade_relativa) * np.sin(
+            latitude_em_relacao_ao_plano_equatorial) * np.cos(
+            latitude_em_relacao_ao_plano_equatorial) - 2 * m * we * velocidade * (
+                            np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.cos(
+                        latitude_em_relacao_ao_plano_equatorial) - np.cos(phi) * np.sin(
+                        latitude_em_relacao_ao_plano_equatorial)));
+    # Ap = (1 / (m * V * np.cos(phi))) * (m * (V**2 / r) * np.cos(phi)**2 * np.sin(A) * np.tan(delta) + ft * np.sin(mu) + fy - m * gd * np.sin(A) + m * we**2 * r * np.sin(A) * np.sin(delta) * np.cos(delta) - 2 * m * we * V * (np.sin(phi) * np.cos(A) * np.cos(delta) - np.cos(phi) * np.sin(delta)))
+    phip = 1 * (1 / (m * velocidade)) * (
+                m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) + ft * np.sin(epsl) * np.cos(
+            mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) \
+                + m * we ** 2 * distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial) * (
+                            np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(
+                        latitude_em_relacao_ao_plano_equatorial) + np.cos(phi) * np.cos(
+                        latitude_em_relacao_ao_plano_equatorial)) + 2 * m * we * velocidade * np.sin(
+            azimute_vetor_velocidade_relativa) * np.cos(latitude_em_relacao_ao_plano_equatorial));
+    # phip = (1 / (m * V)) * (m * (V**2 / r) * np.cos(phi) + ft * np.sin(epsl) * np.cos(mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(A) + m * we**2 * r * np.cos(delta) * (np.sin(phi) * np.cos(A) * np.sin(delta) + np.cos(phi) * np.cos(delta)) + 2 * m * we * V * np.sin(A) * np.cos(delta))
 
     ## Saturação da altitude
     if h < 0:  # Altitude negativa não é permitida
@@ -91,7 +112,8 @@ def modelo_dinamica_foguete(t, X):
 
     ## Modela o trilho de lancamento
     H = h - h0  # Altura
-    if ((H <= l_trilho) and (t <= 10)):  # Verifica se a altura eh menor que l_trilho nos primeiros segundos da simulacao
+    if ((H <= l_trilho) and (
+            t <= 10)):  # Verifica se a altura eh menor que l_trilho nos primeiros segundos da simulacao
         Ap = 0
         phip = 0  # Anula as derivadas dos angulos de orientacao da velocidade
 
