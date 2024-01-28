@@ -4,14 +4,14 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 import parametros
-from RvelPolar2RvelRet import RvelPolar2RvelRet
-from Vrel2Vine import Vrel2Vine
 from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from atm_padrao import atm_padrao
 from dinamica_foguete import dinamica_foguete
-from domain.OrbitalUtils.det_orbita import det_orbita
-from long_ECEF2ECI import long_ECEF2ECI
 from propulsao_N_estagios import propulsao_N_estagios
+from src.domain.OrbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
+from src.domain.OrbitalUtils.Vrel2Vine import Vrel2Vine
+from src.domain.OrbitalUtils.det_orbita import det_orbita
+from src.domain.OrbitalUtils.long_ECEF2ECI import long_ECEF2ECI
 
 global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fator_correcao, massa_carga_util
 global ms, m0, mp, ti, tq, ts, Isp, h0, l_trilho, tg, agso, Tq3, Tq31, Tq32, Ts3, vgso, mp3

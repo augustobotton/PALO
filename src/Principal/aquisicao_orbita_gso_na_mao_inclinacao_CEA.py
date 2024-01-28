@@ -3,14 +3,14 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 import parametros
-from RvelPolar2RvelRet import RvelPolar2RvelRet
-from Vrel2Vine import Vrel2Vine
 from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
-from atm_padrao import atm_padrao
 from dinamica_foguete import dinamica_foguete
-from domain.OrbitalUtils.det_orbita import det_orbita
-from long_ECEF2ECI import long_ECEF2ECI
 from propulsao_N_estagios import propulsao_N_estagios
+from src.domain.Atmosfera.ModeloAtmosferico import ModeloAtmosferico
+from src.domain.OrbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
+from src.domain.OrbitalUtils.Vrel2Vine import Vrel2Vine
+from src.domain.OrbitalUtils.det_orbita import det_orbita
+from src.domain.OrbitalUtils.long_ECEF2ECI import long_ECEF2ECI
 
 # Inicializa os parâmetros
 Re = parametros.Re
@@ -315,7 +315,8 @@ for i in range(N):
     ft[i], m[i], mu[i], epsl[i] = propulsao_N_estagios(t[i], X[i])
 
     # Parâmetros atmosféricos
-    T[i], _, _, rho[i], _, M[i], _, _, Kn, _, _, R = atm_padrao(h[i], V[i], lc, dT)
+    modelo_atmosferico = ModeloAtmosferico()
+    T[i], _, _, rho[i], _, M[i], _, _, Kn, _, _, R = modelo_atmosferico.calcula(h[i], V[i], lc, dT)
 
     # Forças aerodinâmicas
     D[i], _, _ = aerodinamica_multiplos_estagios(t[i], V[i], h[i], M[i], Kn, T[i], rho[i], R)

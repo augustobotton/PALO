@@ -1,4 +1,4 @@
-import modelo_aerodinamico as ma
+import ModeloAerodinamico as ma
 import parametros
 
 

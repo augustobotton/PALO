@@ -2,10 +2,10 @@ import numpy as np
 
 import parametros
 from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
-from atm_padrao import atm_padrao
-from grav_axisimetrico import grav_axisimetrico
 from parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
 from propulsao_N_estagios import propulsao_N_estagios
+from src.domain.Atmosfera.ModeloAtmosferico import ModeloAtmosferico
+from src.domain.OrbitalUtils.grav_axisimetrico import grav_axisimetrico
 
 
 def dinamica_foguete(t, X):
@@ -53,7 +53,8 @@ def dinamica_foguete(t, X):
 
     ## Função para cálculo do modelo atmosférico
     h = distancia_radial_centro_da_terra - Re  # Altitude
-    T, _, _, rho, _, M, _, _, Kn, _, _, R = atm_padrao(h, velocidade, lc, dT)
+    modelo_atmosferico = ModeloAtmosferico()
+    T, _, _, rho, _, M, _, _, Kn, _, _, R = modelo_atmosferico.calcula(h, velocidade, lc, dT)
 
     ## Função para cálculo do modelo aerodinâmico
     # Depende da altitude e velocidade

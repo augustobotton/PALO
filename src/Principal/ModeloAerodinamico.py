@@ -12,18 +12,26 @@ class ModeloAerodinamico:
         self.constante_do_gas_ideal = constante_do_gas_ideal
 
     def calcula(self):
-        parametro_de_velocidade_nao_dimensional = self._computa_parametro_de_velocidade_nao_dimensional()
-        coeficiente_de_arrasto_em_escoamento_livre_molecular = self._computa_coef_de_arrasto_em_escoamento_livre_molecular(
-            parametro_de_velocidade_nao_dimensional)
+        coeficiente_de_arrasto_em_escoamento_livre_molecular = self._computa_coef_de_arrasto_em_escoamento_livre_molecular()
         coeficiente_de_arrasto_interpolado = self._interpola_coeficiente_de_arrasto(self.numero_de_mach)
-        return coeficiente_de_arrasto_interpolado
+        if self.altitude < 2000e3:
+            if self.numero_de_knudsen < 0.0146:
+                coeficiente_de_arrasto = coeficiente_de_arrasto_interpolado
+            elif self.numero_de_knudsen < 14.5:
+                coeficiente_de_arrasto = coeficiente_de_arrasto_interpolado + (
+                        coeficiente_de_arrasto_em_escoamento_livre_molecular - coeficiente_de_arrasto_interpolado) * (
+                                                 (1 / 3) * np.log10(
+                                             self.numero_de_knudsen / np.sin(30 * np.pi / 180)) + 0.05113)
+            else:
+                coeficiente_de_arrasto = coeficiente_de_arrasto_em_escoamento_livre_molecular
+        else:
+            coeficiente_de_arrasto = 0
 
-    def _computa_parametro_de_velocidade_nao_dimensional(self):
-        return self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)
+        return coeficiente_de_arrasto
 
-    @staticmethod
-    def _computa_coef_de_arrasto_em_escoamento_livre_molecular(velocidade_nao_dimensional):
-        return 1.75 + np.sqrt(np.pi) / (2 * velocidade_nao_dimensional)
+    def _computa_coef_de_arrasto_em_escoamento_livre_molecular(self):
+        return 1.75 + np.sqrt(np.pi) / (
+                2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
 
     @staticmethod
     def _interpola_coeficiente_de_arrasto(numero_de_mach):
@@ -110,7 +118,3 @@ class ModeloAerodinamico:
                                                     [11.7325, 0.4824]])
         return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1],
                                  numero_de_mach)
-
-# Example usage
-# model = AerodynamicModel(V, h, M, Kn, T, R)
-# results = model.calculate()
