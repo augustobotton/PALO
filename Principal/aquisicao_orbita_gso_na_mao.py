@@ -11,7 +11,7 @@ from Vrel2Vine import Vrel2Vine
 from long_ECEF2ECI import long_ECEF2ECI
 from RvelPolar2RvelRet import RvelPolar2RvelRet
 from det_orbita import det_orbita
-from dinamica_foguete import dinamica_foguete
+from dinamica_foguete import modelo_dinamica_foguete
 
 global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fc, mL
 global ms, m0, mp, ti, tq, ts, Isp, h0, l_trilho, tg, agso, Tq3, Tq31, Tq32, Ts3, vgso, mp3
@@ -21,7 +21,7 @@ def clear_console():
 
 # Parâmetros propulsivos
 Isp = np.array([251, 271, 315])  # s - Impulso específico dos estágios
-parametros.Isp = Isp
+parametros.impulso_especifico_por_estagio = Isp
 mp = np.array([5.5262e4, 11058, 0, 0])  # kg - Massa de propelente dos estágios
 parametros.mp = mp
 mp3 = 243.6  # kg - Massa de propelente do terceiro estágio (RD843)
@@ -31,13 +31,13 @@ Tq3 = 301  # s - TEMPO DE QUEIMA DO 3° ESTÁGIO SE ELE IGNITASSE SÓ UMA VEZ
 
 # Parâmetros de massa estrutural e de carga útil
 ms = np.array([7750, 1367, 64.7544])  # kg - Massa estrutural dos estágios
-parametros.ms = ms
+parametros.massa_estrutural_por_estagio = ms
 mL = 13  # kg - Massa da carga útil
-parametros.mL = mL
+parametros.massa_de_carga_util = mL
 
 # Parâmetros aerodinâmicos e ambientais
 fc = 1.28  # Fator de correção do arrasto
-parametros.fc = fc
+parametros.fator_correcao_arrasto = fc
 S1 = 4.6 * 5 / 3  # m^2 - Area aproximada da secao transversal do primeiro estagio
 S2 = 1.5  # m^2 - Area aproximada da secao transversal do segundo estagio
 S3 = 1.5  # m^2 - Area aproximada da secao transversal do terceiro estagio
@@ -204,7 +204,7 @@ while simula == 1:
     }
 
     # Solve the differential equations
-    sol = solve_ivp(dinamica_foguete, [0, TF], X0, method='LSODA', **options)
+    sol = solve_ivp(modelo_dinamica_foguete, [0, TF], X0, method='LSODA', **options)
 
     t = sol.t
     X = sol.y

@@ -29,73 +29,75 @@ def det_orbita(t0, rc0, vc0, mu):
     # nodos, medido no plano orbital.
     ## Cálculos
     # Distância radial ao primário no instante observado
-    rc0 = rc0.T  # pra funcionar no np.cross
+    rc0 = rc0.T  # para funcionar no np.cross
     vc0 = vc0.T
 
-    r0 = np.linalg.norm(rc0);
+    r0 = np.linalg.norm(rc0)
     # Vetor quantidade de movimento angular específica no referencial celeste
-    hc = np.cross(rc0, vc0);  # como rc0 e vc0 foram transpostos, hc vai ser 1x3 tambem
+    hc = np.cross(rc0, vc0)  # como rc0 e vc0 foram transpostos, hc vai ser 1x3 tambem
     # Vetor excentricidade no sistema celeste
-    ec = np.cross(vc0, hc) / mu - rc0 / r0;  # voltando pra (3x1)
+    ec = np.cross(vc0, hc) / mu - rc0 / r0  # voltando pra (3x1)
     # Excentricidade da órbita
-    e = np.linalg.norm(ec);
+    e = np.linalg.norm(ec)
     # Módulo do vetor hc
-    h = np.linalg.norm(hc);
+    h = np.linalg.norm(hc)
 
     # Parâmetro da órbita dada
-    p = h ** 2 / mu;
+    p = h ** 2 / mu
     # Semi eixo maior
 
-    a = p / (1 - e ** 2);
+    a = p / (1 - e ** 2)
 
     # Vetor parâmetro no referencial celeste
-    pc = p * np.cross(hc, ec) / (h * e);
+    pc = p * np.cross(hc, ec) / (h * e)
     # Anomalia verdadeira
-    costheta = (p - r0) / (e * r0);
-    sintheta = np.dot(np.squeeze(rc0), np.squeeze(pc)) / (r0 * p);
-    theta = np.arctan2(sintheta, costheta);
+    costheta = (p - r0) / (e * r0)
+    sintheta = np.dot(np.squeeze(rc0), np.squeeze(pc)) / (r0 * p)
+    theta = np.arctan2(sintheta, costheta)
     # O tempo de perigeu depende do tipo de órbita
     if (0 <= e) and (e < 1):
-        tipo = 'e';  # Órbita elíptica
+        tipo = 'e' # Órbita elíptica
     elif e == 1:
-        tipo = 'p';  # Órbita parabólica
+        tipo = 'p'  # Órbita parabólica
     else:
-        tipo = 'h';  # Órbita hiperbólica
+        tipo = 'h'  # Órbita hiperbólica
 
     # Tempo de perigeu
     if tipo == 'e':  # Órbita elíptica
         # Movimento médio
-        n = np.sqrt(mu / a ** 3);
+        n = np.sqrt(mu / a ** 3)
         # Anomalia excêntrica
-        E = 2 * np.arctan(np.sqrt((1 - e) / (1 + e)) * np.tan(theta / 2));
-        tau = t0 - (E - e * np.sin(E)) / n;
+        E = 2 * np.arctan(np.sqrt((1 - e) / (1 + e)) * np.tan(theta / 2))
+        tau = t0 - (E - e * np.sin(E)) / n
     elif tipo == 'p':  # Órbita parabólica
-        tau = -((np.tan(theta / 2)) ** 3 + 3 * np.tan(theta / 2)) / (mu / p ** 3) ** (1 / 6);
+        tau = -((np.tan(theta / 2)) ** 3 + 3 * np.tan(theta / 2)) / (mu / p ** 3) ** (1 / 6)
     else:  # Órbita hiperbólica
         # Movimento médio hiperbólico
-        n = np.sqrt(-mu / a ** 3);
+        n = np.sqrt(-mu / a ** 3)
         # Anomalia hiperbólica
-        H = 2 * np.arctanh(np.sqrt((e - 1) / (1 + e)) * np.tan(theta / 2));
-        tau = -(e * np.sinh(H) - H) / n;
+        H = 2 * np.arctanh(np.sqrt((e - 1) / (1 + e)) * np.tan(theta / 2))
+        tau = -(e * np.sinh(H) - H) / n
 
     # Linha dos nodos
     # Vetor unitário ao longo do vetor h (no sistema celeste)
     ih = hc / h;
     # Vetor unitário ao longo da linha dos nodos (no sistema celeste)
-    Kc = np.array([[0], [0], [1]]);
-    nc = np.cross(Kc.T, ih) / np.linalg.norm(np.cross(Kc.T, ih));
+    Kc = np.array([[0], [0], [1]])
+    nc = np.cross(Kc.T, ih) / np.linalg.norm(np.cross(Kc.T, ih))
     # Ascenção reta do nodo ascendente
-    OMEGA = np.arctan2(nc[0][1], nc[0][0]);
+    OMEGA = np.arctan2(nc[0][1], nc[0][0])
     # Inclinação
-    i = np.arccos(float(np.dot(ih, Kc)));
+    inclinacao = np.arccos(float(np.dot(ih, Kc)))
+
     # Vetor unitário ao longo do vetor excentricidade (no referencial
     # celeste)
-    ie = ec / e;
+    ie = ec / e
     # Argumento de perigeu
-    cosomega = np.dot(np.squeeze(ie), np.squeeze(nc));
-    sinomega = np.dot(np.squeeze(ih), np.squeeze(np.cross(nc, ie)));
-    omega = np.arctan2(sinomega, cosomega);
-    ## Vetor de parâmetros de saída
-    par_orb = [a, e, tau, OMEGA, i, omega];
+    cosomega = np.dot(np.squeeze(ie), np.squeeze(nc))
+    sinomega = np.dot(np.squeeze(ih), np.squeeze(np.cross(nc, ie)))
+    omega = np.arctan2(sinomega, cosomega)
 
-    return par_orb
+    ## Vetor de parâmetros de saída
+    parametros_orbitais = [a, e, tau, OMEGA, inclinacao, omega]
+
+    return parametros_orbitais

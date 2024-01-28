@@ -2,18 +2,18 @@ import parametros
 from Vrel2Vine import Vrel2Vine
 import numpy as np
 
-def propulsao_N_estagios(t, X):
+def propulsao_N_estagios(tempo, vetor_de_estados):
     ti = parametros.ti
     tq = parametros.tq
     ts = parametros.ts
-    Isp = parametros.Isp
+    Isp = parametros.impulso_especifico_por_estagio
     mp = parametros.mp
-    ms = parametros.ms
+    ms = parametros.massa_estrutural_por_estagio
     g = parametros.g
     m0 = parametros.m0
     Re = parametros.Re
     we = parametros.we
-    mL = parametros.mL
+    mL = parametros.massa_de_carga_util
     # Função para cálculo dos parâmetros propulsivos em função do tempo
     # Veículo de até 3 estágios
     # Entrada
@@ -35,19 +35,19 @@ def propulsao_N_estagios(t, X):
     N = len(ti)
 
     if N == 1:
-        ft, m = propulsor_1_estagio(t, ti, tq, ts, Isp, mp, ms, m0, g)
+        ft, m = propulsor_1_estagio(tempo, ti, tq, ts, Isp, mp, ms, m0, g)
     elif N == 2:
-        ft, m = propulsor_2_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g)
+        ft, m = propulsor_2_estagios(tempo, ti, tq, ts, Isp, mp, ms, m0, g)
     elif N == 3:
-        ft, m = propulsor_3_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g)
+        ft, m = propulsor_3_estagios(tempo, ti, tq, ts, Isp, mp, ms, m0, g)
     elif N == 4:
-        ft, m = propulsor_3_estagios_2ig(t, ti, tq, ts, Isp, mp, ms, m0, mL, g)
+        ft, m = propulsor_3_estagios_2ig(tempo, ti, tq, ts, Isp, mp, ms, m0, mL, g)
 
-    V = X[0]
-    A = X[1]
-    phi = X[2]
-    r = X[3]
-    delta = X[4]
+    V = vetor_de_estados[0]
+    A = vetor_de_estados[1]
+    phi = vetor_de_estados[2]
+    r = vetor_de_estados[3]
+    delta = vetor_de_estados[4]
 
     # Altitude
     h = r - Re
@@ -142,22 +142,22 @@ def propulsor_3_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
     if t <= ti[0]:
         # Antes da ignição
         m = m0  # Massa inicial
-        ft = 0  # Força propulsiva nula
+        forca_propulsiva = 0  # Força propulsiva nula
     elif t <= tq[0]:
         # Taxa de queima contínua
         md = -mp[0] / (tq[0] - ti[0])
         # Está queimando o primeiro estágio
         m = m0 + md * (t - ti[0])
         # Força propulsiva constante
-        ft = -g * Isp[0] * md
+        forca_propulsiva = -g * Isp[0] * md
     elif t <= ts[0]:
         # Entre a queima e a separação
         m = m0 - mp[0]
-        ft = 0
+        forca_propulsiva = 0
     elif t <= ti[1]:
         # Entre a separação e a ignição
         m = m0 - mp[0] - ms[0]
-        ft = 0
+        forca_propulsiva = 0
     elif t <= tq[1]:
         # Taxa de queima contínua no segundo estágio
         md = -mp[1] / (tq[1] - ti[1])
@@ -165,15 +165,15 @@ def propulsor_3_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
         m02 = m0 - mp[0] - ms[0]
         m = m02 + md * (t - ti[1])
         # Força propulsiva constante
-        ft = -g * Isp[1] * md
+        forca_propulsiva = -g * Isp[1] * md
     elif t <= ts[1]:
         # Após a queima do segundo estágio e antes da separação do mesmo
         m = m0 - mp[0] - ms[0] - mp[1]
-        ft = 0
+        forca_propulsiva = 0
     elif t <= ti[2]:
         # Entre a separação e a ignição
         m = m0 - mp[0] - ms[0] - mp[1] - ms[1]
-        ft = 0
+        forca_propulsiva = 0
     elif t <= tq[2]:
         # Taxa de queima contínua no terceiro estágio
         md = -mp[2] / (tq[2] - ti[2])
@@ -181,84 +181,84 @@ def propulsor_3_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
         m03 = m0 - mp[0] - ms[0] - mp[1] - ms[1]
         m = m03 + md * (t - ti[2])
         # Força propulsiva constante
-        ft = -g * Isp[2] * md
+        forca_propulsiva = -g * Isp[2] * md
     elif t <= ts[2]:
         # Após a queima do terceiro estágio e antes da separação do mesmo
         m = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2]
-        ft = 0
+        forca_propulsiva = 0
     else:
         # Após a separação do terceiro estágio
         m = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2] - ms[2]
-        ft = 0
+        forca_propulsiva = 0
 
-    return ft, m
+    return forca_propulsiva, m
 
 
 def propulsor_3_estagios_2ig(t, ti, tq, ts, Isp, mp, ms, m0,mL, g):
     if t <= ti[0]:
         # Antes da ignição
-        m = m0  # Massa inicial
-        ft = 0  # Força propulsiva nula
+        massa_em_funcao_do_tempo = m0  # Massa inicial
+        forca_propulsiva = 0  # Força propulsiva nula
     elif t <= tq[0]:
         # Taxa de queima contínua
         md = -mp[0] / (tq[0] - ti[0])
         # Está queimando o primeiro estágio
-        m = m0 + md * (t - ti[0])
+        massa_em_funcao_do_tempo = m0 + md * (t - ti[0])
         # Força propulsiva constante
-        ft = -g * Isp[0] * md
+        forca_propulsiva = -g * Isp[0] * md
     elif t <= ts[0]:
         # Entre a queima e a separação
-        m = m0 - mp[0]
-        ft = 0
+        massa_em_funcao_do_tempo = m0 - mp[0]
+        forca_propulsiva = 0
     elif t <= ti[1]:
         # Entre a separação e a ignição
-        m = m0 - mp[0] - ms[0]
-        ft = 0
+        massa_em_funcao_do_tempo = m0 - mp[0] - ms[0]
+        forca_propulsiva = 0
     elif t <= tq[1]:
         # Taxa de queima contínua no segundo estágio
         md = -mp[1] / (tq[1] - ti[1])
         # Durante a queima do segundo estágio
         m02 = m0 - mp[0] - ms[0]
-        m = m02 + md * (t - ti[1])
+        massa_em_funcao_do_tempo = m02 + md * (t - ti[1])
         # Força propulsiva constante
-        ft = -g * Isp[1] * md
+        forca_propulsiva = -g * Isp[1] * md
     elif t <= ts[1]:
         # Após a queima do segundo estágio e antes da separação do mesmo
-        m = m0 - mp[0] - ms[0] - mp[1]
-        ft = 0
+        massa_em_funcao_do_tempo = m0 - mp[0] - ms[0] - mp[1]
+        forca_propulsiva = 0
     elif t <= ti[2]:
         # Entre a separação e a ignição
-        m = m0 - mp[0] - ms[0] - mp[1] - ms[1]
-        ft = 0
+        massa_em_funcao_do_tempo = m0 - mp[0] - ms[0] - mp[1] - ms[1]
+        forca_propulsiva = 0
     elif t <= tq[2]:
         # Taxa de queima contínua no terceiro estágio - primeira ignicao
         md = -mp[2] / (tq[2] - ti[2])
         # Durante a queima do terceiro estágio
         m03 = m0 - mp[0] - ms[0] - mp[1] - ms[1]
-        m = m03 + md * (t - ti[2])
+        massa_em_funcao_do_tempo = m03 + md * (t - ti[2])
         # Força propulsiva constante
-        ft = -g * Isp[2] * md
+        forca_propulsiva = -g * Isp[2] * md
     elif t <= ti[3]:
         # Antes da nova queima do terceiro estagio
-        m = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2]
-        ft = 0
+        massa_em_funcao_do_tempo = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2]
+        forca_propulsiva = 0
     elif t <= tq[3]:
         # Taxa de queima contínua no terceiro estágio - segunda ignicao
         md = -mp[3] / (tq[3] - ti[3])
         # Durante a queima do terceiro estágio
         m03 = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2]
-        m = m03 + md * (t - ti[3])
+        massa_em_funcao_do_tempo = m03 + md * (t - ti[3])
         # Força propulsiva constante
-        ft = -g * Isp[2] * md
+        forca_propulsiva = -g * Isp[2] * md
     elif t <= ts[2]:
         # Após a queima do terceiro estágio e antes da separação do mesmo
-        m = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2] - mp[3]
-        ft = 0
+        massa_em_funcao_do_tempo = m0 - mp[0] - ms[0] - mp[1] - ms[1] - mp[2] - mp[3]
+        forca_propulsiva = 0
     else:
         # Após a separação do terceiro estágio
-        m = mL
-        ft = 0
+        massa_em_funcao_do_tempo = mL
+        forca_propulsiva = 0
 
-    return ft, m
+    return forca_propulsiva, massa_em_funcao_do_tempo
 
 

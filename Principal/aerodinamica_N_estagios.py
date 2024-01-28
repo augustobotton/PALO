@@ -4,7 +4,7 @@ import parametros
 def aerodinamica_N_estagios(t, V, h, M, Kn, T, rho, R):
     ts = parametros.ts
     Sr = parametros.Sr
-    fc = parametros.fc
+    fator_de_correcao_arrasto = parametros.fator_correcao_arrasto
     # Modelo de arrasto conforme a referencia
     # TEWARI, A. Atmospheric and Space Flight Dynamics:
     # Modelling and simulation with MATLAB and Simulink. Boston: Birkhauser, 2007.
@@ -15,9 +15,9 @@ def aerodinamica_N_estagios(t, V, h, M, Kn, T, rho, R):
     # referencia de cada estagio
 
     # Coeficiente de arrasto em funcao do numero de Mach e de Knuden
-    CD = modelo_aerodinamico(V, h, M, Kn, T, R)
+    coeficiente_de_arrasto_machKnudesen = modelo_aerodinamico(V, h, M, Kn, T, R)
     # Fator de correcao do arrasto a partir de dados de tunel de vento
-    CD = fc * CD
+    coeficiente_de_arrasto_machKnudesen = fator_de_correcao_arrasto * coeficiente_de_arrasto_machKnudesen
 
     # A area de referencia depende do estagio atual
     # Numero de estagios
@@ -30,7 +30,7 @@ def aerodinamica_N_estagios(t, V, h, M, Kn, T, rho, R):
         S = area3estagios(t, ts, Sr)
 
     # Forcas
-    D = 0.5 * rho * V ** 2 * S * CD
+    D = 0.5 * rho * V ** 2 * S * coeficiente_de_arrasto_machKnudesen
     fy = 0
     L = 0
 

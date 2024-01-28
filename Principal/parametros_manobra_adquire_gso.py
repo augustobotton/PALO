@@ -28,7 +28,7 @@ def parametros_manobra_adquire_gso(t, m, X):
     Tq32 = parametros.Tq32
     Ts3 = parametros.Ts3
     vgso = parametros.vgso
-    Isp = parametros.Isp
+    Isp = parametros.impulso_especifico_por_estagio
     g = parametros.g
     mp3 = parametros.mp3
     mp32 = parametros.mp32

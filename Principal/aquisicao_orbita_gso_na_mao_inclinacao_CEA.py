@@ -10,7 +10,7 @@ from Vrel2Vine import Vrel2Vine
 from long_ECEF2ECI import long_ECEF2ECI
 from RvelPolar2RvelRet import RvelPolar2RvelRet
 from det_orbita import det_orbita
-from dinamica_foguete import dinamica_foguete
+from dinamica_foguete import modelo_dinamica_foguete
 
 
 # Inicializa os parâmetros
@@ -24,15 +24,15 @@ g = parametros.g
 lc = parametros.lc
 dT = parametros.dT
 Sr = parametros.Sr
-fc = parametros.fc
-mL = parametros.mL
-ms = parametros.ms
+fc = parametros.fator_correcao_arrasto
+massa_de_carga_util = parametros.massa_de_carga_util
+massa_estrutural_por_estagio = parametros.massa_estrutural_por_estagio
 m0 = parametros.m0
 mp = parametros.mp
 ti = parametros.ti
 tq = parametros.tq
 ts = parametros.ts
-Isp = parametros.Isp
+impulso_especico_por_estagio = parametros.impulso_especifico_por_estagio
 h0 = parametros.h0
 l_trilho = parametros.l_trilho
 tg = parametros.tg
@@ -45,8 +45,8 @@ vgso = parametros.vgso
 mp3 = parametros.mp3
 
 # Parâmetros propulsivos
-Isp = np.array([251, 271, 315])  # s - Impulso específico dos estágios
-parametros.Isp = Isp
+impulso_especico_por_estagio = np.array([251, 271, 315])  # s - Impulso específico dos estágios
+parametros.impulso_especifico_por_estagio = impulso_especico_por_estagio
 mp[0] = 55290
 parametros.mp[0] = mp[0]
 mp[1] = 11058 # kg - Massa de propelente dos estágios
@@ -62,14 +62,14 @@ Tq3 = 277.5325  # s - TEMPO DE QUEIMA DO 3° ESTÁGIO SE ELE IGNITASSE SÓ UMA V
 parametros.Tq3 = Tq3
 
 # Parâmetros de massa estrutural e de carga útil
-ms = np.array([7385, 1367, 59.69])  # kg - Massa estrutural dos estágios
-parametros.ms = ms
-mL = 13  # kg - Massa da carga útil
-parametros.mL = mL
+massa_estrutural_por_estagio = np.array([7385, 1367, 59.69])  # kg - Massa estrutural dos estágios
+parametros.massa_estrutural_por_estagio = massa_estrutural_por_estagio
+massa_de_carga_util = 13  # kg - Massa da carga útil
+parametros.massa_de_carga_util = massa_de_carga_util
 
 # Parâmetros aerodinâmicos e ambientais
 fc = 1.28  # Fator de correção do arrasto
-parametros.fc = fc
+parametros.fator_correcao_arrasto = fc
 S1 = 4.6 * 5 / 3  # m^2 - Area aproximada da secao transversal do primeiro estagio
 S2 = 1.5  # m^2 - Area aproximada da secao transversal do segundo estagio
 S3 = 1.5  # m^2 - Area aproximada da secao transversal do terceiro estagio
@@ -185,27 +185,27 @@ sinalPhii = parametros.sinalPhii
 achouApogeu = parametros.achouApogeu
 
 
-m0 = np.sum(mp) + np.sum(ms) + mL
+m0 = np.sum(mp) + np.sum(massa_estrutural_por_estagio) + massa_de_carga_util
 parametros.m0 = m0
 r0 = Re + h0
 
 # Estudo simplificado pela equação de foguete
 mpx = np.array([mp[0],mp[1], mp3])
-ms_mpx_sum = ms + mpx
-sigma = ms / ms_mpx_sum
+ms_mpx_sum = massa_estrutural_por_estagio + mpx
+sigma = massa_estrutural_por_estagio / ms_mpx_sum
 
 m01 = m0
-m02 = ms[1] + mpx[1] + ms[2] + mpx[2] + mL
-m03 = ms[2] + mpx[2] + mL
+m02 = massa_estrutural_por_estagio[1] + mpx[1] + massa_estrutural_por_estagio[2] + mpx[2] + massa_de_carga_util
+m03 = massa_estrutural_por_estagio[2] + mpx[2] + massa_de_carga_util
 
 lamb0 = m02 / m01
 lamb1 = m03 / m02
-lamb2 = mL / m03
+lamb2 = massa_de_carga_util / m03
 lamb = np.array([lamb0, lamb1, lamb2])
 
 lambL = np.prod(lamb)
 
-ve = g * Isp
+ve = g * impulso_especico_por_estagio
 
 Dv = -np.sum(ve * np.log(sigma + (1 - sigma) * lamb))
 
@@ -217,7 +217,7 @@ print('Area de referencia da carga util (m^2):', Sr[3])
 print('Massa inicial antes da queima do primeiro estagio - kg:', m01)
 print('Massa inicial antes da queima do segundo estagio - kg:', m02)
 print('Massa inicial antes da queima do terceiro estagio - kg:', m03)
-print('Massa da carga util - kg:', mL)
+print('Massa da carga util - kg:', massa_de_carga_util)
 print('Razoes estruturais:', sigma)
 print('Razoes de carga util:', lamb)
 print('Velocidades de exaustao - m/s:', ve)
@@ -260,7 +260,7 @@ options = {
 
 # Solve the differential equations
 #sol = solve_ivp(dinamica_foguete, [0, TF], X0, method='LSODA', **options)
-sol = solve_ivp(dinamica_foguete, [0,TF], X0, **options)
+sol = solve_ivp(modelo_dinamica_foguete, [0, TF], X0, **options)
 t = sol.t  # Redimensiona t para ser uma matriz de coluna
 X = sol.y.T
 
@@ -419,7 +419,7 @@ print(ti[3])
 DVgso = vgso - vagto  # Impulso de velocidade requerido para circularizacao da orbita (km/s)
 print('Impulso de velocidade requerido para circularizacao da orbita (km/s):')
 print(DVgso / 1e3)
-mp32 = (m[ifq-1] * np.exp(DVgso / (Isp[2] * g)) - m[ifq-1]) / np.exp(DVgso / (Isp[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
+mp32 = (m[ifq-1] * np.exp(DVgso / (impulso_especico_por_estagio[2] * g)) - m[ifq - 1]) / np.exp(DVgso / (impulso_especico_por_estagio[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
 print('Massa de propelente requerida para circularizacao da orbita (kg):')
 print(mp32)
 print('Massa de propelente disponivel para o 3º disparo (kg):')
