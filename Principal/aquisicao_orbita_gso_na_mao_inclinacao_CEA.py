@@ -5,10 +5,10 @@ from scipy.integrate import solve_ivp
 import parametros
 from RvelPolar2RvelRet import RvelPolar2RvelRet
 from Vrel2Vine import Vrel2Vine
-from aerodinamica_N_estagios import aerodinamica_N_estagios
+from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from atm_padrao import atm_padrao
-from det_orbita import det_orbita
 from dinamica_foguete import dinamica_foguete
+from domain.OrbitalUtils.det_orbita import det_orbita
 from long_ECEF2ECI import long_ECEF2ECI
 from propulsao_N_estagios import propulsao_N_estagios
 
@@ -22,18 +22,18 @@ J4 = parametros.J4
 g = parametros.g
 lc = parametros.lc
 dT = parametros.dT
-Sr = parametros.Sr
-fc = parametros.fator_correcao_arrasto
+Sr = parametros.area_de_referencia
+fator_correcao = parametros.fator_correcao_arrasto
 massa_de_carga_util = parametros.massa_de_carga_util
 massa_estrutural_por_estagio = parametros.massa_estrutural_por_estagio
 m0 = parametros.m0
 mp = parametros.mp
 ti = parametros.ti
 tq = parametros.tq
-ts = parametros.ts
+ts = parametros.tempo_limite_separacao
 impulso_especico_por_estagio = parametros.impulso_especifico_por_estagio
 h0 = parametros.h0
-l_trilho = parametros.l_trilho
+l_trilho = parametros.comprimento_do_trilho
 tg = parametros.tg
 agso = parametros.agso
 Tq3 = parametros.Tq3
@@ -67,8 +67,8 @@ massa_de_carga_util = 13  # kg - Massa da carga útil
 parametros.massa_de_carga_util = massa_de_carga_util
 
 # Parâmetros aerodinâmicos e ambientais
-fc = 1.28  # Fator de correção do arrasto
-parametros.fator_correcao_arrasto = fc
+fator_correcao = 1.28  # Fator de correção do arrasto
+parametros.fator_correcao_arrasto = fator_correcao
 S1 = 4.6 * 5 / 3  # m^2 - Area aproximada da secao transversal do primeiro estagio
 S2 = 1.5  # m^2 - Area aproximada da secao transversal do segundo estagio
 S3 = 1.5  # m^2 - Area aproximada da secao transversal do terceiro estagio
@@ -85,7 +85,7 @@ f4 = (l4 / lt) * 0.5 + 0.5  # Fator de correcao da carga util
 
 Sr = np.array([S1, S2 * f2, S3 * f3, SL * f4])
 Sr = Sr.reshape(-1, 1)
-parametros.Sr = Sr
+parametros.area_de_referencia = Sr
 
 lc = 1.5  # Comprimento característico - diâmetro dos estágios 2 e superiores
 parametros.lc = lc
@@ -113,7 +113,7 @@ parametros.h0 = h0
 delta0 = -2.3267844 * np.pi / 180  # rad - Latitude inicial
 lon0 = -44.4111042 * np.pi / 180  # rad - Longitude inicial
 l_trilho = lt  # m - igual ao comprimento total do foguete
-parametros.l_trilho = l_trilho
+parametros.comprimento_do_trilho = l_trilho
 
 ingso = 2.3267844 * np.pi / 180  # Inclinacao
 agso = 42.164140e6  # m
@@ -149,13 +149,13 @@ parametros.ti[0] = ti[0]
 tq[0] = ti[0] + Tq1
 parametros.tq[0] = tq[0]
 ts[0] = tq[0] + Ts1
-parametros.ts[0] = ts[0]
+parametros.tempo_limite_separacao[0] = ts[0]
 ti[1] = ts[0] + TEq2
 parametros.ti[1] = ti[1]
 tq[1] = ti[1] + Tq2
 parametros.tq[1] = tq[1]
 ts[1] = tq[1] + Ts2
-parametros.ts[1] = ts[1]
+parametros.tempo_limite_separacao[1] = ts[1]
 ti[2] = ts[1] + TEq3
 parametros.ti[2] = ti[2]
 tq[2] = ti[2] + Tq31
@@ -165,11 +165,11 @@ parametros.ti[3] = ti[3]
 tq[3] = ti[3] + Tq32
 parametros.tq[3] = tq[3]
 ts[2] = tq[3] + Ts3
-parametros.ts[2] = ts[2]
+parametros.tempo_limite_separacao[2] = ts[2]
 
 parametros.ti = ti
 parametros.tq = tq
-parametros.ts = ts
+parametros.tempo_limite_separacao = ts
 
 mp[2] = mp31
 parametros.mp[2] = mp[2]
@@ -318,7 +318,7 @@ for i in range(N):
     T[i], _, _, rho[i], _, M[i], _, _, Kn, _, _, R = atm_padrao(h[i], V[i], lc, dT)
 
     # Forças aerodinâmicas
-    D[i], _, _ = aerodinamica_N_estagios(t[i], V[i], h[i], M[i], Kn, T[i], rho[i], R)
+    D[i], _, _ = aerodinamica_multiplos_estagios(t[i], V[i], h[i], M[i], Kn, T[i], rho[i], R)
 
     q[i] = 0.5 * rho[i] * V[i] ** 2  # Pressão dinâmica
 

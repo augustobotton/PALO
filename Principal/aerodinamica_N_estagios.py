@@ -1,75 +1,41 @@
-from modelo_aerodinamico import modelo_aerodinamico
+import modelo_aerodinamico as ma
 import parametros
 
-def aerodinamica_N_estagios(t, V, h, M, Kn, T, rho, R):
-    ts = parametros.ts
-    Sr = parametros.Sr
-    fator_de_correcao_arrasto = parametros.fator_correcao_arrasto
-    # Modelo de arrasto conforme a referencia
-    # TEWARI, A. Atmospheric and Space Flight Dynamics:
-    # Modelling and simulation with MATLAB and Simulink. Boston: Birkhauser, 2007.
-    # Exemplo 12.6
-    # Vale para foguete de 1, 2 ou 3 estagios, com carga util
-    # Assume-se o mesmo coeficiente de arrasto para o foguete todo e seus
-    # estagios. A magnitude do arrasto eh alterada em funcao da area de
-    # referencia de cada estagio
 
-    # Coeficiente de arrasto em funcao do numero de Mach e de Knuden
-    coeficiente_de_arrasto_machKnudesen = modelo_aerodinamico(V, h, M, Kn, T, R)
-    # Fator de correcao do arrasto a partir de dados de tunel de vento
-    coeficiente_de_arrasto_machKnudesen = fator_de_correcao_arrasto * coeficiente_de_arrasto_machKnudesen
+def aerodinamica_multiplos_estagios(tempo, velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
+                                    densidade_do_ar,
+                                    constante_do_gas_ideal):
+    """
+    Calcula as forças aerodinâmicas para foguetes de múltiplos estágios.
 
-    # A area de referencia depende do estagio atual
-    # Numero de estagios
-    N = len(ts)
-    if N == 1:
-        S = area1estagio(t, ts, Sr)
-    elif N == 2:
-        S = area2estagios(t, ts, Sr)
-    elif N == 3:
-        S = area3estagios(t, ts, Sr)
+    """
 
-    # Forcas
-    D = 0.5 * rho * V ** 2 * S * coeficiente_de_arrasto_machKnudesen
-    fy = 0
-    L = 0
+    tempo_limite_separacao = parametros.tempo_limite_separacao
+    area_de_referencia = parametros.area_de_referencia
+    fator_correcao_arrasto = parametros.fator_correcao_arrasto
 
-    return D, fy, L
+    # Calcular o coeficiente de arrasto
+    coeficiente_arrasto = ma.ModeloAerodinamico(velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
+                                                constante_do_gas_ideal).calcula()
+    coeficiente_arrasto_ajustado = fator_correcao_arrasto * coeficiente_arrasto
+
+    # Determinar a área de referência com base no estágio
+    area_do_estagio = calcula_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
+
+    # Calcular as forças
+    arrasto = 0.5 * densidade_do_ar * velocidade ** 2 * area_do_estagio * coeficiente_arrasto_ajustado
+    forca_sustentacao_lateral = 0
+    forca_sustentacao = 0
+
+    return arrasto, forca_sustentacao_lateral, forca_sustentacao
 
 
-def area1estagio(t, ts, Sr):
-    if t <= ts[0]:
-        # Foguete e carga util
-        S = Sr[0]
-    else:
-        S = Sr[1]  # Carga util
-    return S
-
-
-def area2estagios(t, ts, Sr):
-    if t <= ts[0]:
-        # Todos os estágios
-        S = Sr[0]
-    elif t <= ts[1]:
-        # Segundo estágio e carga útil
-        S = Sr[1]
-    else:
-        # Carga útil
-        S = Sr[2]
-    return S
-
-
-def area3estagios(t, ts, Sr):
-    if t <= ts[0]:
-        # Todos os estágios
-        S = Sr[0]
-    elif t <= ts[1]:
-        # Segundo estágio
-        S = Sr[1]
-    elif t <= ts[2]:
-        # Terceiro estágio e carga útil
-        S = Sr[2]
-    else:
-        # Carga útil
-        S = Sr[3]
-    return S
+def calcula_area_referencia(tempo, tempo_limite_separacao, area_de_referencia):
+    """
+    Calcula a área de referência com base no estágio do foguete.
+    """
+    N = len(tempo_limite_separacao)
+    for i in range(N):
+        if tempo <= tempo_limite_separacao[i]:
+            return area_de_referencia[i]
+    return area_de_referencia[-1]  # Padrão para a área do último estágio

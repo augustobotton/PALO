@@ -3,6 +3,7 @@ import numpy as np
 import parametros
 from Vrel2Vine import Vrel2Vine
 
+
 def parametros_manobra_adquire_gso(t, m, X):
     """
     Função para calcular os parâmetros da manobra mono impulsiva de aquisição de órbita GSO.
@@ -22,17 +23,14 @@ def parametros_manobra_adquire_gso(t, m, X):
     achouApogeu = parametros.achouApogeu
     ti = parametros.ti
     tq = parametros.tq
-    ts = parametros.ts
+    ts = parametros.tempo_limite_separacao
     Tq3 = parametros.Tq3
     Tq31 = parametros.Tq31
-    Tq32 = parametros.Tq32
     Ts3 = parametros.Ts3
     vgso = parametros.vgso
     Isp = parametros.impulso_especifico_por_estagio
     g = parametros.g
     mp3 = parametros.mp3
-    mp32 = parametros.mp32
-    DVgso = parametros.DVgso
 
     # Desmenbra o vetor de estado
     V = X[0]
@@ -59,9 +57,10 @@ def parametros_manobra_adquire_gso(t, m, X):
 
                 DVgso = vgso - Vi  # Quando se nos passa nos testes acima, "Vi" é a velocidade de apogeu da GTO
                 parametros.DVgso = DVgso
-                mp32 = (m * np.exp(DVgso / (Isp[2] * g)) - m) / np.exp(DVgso / (Isp[2] * g))  # Massa de propelente necessária
+                mp32 = (m * np.exp(DVgso / (Isp[2] * g)) - m) / np.exp(
+                    DVgso / (Isp[2] * g))  # Massa de propelente necessária
                 parametros.mp32 = mp32
-                Tq32 = Tq3 * mp32 / mp3  # Duração da queima necessária
+                Tq32 = (Tq3 * mp32) / mp3  # Duração da queima necessária
                 parametros.Tq32 = Tq32
                 # Verifica se o tempo é maior que o máximo, se ocorrer, corrige
                 if Tq31 + Tq32 > Tq3:
@@ -71,8 +70,8 @@ def parametros_manobra_adquire_gso(t, m, X):
                 parametros.tq[3] = tq[3]
                 parametros.tq = tq
                 ts[2] = tq[3] + Ts3  # Tempo de separação
-                parametros.ts[2] = ts[2]
-                parametros.ts = ts
+                parametros.tempo_limite_separacao[2] = ts[2]
+                parametros.tempo_limite_separacao = ts
 
     sinalPhii = np.sign(phii)  # Guarda o sinal de phi inercial para verificar mudança na próxima iteração
     parametros.sinalPhii = sinalPhii

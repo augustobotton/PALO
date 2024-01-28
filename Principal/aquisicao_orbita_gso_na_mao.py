@@ -6,14 +6,14 @@ from scipy.integrate import solve_ivp
 import parametros
 from RvelPolar2RvelRet import RvelPolar2RvelRet
 from Vrel2Vine import Vrel2Vine
-from aerodinamica_N_estagios import aerodinamica_N_estagios
+from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from atm_padrao import atm_padrao
-from det_orbita import det_orbita
 from dinamica_foguete import dinamica_foguete
+from domain.OrbitalUtils.det_orbita import det_orbita
 from long_ECEF2ECI import long_ECEF2ECI
 from propulsao_N_estagios import propulsao_N_estagios
 
-global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fc, mL
+global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fator_correcao, massa_carga_util
 global ms, m0, mp, ti, tq, ts, Isp, h0, l_trilho, tg, agso, Tq3, Tq31, Tq32, Ts3, vgso, mp3
 
 
@@ -34,15 +34,15 @@ Tq3 = 301  # s - TEMPO DE QUEIMA DO 3° ESTÁGIO SE ELE IGNITASSE SÓ UMA VEZ
 # Parâmetros de massa estrutural e de carga útil
 ms = np.array([7750, 1367, 64.7544])  # kg - Massa estrutural dos estágios
 parametros.massa_estrutural_por_estagio = ms
-mL = 13  # kg - Massa da carga útil
-parametros.massa_de_carga_util = mL
+massa_carga_util = 13  # kg - Massa da carga útil
+parametros.massa_de_carga_util = massa_carga_util
 
 # Parâmetros aerodinâmicos e ambientais
-fc = 1.28  # Fator de correção do arrasto
-parametros.fator_correcao_arrasto = fc
-S1 = 4.6 * 5 / 3  # m^2 - Area aproximada da secao transversal do primeiro estagio
-S2 = 1.5  # m^2 - Area aproximada da secao transversal do segundo estagio
-S3 = 1.5  # m^2 - Area aproximada da secao transversal do terceiro estagio
+fator_correcao = 1.28  # Fator de correção do arrasto
+parametros.fator_correcao_arrasto = fator_correcao
+area_secao_transversal_primeiro_estagio = 4.6 * 5 / 3
+area_secao_transversal_segundo_estagio = 1.5  # m^2 - Area aproximada da secao transversal do segundo estagio
+area_secao_transversal_terceiro_estagio = 1.5  # m^2 - Area aproximada da secao transversal do terceiro estagio
 SL = 1.5  # m^2 - Area aproximada da secao transversal da carga útil
 
 lt = 7.33 + 7.1 + 6.28  # m - Comprimento total
@@ -54,8 +54,9 @@ f2 = (l2 / lt) * 0.5 + 0.5  # Fator de correcao do segundo estagio
 f3 = (l3 / lt) * 0.5 + 0.5  # Fator de correcao do terceiro estagio
 f4 = (l4 / lt) * 0.5 + 0.5  # Fator de correcao da carga util
 
-Sr = [S1, S2 * f2, S3 * f3, SL * f4]
-parametros.Sr = Sr
+Sr = [area_secao_transversal_primeiro_estagio, area_secao_transversal_segundo_estagio * f2,
+      area_secao_transversal_terceiro_estagio * f3, SL * f4]
+parametros.area_de_referencia = Sr
 
 lc = 1.5  # Comprimento característico - diâmetro dos estágios 2 e superiores
 parametros.lc = lc
@@ -83,7 +84,7 @@ parametros.h0 = h0
 delta0 = -2.3267844 * np.pi / 180  # rad - Latitude inicial
 lon0 = -44.4111042 * np.pi / 180  # rad - Longitude inicial
 l_trilho = lt  # m - igual ao comprimento total do foguete
-parametros.l_trilho = l_trilho
+parametros.comprimento_do_trilho = l_trilho
 
 ingso = 5 * np.pi / 180  # Inclinacao
 agso = 42.164140e6  # m
@@ -124,14 +125,14 @@ mp[3] = mp32
 
 parametros.ti = ti
 parametros.tq = tq
-parametros.ts = ts
+parametros.tempo_limite_separacao = ts
 
 sinalPhii = 0
 parametros.sinalPhii = sinalPhii
 achouApogeu = 0
 parametros.achouApogeu = achouApogeu
 
-m0 = np.sum(mp) + np.sum(ms) + mL
+m0 = np.sum(mp) + np.sum(ms) + massa_carga_util
 parametros.m0 = m0
 r0 = Re + h0
 
@@ -141,12 +142,12 @@ ms_mpx_sum = ms + mpx
 sigma = ms / ms_mpx_sum
 
 m01 = m0
-m02 = ms[1] + mpx[1] + ms[2] + mpx[2] + mL
-m03 = ms[2] + mpx[2] + mL
+m02 = ms[1] + mpx[1] + ms[2] + mpx[2] + massa_carga_util
+m03 = ms[2] + mpx[2] + massa_carga_util
 
 lamb0 = m02 / m01
 lamb1 = m03 / m02
-lamb2 = mL / m03
+lamb2 = massa_carga_util / m03
 lamb = np.array([lamb0, lamb1, lamb2])
 
 lambL = np.prod(lamb)
@@ -163,7 +164,7 @@ print('Area de referencia da carga util (m^2):', Sr[3])
 print('Massa inicial antes da queima do primeiro estagio - kg:', m01)
 print('Massa inicial antes da queima do segundo estagio - kg:', m02)
 print('Massa inicial antes da queima do terceiro estagio - kg:', m03)
-print('Massa da carga util - kg:', mL)
+print('Massa da carga util - kg:', massa_carga_util)
 print('Razoes estruturais:', sigma)
 print('Razoes de carga util:', lamb)
 print('Velocidades de exaustao - m/s:', ve)
@@ -174,9 +175,9 @@ print('Impulso de velocidade total ideal - m/s:', Dv)
 simula = 1
 
 while simula == 1:
-    TF = float(input('Informe o tempo da simulação (s): '))
-    v0 = float(input('Informe o valor inicial da velocidade relativa (m/s): '))
-    phi0 = float(input('Informe a condição inicial do ângulo de elevação (graus): '))
+    TF = 6000  # float(input('Informe o tempo da simulação (s): '))
+    v0 = 2  # float(input('Informe o valor inicial da velocidade relativa (m/s): '))
+    phi0 = 87  # float(input('Informe a condição inicial do ângulo de elevação (graus): '))
     phi0 = phi0 * np.pi / 180
 
     y = np.cos(ingso) / np.cos(delta0)
@@ -268,7 +269,7 @@ for i in range(0, N):
     T[i], _, _, rho[i], _, M[i], _, _, Kn, _, _, R = atm_padrao(h[i], V[i], lc, dT)
 
     # Forças aerodinâmicas
-    D[i], _, _ = aerodinamica_N_estagios(t[i], V[i], h[i], M[i], Kn, T[i], rho[i], R)
+    D[i], _, _ = aerodinamica_multiplos_estagios(t[i], V[i], h[i], M[i], Kn, T[i], rho[i], R)
 
     q[i] = 0.5 * rho[i] * V[i] ** 2  # Pressão dinâmica
 

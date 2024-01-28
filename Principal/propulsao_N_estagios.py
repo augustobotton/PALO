@@ -1,11 +1,13 @@
+import numpy as np
+
 import parametros
 from Vrel2Vine import Vrel2Vine
-import numpy as np
+
 
 def propulsao_N_estagios(tempo, vetor_de_estados):
     ti = parametros.ti
     tq = parametros.tq
-    ts = parametros.ts
+    ts = parametros.tempo_limite_separacao
     Isp = parametros.impulso_especifico_por_estagio
     mp = parametros.mp
     ms = parametros.massa_estrutural_por_estagio
@@ -60,11 +62,10 @@ def propulsao_N_estagios(tempo, vetor_de_estados):
         mu = np.arcsin(np.cos(A) * np.cos(phii) * np.sin(Ai) - np.sin(A) * np.cos(phii) * np.cos(Ai))
         epsl = -np.arctan2(-np.cos(phi) * np.sin(phii) + np.sin(phi) * np.sin(A) * np.cos(phii) * np.sin(Ai) +
                            np.sin(phi) * np.cos(A) * np.cos(phii) * np.cos(Ai), np.sin(phi) * np.sin(phii) +
-                           np.cos(phi) * np.sin(A) * np.cos(phii) * np.sin(Ai) + np.cos(phi) * np.cos(A) * np.cos(phii) * np.cos(Ai))
+                           np.cos(phi) * np.sin(A) * np.cos(phii) * np.sin(Ai) + np.cos(phi) * np.cos(A) * np.cos(
+            phii) * np.cos(Ai))
 
     return ft, m, mu, epsl
-
-
 
 
 def propulsor_1_estagio(t, ti, tq, ts, Isp, mp, ms, m0, g):
@@ -92,6 +93,7 @@ def propulsor_1_estagio(t, ti, tq, ts, Isp, mp, ms, m0, g):
         ft = 0
 
     return ft, m
+
 
 def propulsor_2_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
     # Modelo dos propulsores de foguete de 2 estágios
@@ -134,6 +136,7 @@ def propulsor_2_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
         ft = 0
 
     return ft, m
+
 
 def propulsor_3_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
     # Modelo dos propulsores de foguete de 3 estágios
@@ -194,7 +197,7 @@ def propulsor_3_estagios(t, ti, tq, ts, Isp, mp, ms, m0, g):
     return forca_propulsiva, m
 
 
-def propulsor_3_estagios_2ig(t, ti, tq, ts, Isp, mp, ms, m0,mL, g):
+def propulsor_3_estagios_2ig(t, ti, tq, ts, Isp, mp, ms, m0, mL, g):
     if t <= ti[0]:
         # Antes da ignição
         massa_em_funcao_do_tempo = m0  # Massa inicial
@@ -260,5 +263,3 @@ def propulsor_3_estagios_2ig(t, ti, tq, ts, Isp, mp, ms, m0,mL, g):
         forca_propulsiva = 0
 
     return forca_propulsiva, massa_em_funcao_do_tempo
-
-

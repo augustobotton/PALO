@@ -16,7 +16,7 @@ class ModeloAerodinamico:
         coeficiente_de_arrasto_em_escoamento_livre_molecular = self._computa_coef_de_arrasto_em_escoamento_livre_molecular(
             parametro_de_velocidade_nao_dimensional)
         coeficiente_de_arrasto_interpolado = self._interpola_coeficiente_de_arrasto(self.numero_de_mach)
-        return coeficiente_de_arrasto_em_escoamento_livre_molecular, coeficiente_de_arrasto_interpolado
+        return coeficiente_de_arrasto_interpolado
 
     def _computa_parametro_de_velocidade_nao_dimensional(self):
         return self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)

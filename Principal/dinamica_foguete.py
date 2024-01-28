@@ -1,7 +1,7 @@
 import numpy as np
 
 import parametros
-from aerodinamica_N_estagios import aerodinamica_N_estagios
+from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from atm_padrao import atm_padrao
 from grav_axisimetrico import grav_axisimetrico
 from parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
@@ -32,7 +32,7 @@ def dinamica_foguete(t, X):
     lc = parametros.lc
     dT = parametros.dT
     h0 = parametros.h0
-    l_trilho = parametros.l_trilho
+    l_trilho = parametros.comprimento_do_trilho
     achouApogeu = parametros.achouApogeu
 
     ## Vetor de estado
@@ -57,7 +57,7 @@ def dinamica_foguete(t, X):
 
     ## Função para cálculo do modelo aerodinâmico
     # Depende da altitude e velocidade
-    D, fy, L = aerodinamica_N_estagios(t, velocidade, h, M, Kn, T, rho, R)
+    D, fy, L = aerodinamica_multiplos_estagios(t, velocidade, h, M, Kn, T, rho, R)
 
     ## Calculo da gravidade
     # Função para cálculo do modelo gravitacional
@@ -69,35 +69,35 @@ def dinamica_foguete(t, X):
     deltap = (velocidade / distancia_radial_centro_da_terra) * np.cos(phi) * np.cos(azimute_vetor_velocidade_relativa)
 
     lonp = (velocidade * np.cos(phi) * np.sin(azimute_vetor_velocidade_relativa)) / (
-                distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial))
+            distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial))
 
     ## Equações de dinâmica de translação
     Vp = (1 / m) * (ft * np.cos(epsl) * np.cos(mu) - D - m * gc * np.sin(phi) + m * gd * np.cos(phi) * np.cos(
         azimute_vetor_velocidade_relativa) - \
                     m * we ** 2 * distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial) * (
-                                np.cos(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(
-                            latitude_em_relacao_ao_plano_equatorial) - np.sin(phi) * np.cos(
-                            latitude_em_relacao_ao_plano_equatorial)))
+                            np.cos(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(
+                        latitude_em_relacao_ao_plano_equatorial) - np.sin(phi) * np.cos(
+                        latitude_em_relacao_ao_plano_equatorial)))
     # Vp = (1 / m) * (ft * np.cos(epsl) * np.cos(mu) - D - m * gc * np.sin(phi) + m * gd * np.cos(phi) * np.cos(A) - m * we**2 * r * np.cos(delta) * (np.cos(phi) * np.cos(A) * np.sin(delta) - np.sin(phi) * np.cos(delta)))
     Ap = (1 / (m * velocidade * (np.cos(phi)))) * (
-                m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) ** 2 * np.sin(
-            azimute_vetor_velocidade_relativa) * np.tan(latitude_em_relacao_ao_plano_equatorial) + ft * np.sin(
-            mu) + fy - m * gd * np.sin(azimute_vetor_velocidade_relativa) + \
-                m * we ** 2 * distancia_radial_centro_da_terra * np.sin(azimute_vetor_velocidade_relativa) * np.sin(
-            latitude_em_relacao_ao_plano_equatorial) * np.cos(
-            latitude_em_relacao_ao_plano_equatorial) - 2 * m * we * velocidade * (
-                            np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.cos(
-                        latitude_em_relacao_ao_plano_equatorial) - np.cos(phi) * np.sin(
-                        latitude_em_relacao_ao_plano_equatorial)));
+            m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) ** 2 * np.sin(
+        azimute_vetor_velocidade_relativa) * np.tan(latitude_em_relacao_ao_plano_equatorial) + ft * np.sin(
+        mu) + fy - m * gd * np.sin(azimute_vetor_velocidade_relativa) + \
+            m * we ** 2 * distancia_radial_centro_da_terra * np.sin(azimute_vetor_velocidade_relativa) * np.sin(
+        latitude_em_relacao_ao_plano_equatorial) * np.cos(
+        latitude_em_relacao_ao_plano_equatorial) - 2 * m * we * velocidade * (
+                    np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.cos(
+                latitude_em_relacao_ao_plano_equatorial) - np.cos(phi) * np.sin(
+                latitude_em_relacao_ao_plano_equatorial)));
     # Ap = (1 / (m * V * np.cos(phi))) * (m * (V**2 / r) * np.cos(phi)**2 * np.sin(A) * np.tan(delta) + ft * np.sin(mu) + fy - m * gd * np.sin(A) + m * we**2 * r * np.sin(A) * np.sin(delta) * np.cos(delta) - 2 * m * we * V * (np.sin(phi) * np.cos(A) * np.cos(delta) - np.cos(phi) * np.sin(delta)))
     phip = 1 * (1 / (m * velocidade)) * (
-                m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) + ft * np.sin(epsl) * np.cos(
-            mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) \
-                + m * we ** 2 * distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial) * (
-                            np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(
-                        latitude_em_relacao_ao_plano_equatorial) + np.cos(phi) * np.cos(
-                        latitude_em_relacao_ao_plano_equatorial)) + 2 * m * we * velocidade * np.sin(
-            azimute_vetor_velocidade_relativa) * np.cos(latitude_em_relacao_ao_plano_equatorial));
+            m * (velocidade ** 2 / distancia_radial_centro_da_terra) * np.cos(phi) + ft * np.sin(epsl) * np.cos(
+        mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) \
+            + m * we ** 2 * distancia_radial_centro_da_terra * np.cos(latitude_em_relacao_ao_plano_equatorial) * (
+                    np.sin(phi) * np.cos(azimute_vetor_velocidade_relativa) * np.sin(
+                latitude_em_relacao_ao_plano_equatorial) + np.cos(phi) * np.cos(
+                latitude_em_relacao_ao_plano_equatorial)) + 2 * m * we * velocidade * np.sin(
+        azimute_vetor_velocidade_relativa) * np.cos(latitude_em_relacao_ao_plano_equatorial));
     # phip = (1 / (m * V)) * (m * (V**2 / r) * np.cos(phi) + ft * np.sin(epsl) * np.cos(mu) + L - m * gc * np.cos(phi) - m * gd * np.sin(phi) * np.cos(A) + m * we**2 * r * np.cos(delta) * (np.sin(phi) * np.cos(A) * np.sin(delta) + np.cos(phi) * np.cos(delta)) + 2 * m * we * V * np.sin(A) * np.cos(delta))
 
     ## Saturação da altitude
