@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.interpolate import pchip_interpolate
 
+from src.domain.modelos.foguete.ModeloEstrutural import ModeloEstrutural
+
 
 class ModeloAerodinamico:
     def __init__(self, velocidade, altitude, numero_de_mach, numero_de_knudsen, temperatura, constante_do_gas_ideal):
@@ -119,25 +121,25 @@ class ModeloAerodinamico:
         return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1],
                                  numero_de_mach)
 
-    def aerodinamica_multiplos_estagios(tempo, velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
+    def aerodinamica_multiplos_estagios(self, tempo, velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
                                         densidade_do_ar,
                                         constante_do_gas_ideal):
         """
         Calcula as forças aerodinâmicas para foguetes de múltiplos estágios.
 
         """
+        parametros = ModeloEstrutural()
 
-        tempo_limite_separacao = parametros.tempo_limite_separacao
         area_de_referencia = parametros.area_de_referencia
         fator_correcao_arrasto = parametros.fator_correcao_arrasto
 
         # Calcular o coeficiente de arrasto
-        coeficiente_arrasto = ma.ModeloAerodinamico(velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
-                                                    constante_do_gas_ideal).calcula()
+        coeficiente_arrasto = ModeloAerodinamico(velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
+                                                 constante_do_gas_ideal).calcula()
         coeficiente_arrasto_ajustado = fator_correcao_arrasto * coeficiente_arrasto
 
         # Determinar a área de referência com base no estágio
-        area_do_estagio = calcula_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
+        area_do_estagio = self.calcula_area_referencia(self, tempo, tempo_limite_separacao, area_de_referencia)
 
         # Calcular as forças
         arrasto = 0.5 * densidade_do_ar * velocidade ** 2 * area_do_estagio * coeficiente_arrasto_ajustado
@@ -146,7 +148,7 @@ class ModeloAerodinamico:
 
         return arrasto, forca_sustentacao_lateral, forca_sustentacao
 
-    def calcula_area_referencia(tempo, tempo_limite_separacao, area_de_referencia):
+    def calcula_area_referencia(self, tempo, tempo_limite_separacao, area_de_referencia):
         """
         Calcula a área de referência com base no estágio do foguete.
         """

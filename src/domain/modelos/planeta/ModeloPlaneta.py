@@ -1,4 +1,4 @@
-class ParametrosPlanetarios:
+class ModeloPlaneta:
     def __init__(self, delta_temperatura_atm, raio_equatorial, velocidade_inercial_de_rotacao,
                  gravidade_padrao_nivel_do_mar, mut, J2, J3, J4, tempo_longitude_celeste_nula):
         self.delta_temperatura_atm = delta_temperatura_atm  # K - Delta T em relação à atmosfera padrão
@@ -62,7 +62,7 @@ class ConstrutorDePlanetas:
         return self
 
     def construir(self):
-        return ParametrosPlanetarios(
+        return ModeloPlaneta(
             self.delta_temperatura_atm,
             self.raio_equatorial,
             self.velocidade_inercial_de_rotacao,
@@ -75,8 +75,7 @@ class ConstrutorDePlanetas:
         )
 
 
-# Exemplo de uso do Builder para criar um objeto ParametrosPlanetarios
-parametros = ConstrutorDePlanetas() \
+terra = ConstrutorDePlanetas() \
     .com_delta_temperatura_atm(10) \
     .com_raio_equatorial(6378.1370e3) \
     .com_velocidade_inercial_de_rotacao(7.2921150e-5) \
