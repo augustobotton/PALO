@@ -12,7 +12,7 @@ class ModeloPlaneta:
         self.tempo_longitude_celeste_nula = tempo_longitude_celeste_nula
 
 
-class ConstrutorDePlanetas:
+class ConstrutorDePlanetas(ModeloPlaneta):
     def __init__(self):
         self.delta_temperatura_atm = None
         self.raio_equatorial = None

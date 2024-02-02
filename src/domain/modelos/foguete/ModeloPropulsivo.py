@@ -3,6 +3,7 @@ import numpy as np
 
 class ModeloPropulsivo:
     def __init__(self):
+        self.tempo_da_segunda_queima_3_estagio = None
         self.velocidade_de_exaustao = None
         self.impulso_especico_por_estagio = np.array([251, 271, 315])  # s
         self.massa_propelente_estagios_1_2 = np.array([55290, 11058, 0, 0])
@@ -60,7 +61,7 @@ class ModeloPropulsivo:
         """
         estagio -= 1  # Adjust for 0-indexed arrays
         if t <= ti[estagio]:
-            m = m0 if estagio == 0 else calculate_mass_after_separation(ti, tq, ts, mp, ms, m0, estagio)
+            m = m0 if estagio == 0 else calculate_mass_after_separation(self, ti, tq, ts, mp, ms, m0, estagio)
             ft = 0
         elif t <= tq[estagio]:
             md = -mp[estagio] / (tq[estagio] - ti[estagio])

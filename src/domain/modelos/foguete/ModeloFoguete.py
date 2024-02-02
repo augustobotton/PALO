@@ -6,10 +6,11 @@ from src.domain.modelos.foguete.ModeloPropulsivo import ModeloPropulsivo
 
 
 class ModeloFoguete:
+
     def __init__(self):
         self.modelo_propulsivo = ModeloPropulsivo()
-        self.modelo_propulsivo = ModeloEstrutural()
-        self.modelo_propulsivo = ModeloAerodinamico(self.modelo_propulsivo)
+        self.modelo_estrutural = ModeloEstrutural()
+        self.modelo_aerodinamico = ModeloAerodinamico(self.modelo_propulsivo, )
 
     def estudo_delta_v(self, planeta):
         # Estudo simplificado pela equação de foguete
