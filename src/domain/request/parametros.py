@@ -1,12 +1,12 @@
 import numpy as np
 
-Re = 0
-we = 0
+raio_equatorial = 0
+velocidade_inercial_de_rotação_da_terra = 0
 mut = 0
 J2 = 0
 J3 = 0
 J4 = 0
-g = 0
+gravidade_padrao_nivel_do_mar = 0
 lc = 0
 dT = 0
 area_de_referencia = np.zeros(4).T
@@ -24,17 +24,14 @@ Ts3 = 0
 h0 = 0
 comprimento_do_trilho = 0
 tg = 0.0
-Re = 0
 agso = 0
 Tq3 = 0
 Tq31 = 0
 Tq32 = 0
-Ts3 = 0
 vgso = 0
 mp3 = 0
 Tq1 = 0
 Tq2 = 0
-Tq3 = 0
 massa_de_carga_util = 0
 # ft = 0
 # m = 0

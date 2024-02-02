@@ -1,7 +1,7 @@
 import numpy as np
-
 import parametros
-from src.domain.OrbitalUtils.Vrel2Vine import Vrel2Vine
+
+from src.domain.orbitalUtils.Vrel2Vine import Vrel2Vine
 
 
 def propulsao_N_estagios(tempo, vetor_de_estados):
@@ -11,10 +11,10 @@ def propulsao_N_estagios(tempo, vetor_de_estados):
     Isp = parametros.impulso_especifico_por_estagio
     mp = parametros.mp
     ms = parametros.massa_estrutural_por_estagio
-    g = parametros.g
+    g = parametros.gravidade_padrao_nivel_do_mar
     m0 = parametros.m0
-    Re = parametros.Re
-    we = parametros.we
+    Re = parametros.raio_equatorial
+    we = parametros.velocidade_inercial_de_rotação_da_terra
     mL = parametros.massa_de_carga_util
     # Função para cálculo dos parâmetros propulsivos em função do tempo
     # Veículo de até 3 estágios

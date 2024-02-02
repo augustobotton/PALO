@@ -1,11 +1,11 @@
 import numpy as np
-
 import parametros
 from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
+
 from propulsao_N_estagios import propulsao_N_estagios
-from src.domain.Atmosfera.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.OrbitalUtils.grav_axisimetrico import grav_axisimetrico
+from src.domain.modelos.planeta.atmosfera.ModeloAtmosferico import ModeloAtmosferico
+from src.domain.orbitalUtils.grav_axisimetrico import grav_axisimetrico
 
 
 def dinamica_foguete(t, X):
@@ -27,8 +27,8 @@ def dinamica_foguete(t, X):
     # Xp: derivada do vetor de estado X
 
     ## Entrada de constantes por variáveis globais
-    we = parametros.we
-    Re = parametros.Re
+    we = parametros.velocidade_inercial_de_rotação_da_terra
+    Re = parametros.raio_equatorial
     lc = parametros.lc
     dT = parametros.dT
     h0 = parametros.h0

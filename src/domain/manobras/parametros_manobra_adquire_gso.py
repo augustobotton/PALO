@@ -1,7 +1,7 @@
 import numpy as np
-
 import parametros
-from src.domain.OrbitalUtils.Vrel2Vine import Vrel2Vine
+
+from src.domain.orbitalUtils.Vrel2Vine import Vrel2Vine
 
 
 def parametros_manobra_adquire_gso(t, m, X):
@@ -18,7 +18,7 @@ def parametros_manobra_adquire_gso(t, m, X):
     - X: vetor de estado [V, A, phi, r, delta]
 
     """
-    we = parametros.we
+    we = parametros.velocidade_inercial_de_rotação_da_terra
     sinalPhii = parametros.sinalPhii
     achouApogeu = parametros.achouApogeu
     ti = parametros.ti
@@ -29,7 +29,7 @@ def parametros_manobra_adquire_gso(t, m, X):
     Ts3 = parametros.Ts3
     vgso = parametros.vgso
     Isp = parametros.impulso_especifico_por_estagio
-    g = parametros.g
+    g = parametros.gravidade_padrao_nivel_do_mar
     mp3 = parametros.mp3
 
     # Desmenbra o vetor de estado

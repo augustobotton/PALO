@@ -1,27 +1,26 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_ivp
 
-import parametros
-from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
-from dinamica_foguete import dinamica_foguete
-from propulsao_N_estagios import propulsao_N_estagios
-from src.domain.Atmosfera.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.OrbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
-from src.domain.OrbitalUtils.Vrel2Vine import Vrel2Vine
-from src.domain.OrbitalUtils.det_orbita import det_orbita
-from src.domain.OrbitalUtils.long_ECEF2ECI import long_ECEF2ECI
+from src.domain.aerodinamica.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
+from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
+from src.domain.modelos.foguete.propulsao_N_estagios import propulsao_N_estagios
+from src.domain.modelos.planeta.atmosfera.ModeloAtmosferico import ModeloAtmosferico
+from src.domain.orbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
+from src.domain.orbitalUtils.Vrel2Vine import Vrel2Vine
+from src.domain.orbitalUtils.det_orbita import det_orbita
+from src.domain.orbitalUtils.long_ECEF2ECI import long_ECEF2ECI
+from src.domain.request import parametros
 
 # Inicializa os parâmetros
-Re = parametros.Re
-we = parametros.we
+raio_equatorial_terrestre = parametros.raio_equatorial
+velocidade_inercial_de_rotacao_da_terra = parametros.velocidade_inercial_de_rotação_da_terra
 mut = parametros.mut
 J2 = parametros.J2
 J3 = parametros.J3
 J4 = parametros.J4
-g = parametros.g
+g = parametros.gravidade_padrao_nivel_do_mar
 lc = parametros.lc
-dT = parametros.dT
+delta_temperatura_atm = parametros.dT
 Sr = parametros.area_de_referencia
 fator_correcao = parametros.fator_correcao_arrasto
 massa_de_carga_util = parametros.massa_de_carga_util
@@ -43,70 +42,6 @@ Ts3 = parametros.Ts3
 vgso = parametros.vgso
 mp3 = parametros.mp3
 
-# Parâmetros propulsivos
-impulso_especico_por_estagio = np.array([251, 271, 315])  # s - Impulso específico dos estágios
-parametros.impulso_especifico_por_estagio = impulso_especico_por_estagio
-mp[0] = 55290
-parametros.mp[0] = mp[0]
-mp[1] = 11058  # kg - Massa de propelente dos estágios
-parametros.mp[1] = mp[1]
-parametros.mp = mp
-mp3 = 224.53  # kg - Massa de propelente do terceiro estágio (RD843)
-parametros.mp3 = mp3
-Tq1 = 62.0233  # s - DADO DOS MOTORES DO 1° ESTÁGIO
-parametros.Tq1 = Tq1
-Tq2 = 64.6105  # s - DADO DOS MOTORES DO 2° ESTÁGIO
-parametros.Tq2 = Tq2
-Tq3 = 277.5325  # s - TEMPO DE QUEIMA DO 3° ESTÁGIO SE ELE IGNITASSE SÓ UMA VEZ
-parametros.Tq3 = Tq3
-
-# Parâmetros de massa estrutural e de carga útil
-massa_estrutural_por_estagio = np.array([7385, 1367, 59.69])  # kg - Massa estrutural dos estágios
-parametros.massa_estrutural_por_estagio = massa_estrutural_por_estagio
-massa_de_carga_util = 13  # kg - Massa da carga útil
-parametros.massa_de_carga_util = massa_de_carga_util
-
-# Parâmetros aerodinâmicos e ambientais
-fator_correcao = 1.28  # Fator de correção do arrasto
-parametros.fator_correcao_arrasto = fator_correcao
-S1 = 4.6 * 5 / 3  # m^2 - Area aproximada da secao transversal do primeiro estagio
-S2 = 1.5  # m^2 - Area aproximada da secao transversal do segundo estagio
-S3 = 1.5  # m^2 - Area aproximada da secao transversal do terceiro estagio
-SL = 1.5  # m^2 - Area aproximada da secao transversal da carga útil
-
-lt = 7.33 + 7.1 + 6.28  # m - Comprimento total
-l2 = 7.1 + 6.28  # Comprimento sem o primeiro estagio
-l3 = 6.28  # Comprimento sem o segundo estagio
-
-l4 = 1  # Comprimento da carga util
-f2 = (l2 / lt) * 0.5 + 0.5  # Fator de correcao do segundo estagio
-f3 = (l3 / lt) * 0.5 + 0.5  # Fator de correcao do terceiro estagio
-f4 = (l4 / lt) * 0.5 + 0.5  # Fator de correcao da carga util
-
-Sr = np.array([S1, S2 * f2, S3 * f3, SL * f4])
-Sr = Sr.reshape(-1, 1)
-parametros.area_de_referencia = Sr
-
-lc = 1.5  # Comprimento característico - diâmetro dos estágios 2 e superiores
-parametros.lc = lc
-dT = 10  # K - Delta T em relação à atmosfera padrão
-parametros.dT = dT
-Re = 6378.1370e3  # m - Raio equatorial da Terra
-parametros.Re = Re
-we = 7.2921150e-5  # (rad/s) - Velocidade inercial de rotação da Terra
-parametros.we = we
-g = 9.80665  # m/s^2 - aceleração da gravidade ao nível do mar
-parametros.g = g
-mut = 3.986004418e14  # m^3/s^-2
-parametros.mut = mut
-J2 = 0.00108263  # Constante de Jeffery J2
-parametros.J2 = J2
-J3 = -0.00000254  # Constante de Jeffery J3
-parametros.J3 = J3
-J4 = -0.00000161  # Constante de Jeffery J4
-parametros.J4 = J4
-tg = 0  # s - Tempo em que o meridiano de referência tem longitude celeste nula
-parametros.tg = tg
 # Condições iniciais
 h0 = 0  # m - Altitude da base de lancamento
 parametros.h0 = h0
@@ -182,7 +117,7 @@ achouApogeu = parametros.achouApogeu
 
 m0 = np.sum(mp) + np.sum(massa_estrutural_por_estagio) + massa_de_carga_util
 parametros.m0 = m0
-r0 = Re + h0
+r0 = raio_equatorial_terrestre + h0
 
 # Estudo simplificado pela equação de foguete
 mpx = np.array([mp[0], mp[1], mp3])
@@ -220,10 +155,10 @@ print('Razao de carga útil total:', lambL)
 print('Impulso de velocidade total ideal - m/s:', Dv)
 
 # TF = float(input('Informe o tempo da simulação (s): '))
-# v0 = float(input('Informe o valor inicial da velocidade relativa (m/s): '))
-# phi0 = float(input('Informe a condição inicial do ângulo de elevação (graus): '))
 TF = 25000
+# v0 = float(input('Informe o valor inicial da velocidade relativa (m/s): '))
 v0 = 1
+# phi0 = float(input('Informe a condição inicial do ângulo de elevação (graus): '))
 phi0 = 76.8
 phi0 = phi0 * np.pi / 180
 
@@ -234,10 +169,11 @@ if np.abs(y) > 1:
     y = np.sign(y)
 
 Ai_f = np.arcsin(y)
-rpgto = Re + 250e3
+rpgto = raio_equatorial_terrestre + 250e3
 agto = (agso + rpgto) / 2
 vigto = np.sqrt(mut * (2 / rpgto - 1 / agto))
-A0 = np.arctan(np.tan(Ai_f) - (rpgto * we * np.cos(delta0)) / (vigto * np.cos(Ai_f)))
+A0 = np.arctan(
+    np.tan(Ai_f) - (rpgto * velocidade_inercial_de_rotacao_da_terra * np.cos(delta0)) / (vigto * np.cos(Ai_f)))
 
 print('Condicao final de azimute de velocidade inercial (º):')
 print(Ai_f * 180 / np.pi)
@@ -306,7 +242,7 @@ for i in range(N):
     phi[i] = X[i, 2]
 
     # Posição no referencial PCPF
-    h[i] = X[i, 3] - Re
+    h[i] = X[i, 3] - raio_equatorial_terrestre
     r = X[i, 3]
     delta[i] = X[i, 4]
     lon[i] = X[i, 5]
@@ -316,7 +252,8 @@ for i in range(N):
 
     # Parâmetros atmosféricos
     modelo_atmosferico = ModeloAtmosferico()
-    T[i], _, _, rho[i], _, M[i], _, _, Kn, _, _, R = modelo_atmosferico.calcula(h[i], V[i], lc, dT)
+    T[i], _, _, rho[i], _, M[i], _, _, Kn, _, _, R = modelo_atmosferico.calcula(h[i], V[i], lc,
+                                                                                delta_temperatura_atm)
 
     # Forças aerodinâmicas
     D[i], _, _ = aerodinamica_multiplos_estagios(t[i], V[i], h[i], M[i], Kn, T[i], rho[i], R)
@@ -324,10 +261,10 @@ for i in range(N):
     q[i] = 0.5 * rho[i] * V[i] ** 2  # Pressão dinâmica
 
     # Coordenadas da velocidade inercial no referencial LVLH
-    Vi[i], phii[i], Ai[i] = Vrel2Vine(V[i], phi[i], A[i], we, r, delta[i])
+    Vi[i], phii[i], Ai[i] = Vrel2Vine(V[i], phi[i], A[i], velocidade_inercial_de_rotacao_da_terra, r, delta[i])
 
     # Longitude celeste
-    longc[i] = long_ECEF2ECI(t[i], lon[i], we, tg)
+    longc[i] = long_ECEF2ECI(t[i], lon[i], velocidade_inercial_de_rotacao_da_terra, tg)
 
     # Energia específica da órbita
     ee[i] = Vi[i] ** 2 / 2 - mut / r
@@ -357,14 +294,14 @@ ifq = i - 2
 tfq = t[ifq]  # Tempo do fim da queima do terceiro estágio
 Vfq = Vi[ifq] * np.ones([1, N])  # Velocidade inercial no fim da queima do terceiro estágio
 hfq = h[ifq] * np.ones([1, N])  # Altitude no fim da queima do terceiro estágio
-P = 2 * np.pi * np.sqrt((Re + hfq[0][0]) ** 3 / mut)  # Período da órbita obtida
+P = 2 * np.pi * np.sqrt((raio_equatorial_terrestre + hfq[0][0]) ** 3 / mut)  # Período da órbita obtida
 print('*** Parametros da Orbita Obtida ***')
 print('Velocidade no momento da insercao orbital (km/s):')
 print(Vfq[0][0] / 1e3)
 print('Altitude no momento da insercao orbital (km):')
 print(hfq[0][0] / 1e3)
 print('Distancia radial no momento da insercao orbital (km):')
-print((hfq[0][0] + Re) / 1e3)
+print((hfq[0][0] + raio_equatorial_terrestre) / 1e3)
 print('Semi eixo maior (km):')
 print(a[ifq - 1] / 1e3)
 print('Periodo (min): ')
@@ -376,9 +313,9 @@ print(rp / 1e3)
 print('Raio do apogeu (km):')
 print(ra / 1e3)
 print('Altitude do perigeu (km):')
-print((rp - Re) / 1e3)
+print((rp - raio_equatorial_terrestre) / 1e3)
 print('Altitude do apogeu (km):')
-print((ra - Re) / 1e3)
+print((ra - raio_equatorial_terrestre) / 1e3)
 print('*** Parametros da Orbita GTO requerida ***')
 print('Perigeu da orbita GTO requerida (km):')
 rpgto = rp
@@ -413,7 +350,8 @@ DVgso = vgso - vagto  # Impulso de velocidade requerido para circularizacao da o
 print('Impulso de velocidade requerido para circularizacao da orbita (km/s):')
 print(DVgso / 1e3)
 mp32 = (m[ifq - 1] * np.exp(DVgso / (impulso_especico_por_estagio[2] * g)) - m[ifq - 1]) / np.exp(
-    DVgso / (impulso_especico_por_estagio[2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
+    DVgso / (impulso_especico_por_estagio[
+                 2] * g))  # Massa de propelente requerida para circularizacao da orbita (kg)
 print('Massa de propelente requerida para circularizacao da orbita (kg):')
 print(mp32)
 print('Massa de propelente disponivel para o 3º disparo (kg):')
@@ -428,246 +366,3 @@ print('Excentricidade:')
 print(e[-1])
 print('Inclinacao (º):')
 print(inclinacao[-1] * 180 / np.pi)
-
-# Gráficos
-# Figure 1
-plt.close('all')
-plt.figure(1)
-
-plt.subplot(231)
-plt.plot(t, V, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('V (m/s)')
-
-plt.subplot(232)
-plt.plot(t, A * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('A (º)')
-
-plt.subplot(233)
-plt.plot(t, phi * 180 / np.pi, linewidth=2)
-plt.plot(tfq, phi[ifq - 1] * 180 / np.pi, '*')
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('phi (º)')
-
-plt.subplot(234)
-plt.plot(t, h / 1e3, linewidth=2)
-plt.plot(t, hfq.T / 1e3, '--')
-plt.plot(tfq, hfq[0][0] / 1e3, '*')
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('h (km)')
-plt.legend(['altitude', 'altitude no fim da queima do 3º estágio'])
-
-plt.subplot(235)
-plt.plot(t, delta * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('delta (º)')
-
-plt.subplot(236)
-plt.plot(t, lon * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('l(º)')
-
-# Figure 2
-plt.figure(2)
-
-plt.subplot(221)
-plt.plot(t, Vi, linewidth=2)
-plt.plot(t, Vir.T, '--')
-plt.plot(t, Vfq.T, '-.')
-plt.plot(tfq, Vfq[0][0], '*')
-plt.grid(True)
-plt.xlabel('t (s)')
-plt.ylabel('V_i (m/s)')
-plt.legend(['Velocidade inercial', 'Velocidade de perigeu da órbita GTO requerida',
-            'Velocidade no fim da queima do terceiro estágio'])
-
-plt.subplot(222)
-plt.plot(t, Ai * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('A_i (º)')
-
-plt.subplot(223)
-plt.plot(t, phii * 180 / np.pi, linewidth=2)
-plt.plot(tfq, phii[ifq - 1] * 180 / np.pi, '*')
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('phi_i (º)')
-
-plt.subplot(224)
-plt.plot(t, longc * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('lambda (º)')
-
-# Figure 3
-plt.figure(3)
-
-plt.subplot(221)
-plt.plot(t, ft, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('f_t (N)')
-
-plt.subplot(222)
-plt.plot(t, m, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('m (kg)')
-
-plt.subplot(223)
-plt.plot(t, mu * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('\u03BC (º)')
-
-plt.subplot(224)
-plt.plot(t, epsl * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('\u03B5 (º)')
-
-# Figure 4
-plt.figure(4)
-
-plt.subplot(311)
-plt.plot(t, D, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('D (N)')
-
-plt.subplot(323)
-plt.plot(t, q, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('q (N/m^2)')
-
-plt.subplot(324)
-plt.plot(t, M, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('M (-)')
-
-plt.subplot(325)
-plt.plot(t, T - 273.15, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('T (ºC)')
-
-plt.subplot(326)
-plt.plot(t, rho, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('rho (kg/m^3)')
-
-# Figure 5
-plt.figure(5)
-
-plt.subplot(311)
-plt.plot(t, ee, linewidth=2)
-plt.plot(t, eer.T, '--', linewidth=2)
-plt.plot(t, eegso.T, '--', linewidth=2)
-plt.grid(True)
-plt.xlabel('t (s)')
-plt.ylabel('\u03B5 (J/kg)')
-plt.legend(['Energia específica', 'Energia específica da órbita GTO requerida',
-            'Energia específica da órbita GSO requerida'])
-
-plt.subplot(334)
-plt.plot(t, a / 1e3, linewidth=2)
-plt.plot(t, ar.T / 1e3, '--')
-plt.plot(t, Re * np.ones([N, 1]) / 1e3, '-.')
-plt.grid(True)
-plt.xlabel('t (s)')
-plt.ylabel('a (km)')
-plt.legend(['Semi eixo maior', 'Semi eixo maior da órbita GTO requerida', 'Raio da Terra'])
-
-plt.subplot(335)
-plt.plot(t, e, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('e (-)')
-
-plt.subplot(336)
-plt.plot(t, tau, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('\u03C4 (s)')
-
-plt.subplot(337)
-plt.plot(t, OM * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('\u03A9 (º)')
-
-plt.subplot(338)
-plt.plot(t, inclinacao * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('i (º)')
-
-plt.subplot(339)
-plt.plot(t, om * 180 / np.pi, linewidth=2)
-plt.grid(True)
-plt.axis('tight')
-plt.xlabel('t (s)')
-plt.ylabel('\u03C9 (º)')
-
-# Figure 6
-plt.figure(5)
-
-traj = np.column_stack((delta, lon)) * 180 / np.pi
-##desenha_mapa_trajetoria([delta0 * 180 / np.pi, lon0 * 180 / np.pi, h0], traj)
-plt.show()
-
-# Figure 7
-fig7 = plt.figure(7)
-ax = plt.axes(projection="3d")
-
-u = np.linspace(0, 2 * np.pi, 100)
-v = np.linspace(0, np.pi, 100)
-r = Re / 1e3
-
-x = r * np.outer(np.cos(u), np.sin(v))
-y = r * np.outer(np.sin(u), np.sin(v))
-z = r * np.outer(np.ones(np.size(u)), np.cos(v))
-
-ax.plot_surface(x, y, z, rstride=4, cstride=4)
-ax.plot3D(R0[:, 0] / 1e3, R0[:, 1] / 1e3, R0[:, 2] / 1e3, 'red')
-ax = plt.gca()
-ax.set_aspect('equal', adjustable='box')
-ax.set_xlabel('x (km)')
-ax.set_ylabel('y (km)')
-ax.set_zlabel('z (km)')
-
-# Mostra os gráficos
-plt.show()

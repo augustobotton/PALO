@@ -1,17 +1,17 @@
 import os
 
 import numpy as np
+from atm_padrao import atm_padrao
 from scipy.integrate import solve_ivp
 
 import parametros
-from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
-from atm_padrao import atm_padrao
-from dinamica_foguete import dinamica_foguete
-from propulsao_N_estagios import propulsao_N_estagios
-from src.domain.OrbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
-from src.domain.OrbitalUtils.Vrel2Vine import Vrel2Vine
-from src.domain.OrbitalUtils.det_orbita import det_orbita
-from src.domain.OrbitalUtils.long_ECEF2ECI import long_ECEF2ECI
+from src.domain.aerodinamica.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
+from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
+from src.domain.modelos.foguete.propulsao_N_estagios import propulsao_N_estagios
+from src.domain.orbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
+from src.domain.orbitalUtils.Vrel2Vine import Vrel2Vine
+from src.domain.orbitalUtils.det_orbita import det_orbita
+from src.domain.orbitalUtils.long_ECEF2ECI import long_ECEF2ECI
 
 global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fator_correcao, massa_carga_util
 global ms, m0, mp, ti, tq, ts, Isp, h0, l_trilho, tg, agso, Tq3, Tq31, Tq32, Ts3, vgso, mp3
@@ -63,11 +63,11 @@ parametros.lc = lc
 dT = 10  # K - Delta T em relação à atmosfera padrão
 parametros.dT = dT
 Re = 6378.1370e3  # m - Raio equatorial da Terra
-parametros.Re = Re
+parametros.raio_equatorial = Re
 we = 7.2921150e-5  # (rad/s) - Velocidade inercial de rotação da Terra
-parametros.we = we
+parametros.velocidade_inercial_de_rotação_da_terra = we
 g = 9.80665  # m/s^2 - aceleração da gravidade ao nível do mar
-parametros.g = g
+parametros.gravidade_padrao_nivel_do_mar = g
 mut = 3.986004418e14  # m^3/s^-2
 parametros.mut = mut
 J2 = 0.00108263  # Constante de Jeffery J2
