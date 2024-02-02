@@ -12,7 +12,7 @@ def propulsao_N_estagios(tempo, vetor_de_estados):
     mp = parametros.mp
     ms = parametros.massa_estrutural_por_estagio
     g = parametros.gravidade_padrao_nivel_do_mar
-    m0 = parametros.m0
+    m0 = parametros.massa_inicial_do_foguete
     Re = parametros.raio_equatorial
     we = parametros.velocidade_inercial_de_rotação_da_terra
     mL = parametros.massa_de_carga_util

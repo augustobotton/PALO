@@ -1,54 +1,15 @@
 import numpy as np
 from scipy.integrate import solve_ivp
+from src.domain.modelos.foguete.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 
-from src.domain.aerodinamica.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
 from src.domain.modelos.foguete.propulsao_N_estagios import propulsao_N_estagios
-from src.domain.modelos.planeta.atmosfera.ModeloAtmosferico import ModeloAtmosferico
+from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
 from src.domain.orbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
 from src.domain.orbitalUtils.Vrel2Vine import Vrel2Vine
 from src.domain.orbitalUtils.det_orbita import det_orbita
 from src.domain.orbitalUtils.long_ECEF2ECI import long_ECEF2ECI
 from src.domain.request import parametros
-
-# Inicializa os parâmetros
-raio_equatorial_terrestre = parametros.raio_equatorial
-velocidade_inercial_de_rotacao_da_terra = parametros.velocidade_inercial_de_rotação_da_terra
-mut = parametros.mut
-J2 = parametros.J2
-J3 = parametros.J3
-J4 = parametros.J4
-g = parametros.gravidade_padrao_nivel_do_mar
-lc = parametros.lc
-delta_temperatura_atm = parametros.dT
-Sr = parametros.area_de_referencia
-fator_correcao = parametros.fator_correcao_arrasto
-massa_de_carga_util = parametros.massa_de_carga_util
-massa_estrutural_por_estagio = parametros.massa_estrutural_por_estagio
-m0 = parametros.m0
-mp = parametros.mp
-ti = parametros.ti
-tq = parametros.tq
-ts = parametros.tempo_limite_separacao
-impulso_especico_por_estagio = parametros.impulso_especifico_por_estagio
-h0 = parametros.h0
-l_trilho = parametros.comprimento_do_trilho
-tg = parametros.tg
-agso = parametros.agso
-Tq3 = parametros.Tq3
-Tq31 = parametros.Tq31
-Tq32 = parametros.Tq32
-Ts3 = parametros.Ts3
-vgso = parametros.vgso
-mp3 = parametros.mp3
-
-# Condições iniciais
-h0 = 0  # m - Altitude da base de lancamento
-parametros.h0 = h0
-delta0 = -2.3267844 * np.pi / 180  # rad - Latitude inicial
-lon0 = -44.4111042 * np.pi / 180  # rad - Longitude inicial
-l_trilho = lt  # m - igual ao comprimento total do foguete
-parametros.comprimento_do_trilho = l_trilho
 
 ingso = 2.3267844 * np.pi / 180  # Inclinacao
 agso = 42.164140e6  # m
@@ -56,111 +17,9 @@ parametros.agso = agso
 vgso = np.sqrt(mut / agso)
 parametros.vgso = vgso
 
-# Parametros propulsivos e temporais a determinar
-Ts1 = 2
-Ts2 = 2
-Ts3 = 2
-parametros.Ts1 = Ts1
-parametros.Ts2 = Ts2
-parametros.Ts3 = Ts3
-TEq2 = 5  # s
-TEq3 = 300  # s
-
-Tq31 = 222.8  # 222.8
-parametros.Tq31 = Tq31
-Tq32 = Tq3 - Tq31
-parametros.Tq32 = Tq32
-
-mp31 = parametros.mp31
-mp32 = parametros.mp32
-
-mp31 = mp3 * Tq31 / Tq3
-parametros.mp31 = mp31
-mp32 = mp3 * Tq32 / Tq3
-parametros.mp32 = mp32
-
-ti[0] = 0
-parametros.ti[0] = ti[0]
-tq[0] = ti[0] + Tq1
-parametros.tq[0] = tq[0]
-ts[0] = tq[0] + Ts1
-parametros.tempo_limite_separacao[0] = ts[0]
-ti[1] = ts[0] + TEq2
-parametros.ti[1] = ti[1]
-tq[1] = ti[1] + Tq2
-parametros.tq[1] = tq[1]
-ts[1] = tq[1] + Ts2
-parametros.tempo_limite_separacao[1] = ts[1]
-ti[2] = ts[1] + TEq3
-parametros.ti[2] = ti[2]
-tq[2] = ti[2] + Tq31
-parametros.tq[2] = tq[2]
-ti[3] = 1e10
-parametros.ti[3] = ti[3]
-tq[3] = ti[3] + Tq32
-parametros.tq[3] = tq[3]
-ts[2] = tq[3] + Ts3
-parametros.tempo_limite_separacao[2] = ts[2]
-
-parametros.ti = ti
-parametros.tq = tq
-parametros.tempo_limite_separacao = ts
-
-mp[2] = mp31
-parametros.mp[2] = mp[2]
-mp[3] = mp32
-parametros.mp[3] = mp[3]
-parametros.mp = mp
-
-sinalPhii = parametros.sinalPhii
-achouApogeu = parametros.achouApogeu
-
-m0 = np.sum(mp) + np.sum(massa_estrutural_por_estagio) + massa_de_carga_util
-parametros.m0 = m0
-r0 = raio_equatorial_terrestre + h0
-
-# Estudo simplificado pela equação de foguete
-mpx = np.array([mp[0], mp[1], mp3])
-ms_mpx_sum = massa_estrutural_por_estagio + mpx
-sigma = massa_estrutural_por_estagio / ms_mpx_sum
-
-m01 = m0
-m02 = massa_estrutural_por_estagio[1] + mpx[1] + massa_estrutural_por_estagio[2] + mpx[2] + massa_de_carga_util
-m03 = massa_estrutural_por_estagio[2] + mpx[2] + massa_de_carga_util
-
-lamb0 = m02 / m01
-lamb1 = m03 / m02
-lamb2 = massa_de_carga_util / m03
-lamb = np.array([lamb0, lamb1, lamb2])
-
-lambL = np.prod(lamb)
-
-ve = g * impulso_especico_por_estagio
-
-Dv = -np.sum(ve * np.log(sigma + (1 - sigma) * lamb))
-
-# Mostra dados na tela
-print('Area de referencia do foguete com primeiro estagio (m^2):', Sr[0])
-print('Area de referencia do foguete com segundo estagio (m^2):', Sr[1])
-print('Area de referencia do foguete com terceiro estagio (m^2):', Sr[2])
-print('Area de referencia da carga util (m^2):', Sr[3])
-print('Massa inicial antes da queima do primeiro estagio - kg:', m01)
-print('Massa inicial antes da queima do segundo estagio - kg:', m02)
-print('Massa inicial antes da queima do terceiro estagio - kg:', m03)
-print('Massa da carga util - kg:', massa_de_carga_util)
-print('Razoes estruturais:', sigma)
-print('Razoes de carga util:', lamb)
-print('Velocidades de exaustao - m/s:', ve)
-print('Razao de carga útil total:', lambL)
-print('Impulso de velocidade total ideal - m/s:', Dv)
-
-# TF = float(input('Informe o tempo da simulação (s): '))
-TF = 25000
-# v0 = float(input('Informe o valor inicial da velocidade relativa (m/s): '))
-v0 = 1
-# phi0 = float(input('Informe a condição inicial do ângulo de elevação (graus): '))
-phi0 = 76.8
-phi0 = phi0 * np.pi / 180
+tempo_de_simulacao = 25000
+valor_inicial_velocidade_relativa = 1
+angulo_de_elevacao_inicial = np.deg2rad(78)
 
 y = np.cos(ingso) / np.cos(delta0)
 
@@ -180,7 +39,7 @@ print(Ai_f * 180 / np.pi)
 print('Condicao inicial de azimute de velocidade relativa (º):')
 print(A0 * 180 / np.pi)
 
-X0 = [v0, A0, phi0, r0, delta0, lon0]
+X0 = [valor_inicial_velocidade_relativa, A0, angulo_de_elevacao_inicial, r0, delta0, lon0]
 # X0 = X0.T
 options = {
     'rtol': 1e-12,
@@ -190,7 +49,7 @@ options = {
 
 # Solve the differential equations
 # sol = solve_ivp(dinamica_foguete, [0, TF], X0, method='LSODA', **options)
-sol = solve_ivp(dinamica_foguete, [0, TF], X0, **options)
+sol = solve_ivp(dinamica_foguete, [0, tempo_de_simulacao], X0, **options)
 t = sol.t  # Redimensiona t para ser uma matriz de coluna
 X = sol.y.T
 

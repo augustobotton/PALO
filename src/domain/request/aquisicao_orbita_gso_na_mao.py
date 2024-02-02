@@ -3,9 +3,9 @@ import os
 import numpy as np
 from atm_padrao import atm_padrao
 from scipy.integrate import solve_ivp
+from src.domain.modelos.foguete.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 
 import parametros
-from src.domain.aerodinamica.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
 from src.domain.modelos.foguete.propulsao_N_estagios import propulsao_N_estagios
 from src.domain.orbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet

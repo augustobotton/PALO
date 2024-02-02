@@ -8,11 +8,11 @@ class ParametrosPlanetarios:
         self.mut = mut  # m^3/s^-2
         self.J2 = J2  # Constante de Jeffery J2
         self.J3 = J3  # Constante de Jeffery J3
-        self.J4 = J4  # Constante de Jeffery J4
+        self.J4 = None
         self.tempo_longitude_celeste_nula = tempo_longitude_celeste_nula
 
 
-class ParametrosPlanetariosBuilder:
+class ConstrutorDePlanetas:
     def __init__(self):
         self.delta_temperatura_atm = None
         self.raio_equatorial = None
@@ -23,6 +23,7 @@ class ParametrosPlanetariosBuilder:
         self.J3 = None
         self.J4 = None
         self.tempo_longitude_celeste_nula = None
+        self.nome = None
 
     def com_delta_temperatura_atm(self, valor):
         self.delta_temperatura_atm = valor
@@ -75,7 +76,7 @@ class ParametrosPlanetariosBuilder:
 
 
 # Exemplo de uso do Builder para criar um objeto ParametrosPlanetarios
-parametros = ParametrosPlanetariosBuilder() \
+parametros = ConstrutorDePlanetas() \
     .com_delta_temperatura_atm(10) \
     .com_raio_equatorial(6378.1370e3) \
     .com_velocidade_inercial_de_rotacao(7.2921150e-5) \

@@ -25,8 +25,8 @@ def parametros_manobra_adquire_gso(t, m, X):
     tq = parametros.tq
     ts = parametros.tempo_limite_separacao
     Tq3 = parametros.Tq3
-    Tq31 = parametros.Tq31
-    Ts3 = parametros.Ts3
+    Tq31 = parametros.tempo_da_primeira_queima_3_estagio
+    Ts3 = parametros.tempo_de_espera_separacao_3_4
     vgso = parametros.vgso
     Isp = parametros.impulso_especifico_por_estagio
     g = parametros.gravidade_padrao_nivel_do_mar
@@ -61,11 +61,11 @@ def parametros_manobra_adquire_gso(t, m, X):
                     DVgso / (Isp[2] * g))  # Massa de propelente necessária
                 parametros.mp32 = mp32
                 Tq32 = (Tq3 * mp32) / mp3  # Duração da queima necessária
-                parametros.Tq32 = Tq32
+                parametros.tempo_da_segunda_queima_3_estagio = Tq32
                 # Verifica se o tempo é maior que o máximo, se ocorrer, corrige
                 if Tq31 + Tq32 > Tq3:
                     Tq32 = Tq3 - Tq31
-                    parametros.Tq32 = Tq32
+                    parametros.tempo_da_segunda_queima_3_estagio = Tq32
                 tq[3] = ti[3] + Tq32  # Tempo de fim de queima
                 parametros.tq[3] = tq[3]
                 parametros.tq = tq

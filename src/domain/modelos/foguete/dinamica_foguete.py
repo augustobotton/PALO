@@ -1,14 +1,13 @@
 import numpy as np
-import parametros
 from aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 from parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
 
 from propulsao_N_estagios import propulsao_N_estagios
-from src.domain.modelos.planeta.atmosfera.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.orbitalUtils.grav_axisimetrico import grav_axisimetrico
+from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
+from src.domain.modelos.planeta.grav_axisimetrico import grav_axisimetrico
 
 
-def dinamica_foguete(t, X):
+def dinamica_foguete(t, X, terra, base_de_lancamento):
     """
     Função para a dinâmica de translação de um foguete com respeito ao referencial PCPF
     Sistema de referência: aerodinâmico
@@ -27,11 +26,11 @@ def dinamica_foguete(t, X):
     # Xp: derivada do vetor de estado X
 
     ## Entrada de constantes por variáveis globais
-    we = parametros.velocidade_inercial_de_rotação_da_terra
-    Re = parametros.raio_equatorial
-    lc = parametros.lc
-    dT = parametros.dT
-    h0 = parametros.h0
+    we = terra.velocidade_inercial_de_rotação_da_terra
+    Re = terra.raio_equatorial
+    lc = terra.tempo_longitude_celeste_nula
+    dT = terra.delta_temperatura_atm
+    h0 = parametros.altitude_base_de_lancamento
     l_trilho = parametros.comprimento_do_trilho
     achouApogeu = parametros.achouApogeu
 
