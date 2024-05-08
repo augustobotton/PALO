@@ -1,5 +1,7 @@
 import numpy as np
 
+from src.domain.orbitalUtils.Converte import Vrel2Vine
+from src.domain.modelos.planeta.ModeloPlaneta import terra
 
 class ModeloPropulsivo:
     def __init__(self):
@@ -41,7 +43,7 @@ class ModeloPropulsivo:
             3] = self.massa_propelente_terceiro_estagio * self.tempo_da_segunda_queima_3_estagio / self.duracao_total_de_queima_do_terceiro_estagio
         self.massa_inicial_do_foguete = np.sum(self.massa_propelente_estagios_1_2) + np.sum(
             self.massa_estrutural_por_estagio) + self.massa_de_carga_util
-        self.distancia_radial_inicial = planeta.raio_equatorial_terrestre + h0
+        self.distancia_radial_inicial = terra.raio_equatorial_terrestre + h0
 
     def calculate_thrust_mass(self, t, ti, tq, ts, Isp, mp, ms, m0, g, estagio, mL=None):
         """
@@ -103,7 +105,7 @@ class ModeloPropulsivo:
         current_stage = sum([tempo > ts[i] for i in range(N)])
 
         # Calculate thrust and mass for the current stage
-        ft, m = calculate_thrust_mass(tempo, ti, tq, ts, Isp, mp, ms, m0, g, current_stage, mL)
+        ft, m = self.calculate_thrust_mass(tempo, ti, tq, ts, Isp, mp, ms, m0, g, current_stage, mL)
 
         # Additional calculations
         V, A, phi, r, delta = vetor_de_estados

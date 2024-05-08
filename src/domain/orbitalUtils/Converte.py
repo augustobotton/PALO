@@ -3,7 +3,10 @@ import numpy as np
 
 class Converte:
 
-    def long_ECEF2ECI(self, t, long, we, tg):
+    def converte_longitudeFixaPlaneta_para_longitude_celeste(tempo_longitude_celeste_desejada,
+                                                             longitude_fixaPlaneta,
+                                                             velocidade_rotacao_planeta,
+                                                             tempo_meridianoRef_longCeleste_nula):
         # Função para calcular a longitude celeste a partir da longitude fixa ao planeta
         # Entradas
         # t (s) - Tempo no qual se deseja saber a longitude celeste
@@ -12,10 +15,13 @@ class Converte:
         # tg (s) - Tempo no qual o meridiano de referência tem longitude celeste nula
         # Saída
         # long_c (rad) - Longitude celeste no tempo t
-        long_c = long + we * (t - tg)
-        return long_c
 
-    def RvelPolar2RvelRet(self, v, A, phi, r, lat, lon):
+        longitude_relativa_ref_fixo_planeta = longitude_fixaPlaneta + velocidade_rotacao_planeta * (
+                    tempo_longitude_celeste_desejada - tempo_meridianoRef_longCeleste_nula)
+        return longitude_relativa_ref_fixo_planeta
+
+    def RvelPolar2RvelRet(modulo_vetor_velocidade, azimute_da_velocidade, elevacao_da_velocidade,
+                          distancia_radial, latitude, longitude):
         """
         Função para converter velocidade do sistema LVLH (coordenadas polares) para o sistema ECI ou ECEF retangular
         """
@@ -32,44 +38,53 @@ class Converte:
 
         ## Cálculos
         # Matriz de conversão do sistema ECI ou ECEF para o LVLH
-        CLH = np.array([[np.cos(lat) * np.cos(lon), np.cos(lat) * np.sin(lon), np.sin(lat)],
-                        [-np.sin(lon), np.cos(lon), 0],
-                        [-np.sin(lat) * np.cos(lon), -np.sin(lat) * np.sin(lon), np.cos(lat)]], dtype=('object'));
+        matriz_converte_para_LVLH = np.array(
+            [[np.cos(latitude) * np.cos(longitude), np.cos(latitude) * np.sin(longitude), np.sin(latitude)],
+             [-np.sin(longitude), np.cos(longitude), 0],
+             [-np.sin(latitude) * np.cos(longitude), -np.sin(latitude) * np.sin(longitude),
+              np.cos(latitude)]], dtype=('object'));
         # Vetor velocidade em coordenadas cartezianas no sistema LVLH
-        Vlvlh = v * np.array([[np.sin(phi)],
-                              [np.cos(phi) * np.sin(A)],
-                              [np.cos(phi) * np.cos(A)]], dtype=('object'));
+        vetor_velocidade_cood_cartezianas_lvlh = modulo_vetor_velocidade * np.array(
+            [[np.sin(elevacao_da_velocidade)],
+             [np.cos(elevacao_da_velocidade) * np.sin(azimute_da_velocidade)],
+             [np.cos(elevacao_da_velocidade) * np.cos(azimute_da_velocidade)]], dtype=('object'));
         # Transformação da velocidade para o sistema ECI ou ECEF em coordenadas retangulares
 
-        V = CLH.T @ Vlvlh[:][:]
+        vetor_velocidade_coord_retangular = matriz_converte_para_LVLH.T @ vetor_velocidade_cood_cartezianas_lvlh[
+                                                                          :][:]
 
         # Vetor posição no sistema LHVLH
-        Rlvlh = np.array([[r],
-                          [0],
-                          [0]])
+        vetor_posicao_LVLH = np.array([[distancia_radial],
+                                       [0],
+                                       [0]])
         # Transformação da posição para o sistema ECI ou ECEF em coordenadas
         # retangulares
-        R = CLH.T @ Rlvlh
-        return R, V
+        vetor_posicao_coord_retangular = matriz_converte_para_LVLH.T @ vetor_posicao_LVLH
+        return vetor_posicao_coord_retangular, vetor_velocidade_coord_retangular
 
-    def Vrel2Vine(self, vr, phir, Ar, we, r, dt):
-        # Função para converter a velocidade, elevação e azimute da velocidade relativa para a velocidade inercial
-        # Entradas
-        # vr (m/s): velocidade relativa
-        # phir (rad): inclinação da velocidade relativa
-        # Ar (rad): azimute da velocidade relativa
-        # we (rad/s): velocidade de rotação do referencial girante
-        # r (m): distância radial até a origem do referencial inercial
-        # dt (rad): latitude
-        # Saídas
-        # v (m/s): magnitude da velocidade com respeito ao referencial inercial
-        # phi (rad): ângulo de elevação da velocidade inercial (angulo de trajetoria)
-        # A (rad): ângulo de azimute da velocidade inercial
-        ## Cálculos
-        Ai = np.arctan2(vr * np.cos(phir) * np.sin(Ar) + we * r * np.cos(dt), vr * np.cos(phir) * np.cos(Ar))
-        if Ai < 0:
-            Ai += 2 * np.pi
-        vi = np.sqrt(
-            vr ** 2 + 2 * vr * np.cos(phir) * np.sin(Ar) * r * we * np.cos(dt) + r ** 2 * we ** 2 * np.cos(dt) ** 2)
-        phii = np.arctan((np.sin(phir) * np.cos(Ai)) / (np.cos(phir) * np.cos(Ar)))
-        return vi, phii, Ai
+def Vrel2Vine(velocidade_relativa, inclinacao_velocidade_relativa, azimute_da_velocidade_relativa, velocidade_rotacao_ref_girante, distancia_radial_origem_inercial, latitude):
+
+
+    # Função para converter a velocidade, elevação e azimute da velocidade relativa para a velocidade inercial
+    # Entradas
+    # vr (m/s): velocidade relativa
+    # phir (rad): inclinação da velocidade relativa
+    # Ar (rad): azimute da velocidade relativa
+    # we (rad/s): velocidade de rotação do referencial girante
+    # r (m): distância radial até a origem do referencial inercial
+    # dt (rad): latitude
+    # Saídas
+    # v (m/s): magnitude da velocidade com respeito ao referencial inercial
+    # phi (rad): ângulo de elevação da velocidade inercial (angulo de trajetoria)
+    # A (rad): ângulo de azimute da velocidade inercial
+    ## Cálculos
+
+    angulo_azimute_velocidade_inercial = np.arctan2(velocidade_relativa * np.cos(
+        inclinacao_velocidade_relativa) * np.sin(azimute_da_velocidade_relativa) + velocidade_rotacao_ref_girante * distancia_radial_origem_inercial * np.cos(latitude), velocidade_relativa * np.cos(inclinacao_velocidade_relativa) * np.cos(azimute_da_velocidade_relativa))
+    if angulo_azimute_velocidade_inercial < 0:
+
+        angulo_azimute_velocidade_inercial += 2*np.pi
+    magnitude_velocidade_referencial_inercial = np.sqrt(velocidade_relativa ** 2 + 2 * velocidade_relativa * np.cos(inclinacao_velocidade_relativa) * np.sin(azimute_da_velocidade_relativa) * distancia_radial_origem_inercial * velocidade_rotacao_ref_girante * np.cos(latitude) + distancia_radial_origem_inercial ** 2 * velocidade_rotacao_ref_girante ** 2 * np.cos(latitude) ** 2)
+    angulo_de_trajetoria = np.arctan((np.sin(inclinacao_velocidade_relativa) * np.cos(angulo_azimute_velocidade_inercial)) / (np.cos(inclinacao_velocidade_relativa) * np.cos(azimute_da_velocidade_relativa)))
+
+    return magnitude_velocidade_referencial_inercial, angulo_de_trajetoria, angulo_azimute_velocidade_inercial

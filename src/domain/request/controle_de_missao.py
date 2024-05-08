@@ -1,15 +1,13 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 from src.domain.modelos.foguete.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
-
+import parametros
 from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
 from src.domain.modelos.foguete.propulsao_N_estagios import propulsao_N_estagios
 from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.orbitalUtils.RvelPolar2RvelRet import RvelPolar2RvelRet
-from src.domain.orbitalUtils.Vrel2Vine import Vrel2Vine
+from src.domain.orbitalUtils.Converte import *
 from src.domain.orbitalUtils.det_orbita import det_orbita
-from src.domain.orbitalUtils.long_ECEF2ECI import long_ECEF2ECI
-from src.domain.request import parametros
+
 
 ingso = 2.3267844 * np.pi / 180  # Inclinacao
 agso = 42.164140e6  # m
@@ -123,7 +121,7 @@ for i in range(N):
     Vi[i], phii[i], Ai[i] = Vrel2Vine(V[i], phi[i], A[i], velocidade_inercial_de_rotacao_da_terra, r, delta[i])
 
     # Longitude celeste
-    longc[i] = long_ECEF2ECI(t[i], lon[i], velocidade_inercial_de_rotacao_da_terra, tg)
+    longc[i] = converte_longitudeFixaPlaneta_para_longitude_celeste(t[i], lon[i], velocidade_inercial_de_rotacao_da_terra, tg)
 
     # Energia específica da órbita
     ee[i] = Vi[i] ** 2 / 2 - mut / r
