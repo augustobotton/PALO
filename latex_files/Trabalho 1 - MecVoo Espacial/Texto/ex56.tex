@@ -1,0 +1,26 @@
+\subsection{Exemplo 5.6}
+
+\par É dado que um veículo espacial está em uma órbita terrestre de altitude 500 km, com inclinação de 10\degree , deve ser enviado para uma órbita elíptica com altitudes de perigeu de 200km e apogeu de 700km, bem como inclinação de 5\degree. 
+\par Serão aplicados dois impulsos; um para a obtenção da órbita elíptica e o segundo para mudar a inclinação da orbita intermediária, sendo que esse é aplicado no apogeu para minimizar a quantidade de propelente. 
+\par O primeiro impulso deve ser aplicado com um ângulo $\beta_1$, uma vez que a altitude de perigeu solicitada é diferente da inicial. Este está relacionado com a velocidade inicial e final.
+
+\par O segundo impulso de velocidade é baseado na variação de inclinação necessária. Da mesma forma, esse deve ser aplicado de formar a minimizar o uso de propelente, isso se dá com a aplicação no apogeu. 
+
+\par Com essas considerações e utilizando o programa desenvolvido em aula, obtém-se os seguintes resultados:
+
+\begin{table}[H]
+\centering
+\caption{Resultados Exemplo 5.6}
+\label{ex56}
+\begin{tabular}{|c|c|c|}
+\hline
+                         & Valor             & Unidade \\ \hline
+$\Delta_{v1}$ & 274.066           & m/s     \\ \hline
+$\beta_1$                   & 83.12524398118913 & grau    \\ \hline
+$\Delta_{v2}$ & 642.5679592057598 & m/s    \\ \hline
+$\beta_2$                   & 92.05589473193183 & grau    \\ \hline
+\end{tabular}%
+\end{table}
+
+\par Comparando as magnitudes dos impulsos, percebe-se que a mudança de inclinação é a manobra que requer um maior incremento de velocidade, utilizando assim a maior quantidade de propelente. Para a otimização de uma dada missão o interessante é lançar a espaçonave o mais próximo possível da inclinação desejada.
+

@@ -1,0 +1,10 @@
+
+¢python:S5720"XRename "tempo_longitude_celeste_desejada" to "self" or add the missing "self" parameter.(‡…Àâüÿÿÿÿ8Œõïªò1J$d79beeb6-1320-4f91-83e5-bf877a525332
+™python:S5720"ORename "modulo_vetor_velocidade" to "self" or add the missing "self" parameter.(şÜÊùÿÿÿÿ8Úûğªò1J$5fce4456-5a26-45a8-950e-e21e1c04b9ca
+ªpython:S117"aRename this parameter "longitude_fixaPlaneta" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÜØÿÿÿÿÿ8õïªò1J$1de83aab-aab7-41fa-b0e0-993e939ed062
+³python:S117	"oRename this parameter "tempo_meridianoRef_longCeleste_nula" to match the regular expression ^[_a-z][a-z0-9_]*$.(¨Ò‰ú8õïªò1J$204d7e53-b555-4190-bf73-d3e286965369
+Ápython:S100"xRename method "converte_longitudeFixaPlaneta_para_longitude_celeste" to match the regular expression ^[a-z_][a-z0-9_]*$.(‡…Àâüÿÿÿÿ8õïªò1J$75f40355-0a74-4fc1-b1bc-6b621cfa0717
+³python:S117)"jRename this local variable "matriz_converte_para_LVLH" to match the regular expression ^[_a-z][a-z0-9_]*$.(æÛŞ²úÿÿÿÿ8Üûğªò1J$e6eb5177-3d2d-499a-b87f-183d81cd200e
+§python:S1179"cRename this local variable "vetor_posicao_LVLH" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÙÆÕÖ8Üûğªò1J$2ff24d8d-01f1-4e28-8d33-f40cd923e098
+python:S100"URename method "RvelPolar2RvelRet" to match the regular expression ^[a-z_][a-z0-9_]*$.(şÜÊùÿÿÿÿ8Üûğªò1J$edd85e21-3d17-4cd0-9b89-b5c5c87948a8
+spython:S1542A"ORename function "Vrel2Vine" to match the regular expression ^[a-z_][a-z0-9_]*$.(ËÛ¸‰üÿÿÿÿ8¢³òªò1
