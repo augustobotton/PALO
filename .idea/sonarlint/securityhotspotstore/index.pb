@@ -759,3 +759,11 @@ Z
 ,src/ModuloOrbital/orbitalUtils/det_orbita.py,7\f\7fa2341fa1631e70c6d95792e5045ab8cd783fe4
 \
 ,src/ModuloOrbital/orbitalUtils/constantes.py,f\0\f0b773356b18bc0adbf0e956b7d5b004f753b498
+_
+/src/domain/modelos/planeta/ModeloAtmosferico.py,e\7\e7aefebb1b526957889892d99f8784e26d95e4fb
+w
+Gsrc/domain/modelos/planeta/dados_JSON_planetas/dados_atmosfericos_terra,3\d\3db6dc7481ba8c3dc0325af54e06dfcf7fd3fd4c
+|
+Lsrc/domain/modelos/planeta/dados_JSON_planetas/dados_atmosfericos_terra.json,e\7\e7777f03b733e06599f867df1308b3a16749527a
+L
+src/domain/request/simula.py,b\6\b6138e47c0250683d52e35ae8a984c665bb8782f

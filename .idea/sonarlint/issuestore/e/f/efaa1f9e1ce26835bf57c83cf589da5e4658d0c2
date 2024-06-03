@@ -1,4 +1,7 @@
 
-python:S117"NRename this parameter "J2" to match the regular expression ^[_a-z][a-z0-9_]*$.(ğŸıøÿÿÿÿJ$d80fc7c8-f732-4d65-b6a4-a093786e0c6c
-python:S117"NRename this parameter "J3" to match the regular expression ^[_a-z][a-z0-9_]*$.(ğŸıøÿÿÿÿJ$f825cd79-7977-451b-a3d1-6ee631d09f39
-python:S117"NRename this parameter "J4" to match the regular expression ^[_a-z][a-z0-9_]*$.(ğŸıøÿÿÿÿJ$f3ebf38f-c173-4f66-84ba-664b78dacbfc
+’python:S117"NRename this parameter "J2" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ÿ€ëİ8÷›†İı1J$65b77d17-a517-4914-bd0f-ac6a27e042e8
+’python:S117"NRename this parameter "J3" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ÿ€ëİ8÷›†İı1J$ee77ce7f-e427-4498-989d-4ebd855cb863
+’python:S117"NRename this parameter "J4" to match the regular expression ^[_a-z][a-z0-9_]*$.(Ÿ€ëİ8÷›†İı1J$98408c01-2221-4115-824d-93291a166c62
+“python:S1007"JRename method "com_J2" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÿúÂüÿÿÿÿ8ø›†İı1J$c3a049e2-de8c-4b97-b855-83ee12c73e43
+python:S100;"JRename method "com_J3" to match the regular expression ^[a-z_][a-z0-9_]*$.(ğ¯‘Ø8ø›†İı1J$c48770b8-59b4-4e1f-8ba7-8d12d734b419
+python:S100?"JRename method "com_J4" to match the regular expression ^[a-z_][a-z0-9_]*$.(íÇŠ˜8ø›†İı1J$5c29b777-ff23-4cb3-9548-4de4948003dd
