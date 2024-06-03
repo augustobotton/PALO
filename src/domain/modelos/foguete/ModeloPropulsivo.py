@@ -3,41 +3,26 @@ from src.ModuloOrbital.orbitalUtils.Converte import Vrel2Vine
 from src.domain.modelos.planeta.ModeloPlaneta import terra
 
 class ModeloPropulsivo:
-    def __init__(self, impulso_especifico: list, massa_propelente_estagios: list, massa_propelente_terceiro_estagio: float,
-                 duracao_queima_estagios: list, tempo_espera_separacao: list, tempo_espera_ignicao: list,
-                 tempo_primeira_queima_terceiro_estagio: float, massa_estrutural_por_estagio: list,
-                 massa_de_carga_util: float, h0: float):
-        """
-        Inicializa a classe com os parâmetros fornecidos.
-
-        :param impulso_especifico: Lista de impulsos específicos para cada estágio
-        :param massa_propelente_estagios: Lista de massas de propelente para os estágios
-        :param massa_propelente_terceiro_estagio: Massa de propelente do terceiro estágio
-        :param duracao_queima_estagios: Lista de durações de queima para cada estágio
-        :param tempo_espera_separacao: Lista de tempos de espera entre as separações dos estágios
-        :param tempo_espera_ignicao: Lista de tempos de espera antes da ignição dos estágios
-        :param tempo_primeira_queima_terceiro_estagio: Duração da primeira queima do terceiro estágio
-        :param massa_estrutural_por_estagio: Lista de massas estruturais para cada estágio
-        :param massa_de_carga_util: Massa da carga útil
-        :param h0: Altura inicial
-        """
+    def __init__(self, builder):
+        self.massa_inicial_do_foguete = None
+        self.distancia_radial_inicial = None
         self.tempo_da_segunda_queima_3_estagio = None
         self.velocidade_de_exaustao = None
-        self.impulso_especifico_por_estagio = np.array(impulso_especifico)
-        self.massa_propelente_estagios_1_2 = np.array(massa_propelente_estagios)
-        self.massa_propelente_terceiro_estagio = massa_propelente_terceiro_estagio
-        self.duracao_de_queima_primeiro_estagio = duracao_queima_estagios[0]
-        self.duracao_de_queima_segundo_estagio = duracao_queima_estagios[1]
-        self.duracao_total_de_queima_do_terceiro_estagio = duracao_queima_estagios[2]
-        self.tempo_de_espera_separacao_1_2 = tempo_espera_separacao[0]
-        self.tempo_de_espera_separacao_2_3 = tempo_espera_separacao[1]
-        self.tempo_de_espera_separacao_3_4 = tempo_espera_separacao[2]
-        self.tempo_espera_ignicao_2_estagio = tempo_espera_ignicao[0]
-        self.tempo_espera_ignicao_3_estagio = tempo_espera_ignicao[1]
-        self.tempo_da_primeira_queima_3_estagio = tempo_primeira_queima_terceiro_estagio
-        self.massa_estrutural_por_estagio = massa_estrutural_por_estagio
-        self.massa_de_carga_util = massa_de_carga_util
-        self.h0 = h0
+        self.impulso_especifico_por_estagio = np.array(builder.impulso_especifico)
+        self.massa_propelente_estagios_1_2 = np.array(builder.massa_propelente_estagios)
+        self.massa_propelente_terceiro_estagio = builder.massa_propelente_terceiro_estagio
+        self.duracao_de_queima_primeiro_estagio = builder.duracao_queima_estagios[0]
+        self.duracao_de_queima_segundo_estagio = builder.duracao_queima_estagios[1]
+        self.duracao_total_de_queima_do_terceiro_estagio = builder.duracao_queima_estagios[2]
+        self.tempo_de_espera_separacao_1_2 = builder.tempo_espera_separacao[0]
+        self.tempo_de_espera_separacao_2_3 = builder.tempo_espera_separacao[1]
+        self.tempo_de_espera_separacao_3_4 = builder.tempo_espera_separacao[2]
+        self.tempo_espera_ignicao_2_estagio = builder.tempo_espera_ignicao[0]
+        self.tempo_espera_ignicao_3_estagio = builder.tempo_espera_ignicao[1]
+        self.tempo_da_primeira_queima_3_estagio = builder.tempo_primeira_queima_terceiro_estagio
+        self.massa_estrutural_por_estagio = np.array(builder.massa_estrutural_por_estagio)
+        self.massa_de_carga_util = builder.massa_de_carga_util
+        self.h0 = builder.h0
 
     def calcular_tempos(self) -> None:
         """Calcula os tempos de ignição, queima e separação para os estágios do foguete."""
@@ -148,3 +133,59 @@ class ModeloPropulsivo:
                 phii) * np.cos(angulo_i))
 
         return empuxo, massa, mu, epsl
+
+class ModeloPropulsivoBuilder:
+    def __init__(self):
+        self.impulso_especifico = []
+        self.massa_propelente_estagios = []
+        self.massa_propelente_terceiro_estagio = 0.0
+        self.duracao_queima_estagios = []
+        self.tempo_espera_separacao = []
+        self.tempo_espera_ignicao = []
+        self.tempo_primeira_queima_terceiro_estagio = 0.0
+        self.massa_estrutural_por_estagio = []
+        self.massa_de_carga_util = 0.0
+        self.h0 = 0.0
+
+    def set_impulso_especifico(self, impulso_especifico: list):
+        self.impulso_especifico = impulso_especifico
+        return self
+
+    def set_massa_propelente_estagios(self, massa_propelente_estagios: list):
+        self.massa_propelente_estagios = massa_propelente_estagios
+        return self
+
+    def set_massa_propelente_terceiro_estagio(self, massa_propelente_terceiro_estagio: float):
+        self.massa_propelente_terceiro_estagio = massa_propelente_terceiro_estagio
+        return self
+
+    def set_duracao_queima_estagios(self, duracao_queima_estagios: list):
+        self.duracao_queima_estagios = duracao_queima_estagios
+        return self
+
+    def set_tempo_espera_separacao(self, tempo_espera_separacao: list):
+        self.tempo_espera_separacao = tempo_espera_separacao
+        return self
+
+    def set_tempo_espera_ignicao(self, tempo_espera_ignicao: list):
+        self.tempo_espera_ignicao = tempo_espera_ignicao
+        return self
+
+    def set_tempo_primeira_queima_terceiro_estagio(self, tempo_primeira_queima_terceiro_estagio: float):
+        self.tempo_primeira_queima_terceiro_estagio = tempo_primeira_queima_terceiro_estagio
+        return self
+
+    def set_massa_estrutural_por_estagio(self, massa_estrutural_por_estagio: list):
+        self.massa_estrutural_por_estagio = massa_estrutural_por_estagio
+        return self
+
+    def set_massa_de_carga_util(self, massa_de_carga_util: float):
+        self.massa_de_carga_util = massa_de_carga_util
+        return self
+
+    def set_h0(self, h0: float):
+        self.h0 = h0
+        return self
+
+    def build(self):
+        return ModeloPropulsivo(self)

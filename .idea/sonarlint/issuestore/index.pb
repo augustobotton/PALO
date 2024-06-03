@@ -767,3 +767,5 @@ Gsrc/domain/modelos/planeta/dados_JSON_planetas/dados_atmosfericos_terra,3\d\3d
 Lsrc/domain/modelos/planeta/dados_JSON_planetas/dados_atmosfericos_terra.json,e\7\e7777f03b733e06599f867df1308b3a16749527a
 L
 src/domain/request/simula.py,b\6\b6138e47c0250683d52e35ae8a984c665bb8782f
+T
+$src/domain/request/interfaceteste.py,3\e\3e9a90a1528046b714db885f892cbf1ae073877a
