@@ -1,12 +1,11 @@
-import numpy as np
 from scipy.integrate import solve_ivp
 from src.domain.modelos.foguete.aerodinamica_N_estagios import aerodinamica_multiplos_estagios
 import parametros
 from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
 from src.domain.modelos.foguete.propulsao_N_estagios import propulsao_N_estagios
 from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.orbitalUtils.Converte import *
-from src.domain.orbitalUtils.det_orbita import det_orbita
+from src.ModuloOrbital.orbitalUtils.Converte import *
+from src.ModuloOrbital.orbitalUtils.det_orbita import det_orbita
 
 
 ingso = 2.3267844 * np.pi / 180  # Inclinacao

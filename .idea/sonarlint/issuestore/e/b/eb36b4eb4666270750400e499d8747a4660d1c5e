@@ -1,2 +1,6 @@
 
-›python:S930"XRemove 1 unexpected arguments; 'calcula_area_referencia' expects 3 positional arguments.(Μ¨®εύÿÿÿÿJ$ba3e1b81-65e2-44b9-9489-913eb2f8dccc
+ypython:S1172”"3Remove the unused function parameter "temperatura".(„Η•8ƒ¨ύΫύ1J$723ce655-3282-4361-9c22-a8558be0439a
+‰python:S1172•">Remove the unused function parameter "constante_do_gas_ideal".(¦Ϋόÿÿÿÿ8ƒ¨ύΫύ1J$f99312d3-f674-4748-afe7-0c6c85e39617
+|python:S1172”"6Remove the unused function parameter "numero_knudsen".(„Η•8ƒ¨ύΫύ1J$8e7e4f38-3c12-4763-af1c-c43c9a3e7942
+vpython:S1172”"0Remove the unused function parameter "altitude".(„Η•8ƒ¨ύΫύ1J$a0d23166-d9ae-4308-8490-5f7bfaf378f9
+|python:S1172”"6Remove the unused function parameter "numero_de_mach".(„Η•8ƒ¨ύΫύ1J$4766e79b-6730-433d-b614-7322b32c4687

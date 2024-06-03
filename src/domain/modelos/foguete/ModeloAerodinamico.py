@@ -6,7 +6,17 @@ from src.domain.request.parametros import tempo_limite_separacao
 
 
 class ModeloAerodinamico:
-    def __init__(self, velocidade, altitude, numero_de_mach, numero_de_knudsen, temperatura, constante_do_gas_ideal):
+    def __init__(self, velocidade: float, altitude: float, numero_de_mach: float, numero_de_knudsen: float, temperatura: float, constante_do_gas_ideal: float):
+        """
+        Inicializa a classe ModeloAerodinamico com os parâmetros fornecidos.
+
+        :param velocidade: Velocidade do foguete
+        :param altitude: Altitude do foguete
+        :param numero_de_mach: Número de Mach
+        :param numero_de_knudsen: Número de Knudsen
+        :param temperatura: Temperatura
+        :param constante_do_gas_ideal: Constante do gás ideal
+        """
         self.velocidade = velocidade
         self.altitude = altitude
         self.numero_de_mach = numero_de_mach
@@ -14,7 +24,12 @@ class ModeloAerodinamico:
         self.temperatura = temperatura
         self.constante_do_gas_ideal = constante_do_gas_ideal
 
-    def calcula(self):
+    def calcula(self) -> float:
+        """
+        Calcula o coeficiente de arrasto com base nos parâmetros fornecidos.
+
+        :return: Coeficiente de arrasto
+        """
         coeficiente_de_arrasto_em_escoamento_livre_molecular = self._computa_coef_de_arrasto_em_escoamento_livre_molecular()
         coeficiente_de_arrasto_interpolado = self._interpola_coeficiente_de_arrasto(self.numero_de_mach)
         if self.altitude < 2000e3:
@@ -22,9 +37,8 @@ class ModeloAerodinamico:
                 coeficiente_de_arrasto = coeficiente_de_arrasto_interpolado
             elif self.numero_de_knudsen < 14.5:
                 coeficiente_de_arrasto = coeficiente_de_arrasto_interpolado + (
-                        coeficiente_de_arrasto_em_escoamento_livre_molecular - coeficiente_de_arrasto_interpolado) * (
-                                                 (1 / 3) * np.log10(
-                                             self.numero_de_knudsen / np.sin(30 * np.pi / 180)) + 0.05113)
+                    coeficiente_de_arrasto_em_escoamento_livre_molecular - coeficiente_de_arrasto_interpolado) * (
+                                             (1 / 3) * np.log10(self.numero_de_knudsen / np.sin(30 * np.pi / 180)) + 0.05113)
             else:
                 coeficiente_de_arrasto = coeficiente_de_arrasto_em_escoamento_livre_molecular
         else:
@@ -32,12 +46,22 @@ class ModeloAerodinamico:
 
         return coeficiente_de_arrasto
 
-    def _computa_coef_de_arrasto_em_escoamento_livre_molecular(self):
-        return 1.75 + np.sqrt(np.pi) / (
-                2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
+    def _computa_coef_de_arrasto_em_escoamento_livre_molecular(self) -> float:
+        """
+        Computa o coeficiente de arrasto em escoamento livre molecular.
+
+        :return: Coeficiente de arrasto em escoamento livre molecular
+        """
+        return 1.75 + np.sqrt(np.pi) / (2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
 
     @staticmethod
-    def _interpola_coeficiente_de_arrasto(numero_de_mach):
+    def _interpola_coeficiente_de_arrasto(numero_de_mach: float) -> float:
+        """
+        Interpola o coeficiente de arrasto com base no número de Mach.
+
+        :param numero_de_mach: Número de Mach
+        :return: Coeficiente de arrasto interpolado
+        """
         coeficiente_de_arrasto_por_mach = np.array([[0.0000, 0.4736],
                                                     [0.1609, 0.4736],
                                                     [0.3448, 0.4764],
@@ -119,15 +143,22 @@ class ModeloAerodinamico:
                                                     [11.2294, 0.4825],
                                                     [11.4809, 0.4825],
                                                     [11.7325, 0.4824]])
-        return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1],
-                                 numero_de_mach)
+        return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1], numero_de_mach)
 
-    def aerodinamica_multiplos_estagios(self, tempo, velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
-                                        densidade_do_ar,
-                                        constante_do_gas_ideal):
+    def aerodinamica_multiplos_estagios(self, tempo: float, velocidade: float, altitude: float, numero_de_mach: float, numero_knudsen: float, temperatura: float,
+                                        densidade_do_ar: float, constante_do_gas_ideal: float):
         """
         Calcula as forças aerodinâmicas para foguetes de múltiplos estágios.
 
+        :param tempo: Tempo atual
+        :param velocidade: Velocidade do foguete
+        :param altitude: Altitude do foguete
+        :param numero_de_mach: Número de Mach
+        :param numero_knudsen: Número de Knudsen
+        :param temperatura: Temperatura
+        :param densidade_do_ar: Densidade do ar
+        :param constante_do_gas_ideal: Constante do gás ideal
+        :return: Tupla contendo o arrasto, a força de sustentação lateral e a força de sustentação
         """
         parametros = ModeloEstrutural()
 
@@ -135,12 +166,11 @@ class ModeloAerodinamico:
         fator_correcao_arrasto = parametros.fator_correcao_arrasto
 
         # Calcular o coeficiente de arrasto
-        coeficiente_arrasto = ModeloAerodinamico(velocidade, altitude, numero_de_mach, numero_knudsen, temperatura,
-                                                 constante_do_gas_ideal).calcula()
+        coeficiente_arrasto = self.calcula()
         coeficiente_arrasto_ajustado = fator_correcao_arrasto * coeficiente_arrasto
 
         # Determinar a área de referência com base no estágio
-        area_do_estagio = self.calcula_area_referencia(self, tempo, tempo_limite_separacao, area_de_referencia)
+        area_do_estagio = self.calcula_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
 
         # Calcular as forças
         arrasto = 0.5 * densidade_do_ar * velocidade ** 2 * area_do_estagio * coeficiente_arrasto_ajustado
@@ -149,12 +179,18 @@ class ModeloAerodinamico:
 
         return arrasto, forca_sustentacao_lateral, forca_sustentacao
 
-    def calcula_area_referencia(self, tempo, tempo_limite_separacao, area_de_referencia):
+    @staticmethod
+    def calcula_area_referencia(tempo: float, tempo_limite_separacao: list, area_de_referencia: list) -> float:
         """
         Calcula a área de referência com base no estágio do foguete.
+
+        :param tempo: Tempo atual
+        :param tempo_limite_separacao: Lista de tempos limite de separação
+        :param area_de_referencia: Lista de áreas de referência
+        :return: Área de referência para o estágio atual
         """
-        N = len(tempo_limite_separacao)
-        for i in range(N):
+        n_estagios = len(tempo_limite_separacao)
+        for i in range(n_estagios):
             if tempo <= tempo_limite_separacao[i]:
                 return area_de_referencia[i]
         return area_de_referencia[-1]  # Padrão para a área do último estágio

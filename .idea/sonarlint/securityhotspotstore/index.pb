@@ -3,12 +3,6 @@
 	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 U
 %src/dados/diagramas/xmldiagram.drawio,6\1\611d5a0b01a438e14397c20ce41e0ca7bf5e0fd5
-U
-%src/domain/orbitalUtils/constantes.py,b\d\bd9405a49fc9fbd8bf5257cc27bb1fa6a65486ac
-S
-#src/domain/orbitalUtils/Converte.py,7\1\7177077810dee62540bde18aa3f738a71d691c58
-U
-%src/domain/orbitalUtils/det_orbita.py,f\b\fba523399662bc71e63aad621537688d57207aaf
 a
 1src/domain/request/aquisicao_orbita_gso_na_mao.py,0\d\0dc6e5d23044797de36ed1232d3cafdd70aae812
 X
@@ -239,18 +233,12 @@ l
 Qtexto/Mec Voo Espacial/mec2/aula26/Estudo_equacao_foguete_terceira_alternativa.py,d\c\dc397cf003ce0fcc19a9270ef9ce804f4edfce39
 z
 Jtexto/Mec Voo Espacial/mec2/aula27/calculo_parametros_foguete_conceitual.m,0\8\08c426d3cd5c4005681799a8c373166a35004765
-h
-8latex_files/TCC - Augusto Pozzebon/Base/arquivo_2021.tex,7\d\7d3cd6d9a01e58dc10e6492ca24aa2e363535c11
 _
 /texto/Mec Voo Espacial/mec2/aula27/atm_padrao.m,3\e\3e132f4baef5e556828ee803c6acbd44568b35cb
 e
 5texto/Mec Voo Espacial/mec2/aula27/dinamica_foguete.m,a\2\a2c55e7c98391be0718d345611e2ae95fcea4c7c
-e
-5latex_files/TCC - Augusto Pozzebon/Base/ufsm_2021.cls,c\7\c78a9a30c9e58bf04a97e4488c9ae562b593686a
 _
 /texto/Mec Voo Espacial/mec2/aula27/det_orbita.m,9\8\98d837332025606ac0be97cc8aeffebcd2c264d2
-g
-7latex_files/TCC - Augusto Pozzebon/Base/referencias.bib,f\2\f27bbb18782633d944e6188e6a4c2032ad6c056e
 b
 2texto/Mec Voo Espacial/mec2/aula27/long_ECEF2ECI.m,b\0\b0e74e3d845f42be52d81d6fc103d18f33fa11fa
 f
@@ -259,8 +247,6 @@ i
 9texto/Mec Voo Espacial/mec2/aula27/propulsao_N_estagios.m,d\1\d1f86f58c1973a8943ceadd1b08fe8209b33e4db
 h
 8texto/Mec Voo Espacial/mec2/aula27/modelo_aerodinamico.m,9\8\98b470c630c50f5f45b5c824a73e82fe51ad0a04
-b
-2latex_files/TCC - Augusto Pozzebon/Geral/README.md,0\0\00a47f1f5e137b072a38817bce8b41937e37aff6
 l
 <texto/Mec Voo Espacial/mec2/aula27/voo_sondagem_3_estagios.m,c\4\c4b5f0b352cfb8c292d78c18063d4e577891c63d
 m
@@ -335,20 +321,12 @@ e
 ..idea/inspectionProfiles/profiles_settings.xml,1\e\1e9075f5bf079c01ef2c910709e91a497d262080
 b
 2texto/Mec Voo Espacial/mec2/aula29/long_ECEF2ECI.m,4\3\4397d187edc4efd98a3254f67abf15fe402acf67
-n
->latex_files/TCC - Augusto Pozzebon/Geral/Texto/2-Objetivos.tex,7\2\7246910c0b20bb4234bc046a672214ecdb8fadbb
 f
 6texto/Mec Voo Espacial/mec2/aula29/grav_axisimetrico.m,1\a\1a40e3a2149d7634bc955f495a9cec59bc1bfb14
-q
-Alatex_files/TCC - Augusto Pozzebon/Geral/Texto/1-Introdução.tex,e\8\e84a25845f8ec2c0b6833e405131f807781155eb
 s
 Ctexto/Mec Voo Espacial/mec2/aula29/parametros_manobra_adquire_gso.m,6\3\631200fda130bc63185da0ab703cd862adb9af32
-k
-;latex_files/TCC - Augusto Pozzebon/Geral/Texto/tutorial.tex,6\1\613dd7ecb7d099ede5fe6f461a2822690455406a
 h
 8texto/Mec Voo Espacial/mec2/aula29/modelo_aerodinamico.m,8\a\8a113dc2f2e4825a0880b5b2a3346f70dde42e98
-m
-=latex_files/TCC - Augusto Pozzebon/Geral/Texto/Conclusão.tex,0\9\09699070077b78965268d53d6b024a4e3130916f
 f
 6texto/Mec Voo Espacial/mec2/aula29/RvelPolar2RvelRet.m,0\5\056e8966f26088d98d05ade0c24d438e4f1a3b68
 i
@@ -427,8 +405,6 @@ b
 2texto/Mec Voo Espacial/mec2/code/sistReferencia.py,6\3\63734be01cbd4c39084600a001af0ed1af4e694d
 l
 <texto/Mec Voo Espacial/mec2/code/simbol_gravidade_axxisim.py,9\a\9a1b6102c135a0ab0e395ba993f4ee0561048bc3
-]
--texto/Mec Voo Espacial/mec2/trab2/GSO_TUDO.py,d\e\de11819ef0b6c2f15976b82de451bbe3062ae878
 q
 Atexto/Mec Voo Espacial/mec2/trab2/aula18/Calcula_sensibilidades.m,b\4\b42da329ab39c030c254d87769719290562b1c82
 �
@@ -775,3 +751,11 @@ Ltexto/Mec Voo Espacial/mec2/trab2/aula_29_certo/ultimofinalmesmo29/aaaaaa.py,3
 Q.idea/sonarlint/securityhotspotstore/b/f/bf6865382f09169786253d8fb3a34d375613906b,9\f\9fd5ffbbc9ed99249a3beb6d9a37469781eb34f2
 x
 Htexto/Mec Voo Espacial/mec2/trab2/aula_29_certo/ultimofinalmesmo29/aa.py,7\2\720e991c1592bdea24253d710e3697d0ee1005af
+^
+.src/domain/modelos/foguete/dinamica_foguete.py,8\e\8e490d02e7c3c0ceeb94f5be93e3ef7db3652903
+Z
+*src/ModuloOrbital/orbitalUtils/Converte.py,f\a\faa949f4345698dea53c3a704f76e5550a1cad6d
+\
+,src/ModuloOrbital/orbitalUtils/det_orbita.py,7\f\7fa2341fa1631e70c6d95792e5045ab8cd783fe4
+\
+,src/ModuloOrbital/orbitalUtils/constantes.py,f\0\f0b773356b18bc0adbf0e956b7d5b004f753b498

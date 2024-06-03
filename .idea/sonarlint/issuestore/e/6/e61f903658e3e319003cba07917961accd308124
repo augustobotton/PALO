@@ -1,8 +1,4 @@
 
-˜python:S1170"ORename this parameter "Isp" to match the regular expression ^[_a-z][a-z0-9_]*$.(£¿ãıÿÿÿÿ8à¥Ÿõ1J$74c88b71-21f7-41c9-97d9-582ce3081b6f
-—python:S1170"NRename this parameter "mL" to match the regular expression ^[_a-z][a-z0-9_]*$.(£¿ãıÿÿÿÿ8á¥Ÿõ1J$5d3e82e8-07f1-4a1d-8857-3cd9fe101470
-opython:S1172S"*Remove the unused function parameter "tq".(—ÜÚè8á¥Ÿõ1J$f5e8cf0e-ec0b-4620-89e7-43dcf1dea6bd
-opython:S1172S"*Remove the unused function parameter "ti".(—ÜÚè8á¥Ÿõ1J$7adcf4c6-cb01-47c8-a0e5-0fdd4269cb8c
-opython:S1172S"*Remove the unused function parameter "ts".(—ÜÚè8á¥Ÿõ1J$a8390d07-3ea9-4061-aae0-32ae4d6b3824
-œpython:S117u"SRename this local variable "Ai" to match the regular expression ^[_a-z][a-z0-9_]*$.(ûãùüÿÿÿÿ8á¥Ÿõ1J$a432af10-5fe8-4100-b180-d1efe215c153
-¡python:S100d"XRename method "propulsao_N_estagios" to match the regular expression ^[a-z_][a-z0-9_]*$.(×¥Ç•ùÿÿÿÿ8â¥Ÿõ1J$1781a4a7-464c-45d1-974b-641946aab345
+ƒpython:S1172h"?Remove the unused function parameter "tempos_de_fim_de_queima".(—ÀØc8Œ¥×Ûı1J$02314bcf-3e9f-46f5-9b21-8fcb8260dce8
+}python:S1172h"9Remove the unused function parameter "tempos_de_ignicao".(—ÀØc8¥×Ûı1J$70170e75-461d-4f45-840b-da149b8537fb
+…python:S1172i";Remove the unused function parameter "tempos_de_separacao".(³Ê’Âùÿÿÿÿ8¥×Ûı1J$04dcb499-8336-4e96-96b7-11b2904e642b

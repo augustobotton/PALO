@@ -1,15 +1,11 @@
 import os
 
-import numpy as np
-from src.domain.modelos.planeta import ModeloAtmosferico
 from scipy.integrate import solve_ivp
-from src.domain.modelos.foguete import ModeloAerodinamico
 
 import parametros
 from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
-from src.domain.modelos.foguete import ModeloPropulsivo
-from src.domain.orbitalUtils.Converte import *
-from src.domain.orbitalUtils.det_orbita import det_orbita
+from src.ModuloOrbital.orbitalUtils.Converte import *
+from src.ModuloOrbital.orbitalUtils.det_orbita import det_orbita
 
 
 global Re, we, mut, J2, J3, J4, g, lc, dT, Sr, fator_correcao, massa_carga_util

@@ -1,5 +1,5 @@
 import numpy as np
-from src.domain.orbitalUtils.Converte import Vrel2Vine
+from src.ModuloOrbital.orbitalUtils.Converte import Vrel2Vine
 
 
 def parametros_manobra_adquire_gso(t, m, X):
