@@ -144,25 +144,18 @@ class ModeloAerodinamico:
                                                     [11.7325, 0.4824]])
         return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1], numero_de_mach)
 
-    def aerodinamica_multiplos_estagios(self, tempo: float, velocidade: float, altitude: float, numero_de_mach: float, numero_knudsen: float, temperatura: float,
-                                        densidade_do_ar: float, constante_do_gas_ideal: float):
+    def aerodinamica_multiplos_estagios(self, tempo: float, velocidade: float, area_de_referencia: list, tempo_limite_separacao: list,
+                                        densidade_do_ar: float):
         """
         Calcula as forças aerodinâmicas para foguetes de múltiplos estágios.
 
         :param tempo: Tempo atual
         :param velocidade: Velocidade do foguete
-        :param altitude: Altitude do foguete
-        :param numero_de_mach: Número de Mach
-        :param numero_knudsen: Número de Knudsen
-        :param temperatura: Temperatura
         :param densidade_do_ar: Densidade do ar
-        :param constante_do_gas_ideal: Constante do gás ideal
         :return: Tupla contendo o arrasto, a força de sustentação lateral e a força de sustentação
         """
-        parametros = ModeloEstrutural()
 
-        area_de_referencia = parametros.area_de_referencia
-        fator_correcao_arrasto = parametros.fator_correcao_arrasto
+        fator_correcao_arrasto = 1.28
 
         # Calcular o coeficiente de arrasto
         coeficiente_arrasto = self.calcula()

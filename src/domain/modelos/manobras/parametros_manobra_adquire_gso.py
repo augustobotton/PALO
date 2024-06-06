@@ -1,8 +1,9 @@
 import numpy as np
-from src.ModuloOrbital.orbitalUtils.Converte import Vrel2Vine
+
+from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
 
 
-def parametros_manobra_adquire_gso(t, m, X):
+def parametros_manobra_adquire_gso(t, m, X, orbita_alvo, foguete):
     """
     Função para calcular os parâmetros da manobra mono impulsiva de aquisição de órbita GSO.
     Deve ser chamada no final da função de dinâmica, pois precisa rodar ao longo do tempo da simulação,
@@ -16,18 +17,20 @@ def parametros_manobra_adquire_gso(t, m, X):
     - X: vetor de estado [V, A, phi, r, delta]
 
     """
-    we = parametros.velocidade_inercial_de_rotação_da_terra
-    sinalPhii = parametros.sinalPhii
-    achouApogeu = parametros.achouApogeu
+    we = velocidade_inercial_de_rotação_da_terra
+    g = parametros.gravidade_padrao_nivel_do_mar
+    velocidade_orbital_desejada = orbita_alvo.velocidade
+
+    sinalPhii = np.sign
+    achouApogeu = 0
+
     ti = parametros.ti
     tq = parametros.tq
     ts = parametros.tempo_limite_separacao
     Tq3 = parametros.Tq3
     Tq31 = parametros.tempo_da_primeira_queima_3_estagio
     Ts3 = parametros.tempo_de_espera_separacao_3_4
-    vgso = parametros.vgso
     Isp = parametros.impulso_especifico_por_estagio
-    g = parametros.gravidade_padrao_nivel_do_mar
     mp3 = parametros.mp3
 
     # Desmenbra o vetor de estado
@@ -39,7 +42,7 @@ def parametros_manobra_adquire_gso(t, m, X):
 
     # Vetor velocidade inercial
     Vi, phii, _ = Vrel2Vine(V, phi, A, we, r, delta)
-    agso = parametros.agso
+    apogeu_orbita_desejada = orbita_alvo.apogeu
     # Realização de uma sequência de testes para verificar a ocorrência do apogeu da órbita GTO.
     # Quando ele ocorre, determina os parâmetros da manobra.
     if r > 0.9 * agso:

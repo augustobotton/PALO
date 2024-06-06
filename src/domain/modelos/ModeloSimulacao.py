@@ -44,6 +44,16 @@ class Simulacao:
 		self.massa_inicial = np.sum(self.foguete.mp) + np.sum(self.foguete.ms) + self.foguete.mL
 		self.distancia_radial_inicial = self.raio_equatorial + self.altitude_inicial
 
+	def simular(self):
+		dinamica_foguete = self.foguete.dinamica_foguete
+		condicoes_iniciais = [self.velocidade_inicial, self.azimute_inicial, self.angulo_elevacao_inicial,
+		                      self.distancia_radial_inicial, self.latitude_inicial, self.longitude_inicial]
+		opcoes_integracao = {'rtol': 1e-8, 'atol': 1e-10, 'max_step': 1}
+
+		resposta_simulacao = solve_ivp(dinamica_foguete, (0, self.tempo_simulacao), y0=condicoes_iniciais,
+		                               **opcoes_integracao)
+		return resposta_simulacao.t, resposta_simulacao.y
+
 	def _calcular_condicoes_azimute(self):
 		y_t = np.cos(self.inclinacao_orbita) / np.cos(self.latitude_inicial)
 		if abs(y_t) > 1:
@@ -66,13 +76,3 @@ class Simulacao:
 		return np.arctan(np.tan(self.azimute_final) - (
 					apogeu_transferencia * self.velocidade_rotacao * np.cos(self.latitude_inicial)) / (
 					                 velocidade_transferencia * np.cos(self.azimute_final)))
-
-	def simular(self):
-		dinamica_foguete = self.foguete.dinamica_foguete
-		condicoes_iniciais = [self.velocidade_inicial, self.azimute_inicial, self.angulo_elevacao_inicial,
-		                      self.distancia_radial_inicial, self.latitude_inicial, self.longitude_inicial]
-		opcoes_integracao = {'rtol': 1e-8, 'atol': 1e-10, 'max_step': 1}
-
-		resposta_simulacao = solve_ivp(dinamica_foguete, (0, self.tempo_simulacao), y0=condicoes_iniciais,
-		                               **opcoes_integracao)
-		return resposta_simulacao.t, resposta_simulacao.y

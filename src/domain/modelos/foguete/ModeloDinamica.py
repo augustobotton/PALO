@@ -1,5 +1,6 @@
 import numpy as np
-from src.domain.manobras.parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
+
+from src.domain.modelos.manobras.parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
 from src.domain.modelos.planeta.ModeloGravidadePlanetaAxisimetrico import calcular_gravidade_axisimetric
 
 
@@ -21,16 +22,21 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 	ft, massa, mu, epsl = foguete.modelo_propulsivo.propulsao_N_estagios(vetor_tempo,
 	                                                                     vetor_de_estados_foguete)
 
+
 	# Cálculo do modelo atmosférico
 	altitude = distancia_radial - planeta.raio_equatorial
-	T, _, _, rho, _, M, _, _, Kn, _, _, R = modelo_atmosferico.calcula(
+	T, _, _, densidade_do_ar, _, M, _, _, Kn, _, _, R = modelo_atmosferico.calcula(
 		altitude, velocidade, planeta.tempo_longitude_celeste_nula, planeta.delta_temperatura_atm
 	)
 
 	# Cálculo do modelo aerodinâmico
+	areas_de_referencia_para_calculo_do_arrasto, _, _ = (
+		foguete.modelo_estrutural.calcula())
+	tempos_de_separacao = foguete.modelo_propulsivo.tempos_de_separacao
+
 	D, fy, L = foguete.modelo_aerodinamico.aerodinamica_multiplos_estagios(
-		vetor_tempo, velocidade, altitude, M, Kn, T, rho, R
-	)
+		vetor_tempo, velocidade,areas_de_referencia_para_calculo_do_arrasto, tempos_de_separacao,
+		densidade_do_ar)
 
 	# Cálculo da gravidade
 	gc, gd = calcular_gravidade_axisimetric(distancia_radial, latitude)
@@ -52,7 +58,8 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 			massa * (velocidade ** 2 / distancia_radial) * np.cos(phi) ** 2 * np.sin(azimute) * np.tan(
 		latitude) +
 			ft * np.sin(mu) + fy - massa * gd * np.sin(azimute) +
-			massa * planeta.velocidade_inercial_de_rotacao ** 2 * distancia_radial * np.sin(azimute) * np.sin(
+			massa * planeta.velocidade_inercial_de_rotacao ** 2 * distancia_radial * np.sin(azimute) *
+			np.sin(
 		latitude) * np.cos(latitude) -
 			2 * massa * planeta.velocidade_inercial_de_rotacao * velocidade * (
 					np.sin(phi) * np.cos(azimute) * np.cos(latitude) - np.cos(phi) * np.sin(latitude))
@@ -81,8 +88,8 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 	if altura_relativa <= base_de_lancamento.comprimento_trilho and vetor_tempo <= 10:
 		Ap = 0
 		phip = 0
-     #TODO verificar onde e como chamar essa funcao provavelmente no foguete
-	if not achou_apogeu:
+	# TODO verificar onde e como chamar essa funcao provavelmente no foguete
+	if not parametros_manobra_adquire_gso.achouapogeu:
 		parametros_manobra_adquire_gso(vetor_tempo, massa, vetor_de_estados_foguete)
 
 	# Derivada do vetor de estado

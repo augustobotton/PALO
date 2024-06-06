@@ -3,7 +3,7 @@ import os
 from scipy.integrate import solve_ivp
 
 import parametros
-from src.domain.modelos.foguete.dinamica_foguete import dinamica_foguete
+from src.domain.modelos.foguete.ModeloDinamica import dinamica_foguete
 from src.ModuloOrbital.orbitalUtils.Converte import *
 from src.ModuloOrbital.orbitalUtils.det_orbita import det_orbita
 

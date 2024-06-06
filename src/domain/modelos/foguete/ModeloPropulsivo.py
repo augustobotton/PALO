@@ -1,6 +1,7 @@
 import numpy as np
-from src.ModuloOrbital.orbitalUtils.Converte import Vrel2Vine
 from src.domain.modelos.planeta.ModeloPlaneta import terra
+from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
+
 
 class ModeloPropulsivo:
     def __init__(self, builder):
