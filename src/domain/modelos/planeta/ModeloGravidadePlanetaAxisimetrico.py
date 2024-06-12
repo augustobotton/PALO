@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def calcular_gravidade_axisimetric(distancia_radial, colatitude, planeta):
+def calcular_gravidade_axisimetrico(distancia_radial, colatitude, planeta):
 	"""
     Calcula a gravidade de um planeta axissimétrico considerando as constantes de Jeffery (J2, J3, J4).
 

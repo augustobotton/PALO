@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.domain.modelos.manobras.parametros_manobra_adquire_gso import parametros_manobra_adquire_gso
-from src.domain.modelos.planeta.ModeloGravidadePlanetaAxisimetrico import calcular_gravidade_axisimetric
+from src.domain.modelos.planeta.ModeloGravidadePlanetaAxisimetrico import calcular_gravidade_axisimetrico
 
 
 def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, planeta,
@@ -39,7 +39,7 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 		densidade_do_ar)
 
 	# Cálculo da gravidade
-	gc, gd = calcular_gravidade_axisimetric(distancia_radial, latitude)
+	gc, gd = calcular_gravidade_axisimetrico(distancia_radial, latitude)
 
 	# Equações de cinemática de translação
 	rp = velocidade * np.sin(phi)
