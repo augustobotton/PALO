@@ -76,13 +76,13 @@ class Manobras:
 		self.orbita.excentricidade = excentricidade
 		self.orbita.inclinacao = inclinacao
 		self.orbita.raan = raan
-		self.orbita.arg_perigeu = arg_perigeu
+		self.orbita.arg_periastro = arg_perigeu
 		self.orbita.anomalia_verdadeira = anomalia_verdadeira
 
 
 # Exemplo de uso
 orbita_inicial = Orbita(semi_eixo_maior=7000e3, excentricidade=0.001, inclinacao=98.7, raan=120,
-                        arg_perigeu=45, anomalia_verdadeira=10)
+                        arg_periastro=45, anomalia_verdadeira=10)
 manobras = Manobras(orbita_inicial)
 
 # Aplicar uma mudança de velocidade
@@ -98,5 +98,5 @@ print("Novo Semieixo Maior:", orbita_inicial.semi_eixo_maior)
 print("Nova Excentricidade:", orbita_inicial.excentricidade)
 print("Nova Inclinação:", np.degrees(orbita_inicial.inclinacao))
 print("Novo RAAN:", np.degrees(orbita_inicial.raan))
-print("Novo Argumento do Perigeu:", np.degrees(orbita_inicial.arg_perigeu))
+print("Novo Argumento do Perigeu:", np.degrees(orbita_inicial.arg_periastro))
 print("Nova Anomalia Verdadeira:", np.degrees(orbita_inicial.anomalia_verdadeira))

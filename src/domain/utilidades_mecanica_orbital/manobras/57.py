@@ -1,7 +1,6 @@
 # Exemplo 5.7 do Tewari
 
 
-# Importa o pacote feito em outra aula
 # Importações de pacotes do Python
 import numpy as np
 # Inicia o exercício
@@ -56,7 +55,7 @@ vcf=Cpc@vpf
 rcf=np.array(rci);
 print(vcf);print(rcf)
 ## Elementos orbitais da orbita resultante
-par_orb=det_orbita(0,rcf,vcf,mu)
+par_orb=determina_parametros_orbitais(0,rcf,vcf,mu)
 print('Elementos orbitais da orbita resultante');
 print('af = ',par_orb[0],'m');
 print('ef = ',par_orb[1]);
