@@ -30,9 +30,9 @@ def determina_parametros_orbitais(t0, mu, posicao_celeste, velocidade_celeste):
 	sin_theta = np.dot(posicao_celeste, pc) / (distancia_radial_observada * p)
 	anomalia_verdadeira = np.arctan2(sin_theta, cos_theta)
 
-	# Órbita elíptica, parabólica ou hiperbólica
+
 	if e < 1:
-		# Movimento médio e anomalia excêntrica
+		# Órbita elíptica
 		E = 2 * np.arctan(np.sqrt((1 - e) / (1 + e)) * np.tan(anomalia_verdadeira / 2))
 		tempo_periastro = t0 - (E - e * np.sin(E)) / np.sqrt(mu / a ** 3)
 	elif e == 1:
@@ -63,3 +63,4 @@ def determina_parametros_orbitais(t0, mu, posicao_celeste, velocidade_celeste):
 		anomalia_verdadeira).com_tempo_de_periastro(tempo_periastro).construir()
 
 	return orbita
+

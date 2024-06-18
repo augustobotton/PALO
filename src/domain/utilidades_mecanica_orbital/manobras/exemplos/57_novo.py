@@ -3,10 +3,6 @@
 # Importações de pacotes do Python
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.determina_parametros_orbitais import \
-    determina_parametros_orbitais
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import matriz_rotacao_orbital_inercial
-
 # Inicia o exercício
 # Constante gravitacional da Terra
 mu=3.986e14; # m^3/s^2

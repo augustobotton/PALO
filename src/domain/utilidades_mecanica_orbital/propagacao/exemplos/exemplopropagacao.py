@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.propagacao.propagaOrbKepleriana import *
+from src.domain.utilidades_mecanica_orbital.propagacao.propagacao import *
 
 #
 # Script com exemplos de propagacao de orbita

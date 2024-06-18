@@ -44,7 +44,7 @@ def dinPert3corpo(t,X):
 
 #
 # Integra a equação de dinâmica perturbada por terceiro corpo para determinar a posição e
-# velocidade helicêntrica do VE a partir de agora é 100 dias solares médios
+# velocidade heliocêntrica do VE a partir de agora é 100 dias solares médios
 X0=np.concatenate((R0,V0))
 T=100*24*60*60 # s - tempo final
 sol=solve_ivp(dinPert3corpo,[0, T],X0,max_step=24*60*60)
