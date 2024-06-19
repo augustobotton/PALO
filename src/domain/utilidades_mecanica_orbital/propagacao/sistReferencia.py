@@ -1,5 +1,6 @@
 import numpy as np
 
+#TODO trocar das rotações para os angulos de acordo com as referencias
 
 # Matrizes de rotação elementares
 def rotX(alf):

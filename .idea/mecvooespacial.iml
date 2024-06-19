@@ -9,7 +9,4 @@
     <option name="format" value="PLAIN" />
     <option name="myDocStringFormat" value="Plain" />
   </component>
-  <component name="SonarLintModuleSettings">
-    <option name="uniqueId" value="54db4ca5-d478-43e2-b508-ead45e6f74cd" />
-  </component>
 </module>

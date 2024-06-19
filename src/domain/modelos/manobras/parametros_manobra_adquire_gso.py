@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
+from src.domain.utilidades_mecanica_orbital.Orbitas.orbitalUtils.Converte import Vrel2Vine
 
 
 def parametros_manobra_adquire_gso(t, m, X, orbita_alvo, foguete):
