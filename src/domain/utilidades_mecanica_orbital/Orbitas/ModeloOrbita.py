@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.Orbitas.orbitalUtils.calculos_orbitais import determina_parametros_orbitais
+from src.domain.utilidades_mecanica_orbital.orbitalUtils.calculos_orbitais import determina_parametros_orbitais
 
 
 class Orbita:

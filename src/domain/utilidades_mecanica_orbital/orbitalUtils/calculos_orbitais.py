@@ -5,7 +5,7 @@ raio_da_terra = 6378.137 * 1000  # [km]
 parametro_gravitacional = 3.986e14  # [m^2/s^2]
 
 
-def calcaula_velociade_orbital(parametro_gravitacional,raio, semi_eixo_maior=None):
+def calcaula_velocidade_orbital(parametro_gravitacional, raio, semi_eixo_maior=None):
     """
     Calcula a velocidade orbital.
 
@@ -23,7 +23,7 @@ def calcaula_velociade_orbital(parametro_gravitacional,raio, semi_eixo_maior=Non
 
 def semi_eixo_maior(periapsis, apoapsis):
     """
-    Calcula o semi-eixo maior de uma órbita.
+    Calcula o semi-eixo maior de uma órbita eliptica.
 
     Parâmetros:
     periapsis (float): Distância do periapsis.
