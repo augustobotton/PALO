@@ -66,9 +66,9 @@ def manobra_coplanar(orbita_inicial: Orbita, orbita_final: Orbita):
     # Considerar possibilidade de orbita inicial eliptica
     if orbita_inicial.excentricidade > 0:
 
-        anomalia_verdadeira = calcula_anomalia_verdadeira(orbita_inicial, r_f) #TODO conferir equação para anomalia verdadeira
-        angulo_alpha = np.arccos(
-            np.cos(anomalia_verdadeira) / (1 + orbita_inicial.excentricidade * np.cos(anomalia_verdadeira)))
+        # anomalia_verdadeira = calcula_anomalia_verdadeira(orbita_inicial, r_f) #TODO conferir equação para anomalia verdadeira
+        # angulo_alpha = np.arccos(
+        #     np.cos(anomalia_verdadeira) / (1 + orbita_inicial.excentricidade * np.cos(anomalia_verdadeira)))
     else:
         angulo_alpha = np.arccos((r_f * v_i) / (r_f * v_f))
 
@@ -87,3 +87,5 @@ def manobra_mudanca_de_plano(delta_inclinacao, vi):
 
 def manobra_mudanca_de_plano_generica():
     return 0
+
+#TODO olhar exemplo resolvido na aula 27 e criar apenas as equacoes e n criar uma funcao
