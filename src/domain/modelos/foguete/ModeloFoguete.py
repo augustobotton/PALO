@@ -2,9 +2,12 @@ import numpy as np
 from src.domain.modelos.foguete.ModeloAerodinamico import ModeloAerodinamico
 from src.domain.modelos.foguete.ModeloEstrutural import ModeloEstrutural
 from src.domain.modelos.foguete.ModeloPropulsivo import ModeloPropulsivo
+from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
+
 
 class ModeloFoguete:
-    def __init__(self, modelo_propulsivo: ModeloPropulsivo, modelo_estrutural: ModeloEstrutural, modelo_aerodinamico: ModeloAerodinamico):
+    def __init__(self, modelo_propulsivo: ModeloPropulsivo, modelo_estrutural: ModeloEstrutural,
+                 modelo_aerodinamico: ModeloAerodinamico):
         """
         Inicializa a classe ModeloFoguete com os modelos fornecidos.
 
@@ -12,6 +15,20 @@ class ModeloFoguete:
         :param modelo_estrutural: Instância de ModeloEstrutural
         :param modelo_aerodinamico: Instância de ModeloAerodinamico
         """
+        self.sinal_phi_inercial = None
+        self.acho_apogeu = None
+        self.Dv = None
+        self.velocidade_de_exaustao = None
+        self.lambL = None
+        self.lamb = None
+        self.lamb2 = None
+        self.lamb1 = None
+        self.lamb0 = None
+        self.m03 = None
+        self.massa_total_na_ignicacao_2_estagio = None
+        self.sigma = None
+        self.ms_mpx_sum = None
+        self.mpx = None
         self.modelo_propulsivo = modelo_propulsivo
         self.modelo_estrutural = modelo_estrutural
         self.modelo_aerodinamico = modelo_aerodinamico
@@ -21,7 +38,7 @@ class ModeloFoguete:
         self.massa_de_carga_util = modelo_estrutural.massa_de_carga_util
         self.massa_inicial_do_foguete = modelo_propulsivo.massa_inicial_do_foguete
         self.impulso_especifico_por_estagio = modelo_propulsivo.impulso_especifico_por_estagio
-        self.Sr = [modelo_estrutural.area_secao_transversal_1_estagio,
+        self.Sr = [modelo_estrutural.area_secao_transversal_1_estagio, #TODO pegar Sr calculado
                    modelo_estrutural.area_secao_transversal_2_estagio,
                    modelo_estrutural.area_secao_transversal_3_estagio,
                    modelo_estrutural.area_secao_transversal_carga_util]
@@ -32,11 +49,13 @@ class ModeloFoguete:
 
         :param planeta: Instância do planeta com o atributo gravidade
         """
-        mpx = np.array([self.massa_propelente_estagios_1_2[0], self.massa_propelente_estagios_1_2[1], self.massa_propelente_terceiro_estagio])
+        mpx = np.array([self.massa_propelente_estagios_1_2[0], self.massa_propelente_estagios_1_2[1],
+                        self.massa_propelente_terceiro_estagio])
         ms_mpx_sum = self.massa_estrutural_por_estagio + mpx
         sigma = self.massa_estrutural_por_estagio / ms_mpx_sum
 
-        massa_total_na_ignicacao_2_estagio = self.massa_estrutural_por_estagio[1] + mpx[1] + self.massa_estrutural_por_estagio[2] + mpx[2] + self.massa_de_carga_util
+        massa_total_na_ignicacao_2_estagio = self.massa_estrutural_por_estagio[1] + mpx[1] + \
+                                             self.massa_estrutural_por_estagio[2] + mpx[2] + self.massa_de_carga_util
         m03 = self.massa_estrutural_por_estagio[2] + mpx[2] + self.massa_de_carga_util
 
         lamb0 = massa_total_na_ignicacao_2_estagio / self.massa_inicial_do_foguete
@@ -81,6 +100,7 @@ class ModeloFoguete:
         print('Velocidades de exaustão (m/s):', self.velocidade_de_exaustao)
         print('Razão de carga útil total:', self.lambL)
         print('Impulso de velocidade total ideal (m/s):', self.Dv)
+
 
 
 class ConstrutorDeFoguete:

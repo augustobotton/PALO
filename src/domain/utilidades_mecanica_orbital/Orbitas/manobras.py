@@ -60,8 +60,8 @@ def manobra_bieliptica(raio_intermediario, raio_da_orbita_desejada, orbita_inici
 def manobra_coplanar(orbita_inicial: Orbita, orbita_final: Orbita):
     semi_eixo_orbita_final = semi_eixo_maior(orbita_final.calcula_periastro(), orbita_final.calcula_apoastro())
     r_f = np.linalg.norm(orbita_inicial.calcular_vetor_posicao_orbital())
-    v_i = calcaula_velocidade_orbital(orbita_inicial.mu, r_f)
-    v_f = calcaula_velocidade_orbital(orbita_final.mu, r_f, semi_eixo_orbita_final)
+    v_i = calcula_velocidade_orbital(orbita_inicial.mu, r_f)
+    v_f = calcula_velocidade_orbital(orbita_final.mu, r_f, semi_eixo_orbita_final)
 
     # Considerar possibilidade de orbita inicial eliptica
     if orbita_inicial.excentricidade > 0:

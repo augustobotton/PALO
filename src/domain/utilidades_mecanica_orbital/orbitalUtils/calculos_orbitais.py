@@ -5,7 +5,7 @@ raio_da_terra = 6378.137 * 1000  # [km]
 parametro_gravitacional = 3.986e14  # [m^2/s^2]
 
 
-def calcaula_velocidade_orbital(parametro_gravitacional, raio, semi_eixo_maior=None):
+def calcula_velocidade_orbital(parametro_gravitacional, raio, semi_eixo_maior=None):
     """
     Calcula a velocidade orbital.
 
