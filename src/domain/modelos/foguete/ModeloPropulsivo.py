@@ -93,7 +93,7 @@ class ModeloPropulsivo:
         :param massa_carga_util: Massa da carga útil (opcional).
         :return: Tupla de empuxo e massa.
         """
-        estagio -= 1  # Ajuste para arrays baseados em 0
+       # estagio -= 1  # Ajuste para arrays baseados em 0
         if tempo <= tempos_de_ignicao[estagio]:
             massa = massa_inicial if estagio == 0 else self.calcular_massa_apos_separacao(
                 massa_propelente, massa_estrutural,
@@ -158,13 +158,13 @@ class ModeloPropulsivo:
                                                    self.massa_de_carga_util)
 
         # Cálculos controle
-        velocidade, angulo, phi, raio, delta = vetor_de_estados
+        velocidade, angulo, phi, raio, delta, long = vetor_de_estados
         altura = raio - self.planeta.raio_equatorial
         if altura < 200e3:
             epsl = 0
             mu = 0
         else:
-            _, phii, angulo_i = Vrel2Vine(velocidade, phi, angulo, self.planeta.velocidade_angular, raio, delta)
+            _, phii, angulo_i = Vrel2Vine(velocidade, phi, angulo, self.planeta.velocidade_inercial_de_rotacao, raio, delta)
             mu = np.arcsin(
                 np.cos(angulo) * np.cos(phii) * np.sin(angulo_i) - np.sin(angulo) * np.cos(phii) * np.cos(angulo_i))
             epsl = -np.arctan2(

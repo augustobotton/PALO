@@ -1,3 +1,5 @@
+import pickle
+from tqdm import tqdm
 import numpy as np
 from scipy.integrate import solve_ivp
 
@@ -15,9 +17,8 @@ class Simulacao:
         self.base_de_lancamento = base_de_lancamento
         self.foguete = foguete
 
-
         self.inclinacao_orbita = np.radians(self.orbita_alvo.inclinacao)
-        self.altitude_geo_sincrona = self.orbita_alvo.semi_eixo_maior
+        self.altitude_alvo = self.orbita_alvo.semi_eixo_maior
 
         self._configurar_parametros_planeta()
         self._configurar_parametros_base()
@@ -39,43 +40,63 @@ class Simulacao:
         self.longitude_inicial = self.base_de_lancamento.longitude_base_de_lancamento
         self.comprimento_trilho = self.base_de_lancamento.comprimento_do_trilho
 
-    def _configurar_parametros_orbita(self):  #TODO receber uma orbita
-        self.velocidade_geo_sincrona = np.sqrt(self.constante_gravitacional / self.altitude_geo_sincrona)
-
+    def _configurar_parametros_orbita(self):
+        self.velocidade_geo_sincrona = np.sqrt(self.constante_gravitacional / self.altitude_alvo)
         self.distancia_radial_inicial = self.raio_equatorial + self.altitude_inicial
 
     def _calcular_condicoes_azimute(self):
         y_t = np.cos(self.inclinacao_orbita) / np.cos(self.latitude_inicial)
         if abs(y_t) > 1:
-            print(
-                'Nao eh possivel atingir a inclinacao a partir da latitude inicial. Calculando a menor possivel')
+            print('Nao eh possivel atingir a inclinacao a partir da latitude inicial. Calculando a menor possivel')
             y_t = np.sign(y_t)
 
         self.azimute_final = np.arcsin(y_t)
         self.azimute_inicial = self._estimar_azimute_inicial()
 
         print(f'Condicao final de azimute de velocidade inercial (grau): {np.degrees(self.azimute_final)}')
-        print(
-            f'Condicao inicial de azimute de velocidade relativa (grau): {np.degrees(self.azimute_inicial)}')
+        print(f'Condicao inicial de azimute de velocidade relativa (grau): {np.degrees(self.azimute_inicial)}')
 
     def _estimar_azimute_inicial(self):
         apogeu_transferencia = self.raio_equatorial + 250e3
-        semi_eixo_maior_transferencia = (self.altitude_geo_sincrona + apogeu_transferencia) / 2
+        semi_eixo_maior_transferencia = (self.altitude_alvo + apogeu_transferencia) / 2
         velocidade_transferencia = np.sqrt(
             self.constante_gravitacional * (2 / apogeu_transferencia - 1 / semi_eixo_maior_transferencia))
         return np.arctan(np.tan(self.azimute_final) - (
                 apogeu_transferencia * self.velocidade_rotacao * np.cos(self.latitude_inicial)) / (
                                  velocidade_transferencia * np.cos(self.azimute_final)))
 
+    def progress_callback(self, t, y, bar):
+        bar.update(t - bar.n)
+        return t
+
     def simular(self):
         parametros_apogeu = ParametrosManobraAdquireOrbitaDeTransferencia()
 
         condicoes_iniciais = [self.velocidade_inicial, self.azimute_inicial, self.angulo_elevacao_inicial,
-                              self.distancia_radial_inicial, self.latitude_inicial]
+                              self.distancia_radial_inicial, self.latitude_inicial, self.longitude_inicial]
 
         opcoes_integracao = {'rtol': 1e-8, 'atol': 1e-10, 'max_step': 1}
+        print(f'Simulando por {self.tempo_simulacao} segundos')
+        # Create a progress bar
+        with tqdm(total=self.tempo_simulacao) as bar:
+            def fun(t, y):
+                bar.update(t - bar.n)
+                return dinamica_foguete(t, y, self.base_de_lancamento, self.planeta, self.foguete, parametros_apogeu,
+                                        self.orbita_alvo)
 
-        resposta_simulacao = solve_ivp(dinamica_foguete, (0, self.tempo_simulacao), y0=condicoes_iniciais, args=(
-            self.base_de_lancamento, self.planeta, self.foguete, parametros_apogeu, self.orbita_alvo),
-                                       **opcoes_integracao)
+            resposta_simulacao = solve_ivp(
+                fun,
+                (0, self.tempo_simulacao),
+                y0=condicoes_iniciais,
+                method='RK45',
+                t_eval=None,
+                **opcoes_integracao
+            )
+
+        # Save the response to a file
+        with open('resposta_simulacao.pkl', 'wb') as f:
+            pickle.dump(resposta_simulacao, f)
+
         return resposta_simulacao.t, resposta_simulacao.y
+
+

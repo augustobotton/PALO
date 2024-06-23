@@ -4,7 +4,7 @@ from src.domain.modelos.planeta.ModeloGravidadePlanetaAxisimetrico import calcul
 
 
 def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, planeta,
-                     foguete, parametrosApogeu, orbita_alvo):
+                     foguete, parametros_apogeu, orbita_alvo):
     """
 	Função para a dinâmica de translação de um foguete com respeito ao referencial PCPF.
 	Sistema de referência: aerodinâmico.
@@ -12,26 +12,26 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 	"""
 
     # Extrai os parâmetros do vetor de estado
-    velocidade, azimute, phi, distancia_radial, latitude = vetor_de_estados_foguete[:5]
+    velocidade, azimute, phi, distancia_radial, latitude, longitude = vetor_de_estados_foguete[:6]
 
     if velocidade < 0:
         velocidade = 0.0001  # Evita velocidade negativa
+
     # Cálculo da massa e tração em função do tempo
     ft, massa, mu, epsl = foguete.modelo_propulsivo.propulsao_n_estagios(vetor_tempo,
                                                                          vetor_de_estados_foguete)
 
     # Cálculo do modelo atmosférico
     altitude = distancia_radial - planeta.raio_equatorial
-    T, _, _, densidade_do_ar, _, M, _, _, Kn, _, _, R = planeta.modelo_atmosferico.calcula(
-        altitude, velocidade, planeta.tempo_longitude_celeste_nula, planeta.delta_temperatura_atm
-    )
-    foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude,numero_de_knudsen = Kn,numero_de_mach = M, temperatura=T, constante_do_gas_ideal=R, velocidade = velocidade)
-
-    # Cálculo da velocidade relativa
-    Vrel = velocidade - planeta.velocidade_inercial_de_rotacao
     # Cálculo do modelo aerodinâmico
-    areas_de_referencia_para_calculo_do_arrasto, _, _ = (
+    areas_de_referencia_para_calculo_do_arrasto, comprimento_caracteristico, fator_correcao = (
         foguete.modelo_estrutural.calcula())
+    T, _, _, densidade_do_ar, _, M, _, _, Kn, _, _, R = planeta.modelo_atmosferico.calcula(
+        altitude, velocidade, comprimento_caracteristico, planeta.delta_temperatura_atm
+    )
+    foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn, numero_de_mach=M,
+                                                     temperatura=T, constante_do_gas_ideal=R, velocidade=velocidade)
+
     tempos_de_separacao = foguete.modelo_propulsivo.tempos_de_separacao
 
     D, fy, L = foguete.modelo_aerodinamico.aerodinamica_multiplos_estagios(
@@ -88,9 +88,10 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
     if altura_relativa <= base_de_lancamento.comprimento_do_trilho and vetor_tempo <= 10:
         Ap = 0
         phip = 0
-    if not parametrosApogeu.achou_apogeu:
-        parametrosApogeu.parametros_manobra_adquire_gso(vetor_tempo, massa, vetor_de_estados_foguete, orbita_alvo, foguete.modelo_propulsivo,
-                         planeta)
+    if not parametros_apogeu.achou_apogeu:
+        parametros_apogeu.parametros_manobra_adquire_gso(vetor_tempo, massa, vetor_de_estados_foguete, orbita_alvo,
+                                                         foguete.modelo_propulsivo,
+                                                         planeta)
 
     # Derivada do vetor de estado
     Xp = [float(Vp), Ap, phip, rp, deltap, lonp]

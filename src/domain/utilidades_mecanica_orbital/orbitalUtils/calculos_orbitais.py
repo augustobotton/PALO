@@ -248,6 +248,8 @@ def determina_parametros_orbitais(tempo_observacao, parametro_gravitacional, pos
     Retorna:
     objeto: Órbita.
     """
+    posicao_celeste = np.asarray(posicao_celeste, dtype=np.float64).flatten()
+    velocidade_celeste = np.asarray(velocidade_celeste, dtype=np.float64).flatten()
     distancia_radial = calcula_distancia_radial(posicao_celeste)
     momento_angular = calcula_quantidade_movimento_angular_especifica(posicao_celeste, velocidade_celeste)
     excentricidade = calcula_excentricidade(velocidade_celeste, momento_angular, parametro_gravitacional,

@@ -1,5 +1,6 @@
-import numpy as np
+import pickle
 
+import numpy as np
 from src.domain.modelos.foguete.ModeloAerodinamico import ModeloAerodinamico
 from src.domain.modelos.foguete.ModeloEstrutural import ConstrutorModeloEstrutural
 from src.domain.modelos.foguete.ModeloFoguete import ConstrutorDeFoguete
@@ -47,14 +48,18 @@ fogueteConceitual = ConstrutorDeFoguete().com_modelo_propulsivo(meuModeloPropuls
     meuModeloEstrutural).com_modelo_aerodinamico(
     ModeloAerodinamico()).construir()
 
-# Condições iniciais
-tempo_simulacao = 2 * 24 * 60 * 60
-velocidade_inicial = 0.1
-angulo_elevacao_inicial = 80
+print(fogueteConceitual.modelo_propulsivo.tempos_de_separacao)
+# # Condições iniciais
+# tempo_simulacao = 6000
+# velocidade_inicial = 0.1
+# angulo_elevacao_inicial = 76
+#
+# # Criar uma órbita alvo
+# orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
+# condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
+# simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
+# with open('../../construtorderesultados/simulacao.pkl', 'wb') as f:
+#     pickle.dump(simulacao, f)
+# resposta = simulacao.simular()
 
-# Criar uma órbita
-orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
-condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
-simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
-simulacao.simular()
