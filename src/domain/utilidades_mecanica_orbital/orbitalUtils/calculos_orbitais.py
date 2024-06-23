@@ -5,7 +5,7 @@ raio_da_terra = 6378.137 * 1000  # [km]
 parametro_gravitacional = 3.986e14  # [m^2/s^2]
 
 
-def calcaula_velociade_orbital(parametro_gravitacional,raio, semi_eixo_maior=None):
+def calcula_velocidade_orbital(parametro_gravitacional, raio, semi_eixo_maior=None):
     """
     Calcula a velocidade orbital.
 
@@ -23,7 +23,7 @@ def calcaula_velociade_orbital(parametro_gravitacional,raio, semi_eixo_maior=Non
 
 def semi_eixo_maior(periapsis, apoapsis):
     """
-    Calcula o semi-eixo maior de uma órbita.
+    Calcula o semi-eixo maior de uma órbita eliptica.
 
     Parâmetros:
     periapsis (float): Distância do periapsis.
@@ -248,6 +248,8 @@ def determina_parametros_orbitais(tempo_observacao, parametro_gravitacional, pos
     Retorna:
     objeto: Órbita.
     """
+    posicao_celeste = np.asarray(posicao_celeste, dtype=np.float64).flatten()
+    velocidade_celeste = np.asarray(velocidade_celeste, dtype=np.float64).flatten()
     distancia_radial = calcula_distancia_radial(posicao_celeste)
     momento_angular = calcula_quantidade_movimento_angular_especifica(posicao_celeste, velocidade_celeste)
     excentricidade = calcula_excentricidade(velocidade_celeste, momento_angular, parametro_gravitacional,

@@ -1,7 +1,7 @@
 # Importa os pacotes salvos
-import propagaOrbKepleriana
 import perturbacoes
-import det_orbita
+from src.domain.utilidades_mecanica_orbital.orbitalUtils import calculos_orbitais
+from src.domain.utilidades_mecanica_orbital.propagacao import propagacao
 # Importações de pacotes do Python
 import numpy as np
 from scipy.integrate import solve_ivp # Solução numérica de equações diferenciais
@@ -31,7 +31,7 @@ def dinPert3corpo(t,X):
     #Distância
     r=np.linalg.norm(R)
     # Posição do terceiro corpo com respeito ao primário
-    _,R31,_=propagaOrbKepleriana.propagaEliptica(t,mu,orbt)
+    _,R31,_=propagacao.propagaEliptica(t,mu,orbt)
     # Aceleração perturbativa
     ad= perturbacoes.perturb3Corpo(R, R31, mu3)
     # Cinemática
@@ -53,12 +53,22 @@ sol=solve_ivp(dinPert3corpo,[0, T],X0,max_step=24*60*60)
 # Propagação da órbita do VE usando a solução analítica kepleriana. Sol como primário.
 # Ignorando a influência da Terra (terceiro corpo)
 # Identificação dos parâmetros orbitais
-par_orb=det_orbita.det_orbita(0,R0,V0,mu)
+
+
+par_orb=calculos_orbitais.determina_parametros_orbitais(0, mu, R0, V0,)
 N=200
 t=np.linspace(0, T, N)
 Rk=np.empty([3,N]);Vk=np.empty([3,N])
 for i in range(N):
-    _,Rk[:,i],Vk[:,i]=propagaOrbKepleriana.propagaEliptica(t[i],mu,par_orb)
+    _,Rk[:,i],Vk[:,i]=propagacao.propagaEliptica(t[i],mu,par_orb)
+
+
+
+
+
+
+
+
 plt.close("all")
 #
 plt.figure(1);

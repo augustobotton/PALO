@@ -1,8 +1,7 @@
 import os
 
 from scipy.integrate import solve_ivp
-
-import parametros
+import numpy as np
 from src.domain.modelos.foguete.ModeloDinamica import dinamica_foguete
 from src.ModuloOrbital.orbitalUtils.Converte import *
 from src.ModuloOrbital.orbitalUtils.det_orbita import det_orbita
@@ -62,7 +61,7 @@ parametros.raio_equatorial = Re
 we = 7.2921150e-5  # (rad/s) - Velocidade inercial de rotação da Terra
 parametros.velocidade_inercial_de_rotação_da_terra = we
 g = 9.80665  # m/s^2 - aceleração da gravidade ao nível do mar
-parametros.gravidade_padrao_nivel_do_mar = g
+parametros.gravidade = g
 mut = 3.986004418e14  # m^3/s^-2
 parametros.mut = mut
 J2 = 0.00108263  # Constante de Jeffery J2
@@ -73,6 +72,7 @@ J4 = -0.00000161  # Constante de Jeffery J4
 parametros.J4 = J4
 tg = 0  # s - Tempo em que o meridiano de referência tem longitude celeste nula
 parametros.tg = tg
+
 # Condições iniciais
 h0 = 0  # m - Altitude da base de lancamento
 parametros.h0 = h0

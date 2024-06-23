@@ -57,7 +57,7 @@ class ModeloEstrutural:
         return areas_de_referencia_para_calculo_do_arrasto, comprimento_caracteristico, fator_correcao
 
 
-class ModeloEstruturalBuilder:
+class ConstrutorModeloEstrutural:
     def __init__(self):
         self.massa_estrutural_por_estagio = None
         self.massa_de_carga_util = None

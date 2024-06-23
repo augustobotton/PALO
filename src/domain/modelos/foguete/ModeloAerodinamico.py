@@ -3,25 +3,15 @@ from scipy.interpolate import pchip_interpolate
 
 from src.domain.modelos.foguete.ModeloEstrutural import ModeloEstrutural
 
-
+#TODO fazer construtor
 class ModeloAerodinamico:
-    def __init__(self, velocidade: float, altitude: float, numero_de_mach: float, numero_de_knudsen: float, temperatura: float, constante_do_gas_ideal: float):
-        """
-        Inicializa a classe ModeloAerodinamico com os parâmetros fornecidos.
-
-        :param velocidade: Velocidade do foguete
-        :param altitude: Altitude do foguete
-        :param numero_de_mach: Número de Mach
-        :param numero_de_knudsen: Número de Knudsen
-        :param temperatura: Temperatura
-        :param constante_do_gas_ideal: Constante do gás ideal
-        """
-        self.velocidade = velocidade
-        self.altitude = altitude
-        self.numero_de_mach = numero_de_mach
-        self.numero_de_knudsen = numero_de_knudsen
-        self.temperatura = temperatura
-        self.constante_do_gas_ideal = constante_do_gas_ideal
+    def __init__(self):
+        self.altitude = None
+        self.numero_de_knudsen = None
+        self.numero_de_mach = None
+        self.temperatura = None
+        self.constante_do_gas_ideal =  None
+        self.velocidade = None
 
     def calcula(self) -> float:
         """
@@ -162,7 +152,7 @@ class ModeloAerodinamico:
         coeficiente_arrasto_ajustado = fator_correcao_arrasto * coeficiente_arrasto
 
         # Determinar a área de referência com base no estágio
-        area_do_estagio = self.calcula_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
+        area_do_estagio = self.define_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
 
         # Calcular as forças
         arrasto = 0.5 * densidade_do_ar * velocidade ** 2 * area_do_estagio * coeficiente_arrasto_ajustado
@@ -171,8 +161,22 @@ class ModeloAerodinamico:
 
         return arrasto, forca_sustentacao_lateral, forca_sustentacao
 
+    def atualizar_parametros(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                # Tente converter para float se for um dos parâmetros numéricos
+                if key in ['velocidade', 'constante_do_gas_ideal', 'temperatura']:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        raise ValueError(f"Valor inválido para {key}: {value} não pode ser convertido para float.")
+                setattr(self, key, value)
+            else:
+                raise ValueError(f"Parâmetro '{key}' não é um atributo válido do ModeloAerodinamico")
+
+
     @staticmethod
-    def calcula_area_referencia(tempo: float, tempo_limite_separacao: list, area_de_referencia: list) -> float:
+    def define_area_referencia(tempo: float, tempo_limite_separacao: list, area_de_referencia: list) -> float:
         """
         Calcula a área de referência com base no estágio do foguete.
 

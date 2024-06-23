@@ -17,8 +17,8 @@ def calcular_gravidade_axisimetrico(distancia_radial, colatitude, planeta):
 	# Calculando a componente radial da gravidade
 	componente_radial = (
 			(1 / distancia_radial ** 6)
-			* planeta.gravidade_padrao_nivel_do_mar
-			* planeta.constante_gravitacional
+			* planeta.gravidade
+			* planeta.mut
 			* (
 					-distancia_radial ** 4
 					- 1.5 * planeta.J2 * distancia_radial ** 2 * planeta.raio_equatorial ** 2
@@ -37,8 +37,8 @@ def calcular_gravidade_axisimetrico(distancia_radial, colatitude, planeta):
 	componente_colatitudinal = (
 			(1 / distancia_radial ** 6)
 			* 3
-			* planeta.gravidade_padrao_nivel_do_mar
-			* planeta.constante_gravitacional
+			* planeta.gravidade
+			* planeta.mut
 			* planeta.raio_equatorial ** 2
 			* (
 					-0.5 * planeta.J3 * distancia_radial * planeta.raio_equatorial
