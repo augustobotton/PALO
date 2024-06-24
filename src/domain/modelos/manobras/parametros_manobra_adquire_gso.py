@@ -3,7 +3,7 @@ import numpy as np
 from src.domain.utilidades_mecanica_orbital.orbitalUtils import calculos_orbitais
 from src.domain.utilidades_mecanica_orbital.Orbitas import ModeloOrbita
 from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
-from src.domain.modelos.foguete.ModeloPropulsivo import ModeloPropulsivo
+from src.domain.modelos.foguete.propulsao.ModeloPropulsivo import ModeloPropulsivo
 
 
 class ParametrosManobraAdquireOrbitaDeTransferencia():
@@ -68,7 +68,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
                                                                         3]
                     modelo_propulsivo.tempos_de_separacao[-1] = modelo_propulsivo.tempos_de_fim_de_queima[-1] + \
                                                                 modelo_propulsivo.tempos_de_separacao[2]
-                    modelo_propulsivo.calcular_tempos()
+                modelo_propulsivo.calcular_sequenciamento()
         self.sinal_phi_inercial = np.sign(
             phii)  # Guarda o sinal de phi inercial para verificar mudança na próxima iteração
         return 0

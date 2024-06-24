@@ -13,6 +13,7 @@ class Simulacao:
         self.tempo_simulacao = condicoes_iniciais[0]
         self.velocidade_inicial = condicoes_iniciais[1]
         self.angulo_elevacao_inicial = condicoes_iniciais[2]
+       # self.phi_inicial = condicoes_iniciais[4]
         self.orbita_alvo = condicoes_iniciais[3]
         self.planeta = planeta
         self.base_de_lancamento = base_de_lancamento
@@ -51,8 +52,8 @@ class Simulacao:
                 apogeu_transferencia * self.planeta.velocidade_inercial_de_rotacao * np.cos(self.latitude_inicial)) / (
                                  velocidade_transferencia * np.cos(self.azimute_final)))
 
-    def progress_callback(self, t, y, bar):
-        bar.update(t - bar.n)
+    def progress_callback(self, t, y, barra):
+        barra.update(t - barra.n)
         return t
 
     def simular(self):

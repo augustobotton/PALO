@@ -1,18 +1,19 @@
 import pickle
 
 import numpy as np
-from src.domain.modelos.foguete.ModeloAerodinamico import ModeloAerodinamico
-from src.domain.modelos.foguete.ModeloEstrutural import ConstrutorModeloEstrutural
-from src.domain.modelos.foguete.ModeloFoguete import ConstrutorDeFoguete
-from src.domain.modelos.foguete.ModeloPropulsivo import ConstrutorModeloPropulsivo
-from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.modelos.planeta.ModeloPlaneta import ConstrutorDePlanetas
+
 from src.domain.modelos.Simulacao import Simulacao
+from src.domain.modelos.foguete.aerodinamica.ModeloAerodinamico import ModeloAerodinamico
+from src.domain.modelos.foguete.estrutura.ConstrutorModeloEstrutural import ConstrutorModeloEstrutural
+from src.domain.modelos.foguete.propulsao.ConstrutorModeloPropulsivo import ConstrutorModeloPropulsivo
+from src.domain.modelos.foguete.veiculo_lancador.ConstrutorFoguete import ConstrutorDeFoguete
+from src.domain.modelos.planeta.ConstrutorBaseDeLancamento import ConstrutorBaseDeLancamento
+from src.domain.modelos.planeta.ConstrutorPlaneta import ConstrutorPlaneta
+from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
 from src.domain.utilidades_mecanica_orbital.Orbitas.ModeloOrbita import Orbita
-from src.domain.modelos.planeta.ModeloBaseDeLancamento import ConstrutorBaseDeLancamento
 
 json_modelo_atm_terrestre = r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'
-terra = (ConstrutorDePlanetas()
+terra = (ConstrutorPlaneta()
          .com_delta_temperatura_atm(10)
          .com_raio_equatorial(6378.1370e3)
          .com_velocidade_inercial_de_rotacao(7.2921150e-5)
@@ -26,14 +27,14 @@ terra = (ConstrutorDePlanetas()
          .construir())
 
 
+meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico([260, 260]).com_massa_propelente_estagios(
+    [677, 898]).com_duracao_queima_estagios(
+    [62, 64.62,0]).com_tempo_espera_separacao(
+    [2, 2,0]).com_tempo_espera_ignicao([5,0]).com_massa_estrutural_por_estagio(
+    [284, 320]).com_massa_de_carga_util(400).com_h0(0.0).com_planeta(terra).construir()
 
-construtor_propulsivo = ConstrutorModeloPropulsivo()
-meuModeloPropulsivo = construtor_propulsivo.com_impulso_especifico([251, 271, 315]).com_massa_propelente_estagios(
-    [5.5262e4, 11058, 0, 0]).com_massa_total_propelente_terceiro_estagio(243.6).com_duracao_queima_estagios(
-    [62, 64.62, 301]).com_tempo_primeira_queima_terceiro_estagio(262).com_tempo_espera_separacao(
-    [2, 2, 2]).com_tempo_espera_ignicao([5, 1360]).com_massa_estrutural_por_estagio(
-    [7750, 1367, 64.7544]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
 #TODO estou criando dois atributos para dois modelos diferentes, mas o que eu quero é criar um atributo que seja comum para os dois modelos.
+
 meuModeloEstrutural = ConstrutorModeloEstrutural().com_massa_estrutural_por_estagio(
     [7750, 1367, 64.7544]).com_massa_de_carga_util(
     13).com_area_secao_transversal_1_estagio(4.6 * 5 / 3).com_area_secao_transversal_2_estagio(
@@ -46,24 +47,24 @@ fogueteConceitual = ConstrutorDeFoguete().com_modelo_propulsivo(meuModeloPropuls
     meuModeloEstrutural).com_modelo_aerodinamico(
     ModeloAerodinamico()).construir()
 
-construtor_base_de_lancamento = ConstrutorBaseDeLancamento()
-alcantara = construtor_base_de_lancamento.com_altitude_base(
-    0).com_latitude_inicial().com_longitude_inicial().com_comprimento_trilho(fogueteConceitual.modelo_estrutural.comprimento_total_do_foguete).construir()
+
+alcantara = ConstrutorBaseDeLancamento().com_altitude_base(
+    0).com_latitude_inicial().com_longitude_inicial().com_comprimento_trilho(
+    fogueteConceitual.modelo_estrutural.comprimento_total_do_foguete).construir()
 
 fogueteConceitual.mostra_dados()
 
 # Condições iniciais
-tempo_simulacao = 10000
+tempo_simulacao = 75000
 velocidade_inicial = 1
 angulo_elevacao_inicial = np.deg2rad(80)
+phi_inicial = np.deg2rad(80)
 
 # Criar uma órbita alvo
 orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
-condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial,  orbita_alvo]
+condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo, phi_inicial]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
 with open('../../construtorderesultados/simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()
-
-

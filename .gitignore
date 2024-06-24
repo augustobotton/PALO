@@ -3,3 +3,5 @@
 /.idea/other.xml
 /.idea/shelf/Changes.xml
 *.pkl
+*.xml
+*.patch

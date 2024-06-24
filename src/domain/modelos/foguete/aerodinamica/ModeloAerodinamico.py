@@ -1,8 +1,6 @@
 import numpy as np
 from scipy.interpolate import pchip_interpolate
 
-from src.domain.modelos.foguete.ModeloEstrutural import ModeloEstrutural
-
 
 #TODO: OK!
 class ModeloAerodinamico:

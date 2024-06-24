@@ -106,9 +106,3 @@ class ModeloAtmosferico:
         return temperatura_cinetica, temperatura_escala_molecular, pressao, densidade_do_ar, velocidade_do_som, numero_de_mach, viscosidade_dinamica, numero_de_prandtl, numero_de_knudsen, parametro_regime_de_escoamento, reynolds,constante_de_gas_ideal
 
 
-
-# Exemplo de uso com caminho absoluto
-json_file_path = r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'
-modelo = ModeloAtmosferico(json_file_path)
-resultados = modelo.calcula(altitude_geometrica=1000, v=300, lc=0.1, dT=5)
-print(resultados)
