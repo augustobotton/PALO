@@ -20,22 +20,21 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
     # Cálculo da massa e tração em função do tempo
     ft, massa, mu, epsl = foguete.modelo_propulsivo.propulsao_n_estagios(vetor_tempo,
                                                                          vetor_de_estados_foguete)
-
     # Cálculo do modelo atmosférico
     altitude = distancia_radial - planeta.raio_equatorial
+
     # Cálculo do modelo aerodinâmico
-    areas_de_referencia_para_calculo_do_arrasto, comprimento_caracteristico, fator_correcao = (
-        foguete.modelo_estrutural.calcula())
     T, _, _, densidade_do_ar, _, M, _, _, Kn, _, _, R = planeta.modelo_atmosferico.calcula(
-        altitude, velocidade, comprimento_caracteristico, planeta.delta_temperatura_atm
+        altitude, velocidade, foguete.modelo_estrutural.comprimento_caracteristico, planeta.delta_temperatura_atm
     )
+
     foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn, numero_de_mach=M,
                                                      temperatura=T, constante_do_gas_ideal=R, velocidade=velocidade)
-
     tempos_de_separacao = foguete.modelo_propulsivo.tempos_de_separacao
-
+    # Cálculo da força de arrasto
     D, fy, L = foguete.modelo_aerodinamico.aerodinamica_multiplos_estagios(
-        vetor_tempo, velocidade, areas_de_referencia_para_calculo_do_arrasto, tempos_de_separacao,
+        vetor_tempo, velocidade, foguete.modelo_estrutural.areas_de_referencia_para_calculo_do_arrasto,
+        tempos_de_separacao,
         densidade_do_ar)
 
     # Cálculo da gravidade
@@ -88,11 +87,11 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
     if altura_relativa <= base_de_lancamento.comprimento_do_trilho and vetor_tempo <= 10:
         Ap = 0
         phip = 0
-    if not parametros_apogeu.achou_apogeu:
-        parametros_apogeu.parametros_manobra_adquire_gso(vetor_tempo, massa, vetor_de_estados_foguete, orbita_alvo,
-                                                         foguete.modelo_propulsivo,
-                                                         planeta)
+
+    parametros_apogeu.parametros_manobra_adquire_gso(vetor_tempo, massa, vetor_de_estados_foguete, orbita_alvo,
+                                                     foguete.modelo_propulsivo,
+                                                     planeta)
 
     # Derivada do vetor de estado
-    Xp = [float(Vp), Ap, phip, rp, deltap, lonp]
+    Xp = np.array([float(Vp), Ap, phip, rp, deltap, lonp])
     return Xp

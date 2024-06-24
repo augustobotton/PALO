@@ -1,5 +1,6 @@
 import numpy as np
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
+
+from src.domain.modelos.foguete.modelo_propulsores import *
 
 TEMPO_DE_IGNICAO_3_ESTAGIO = 1e10
 
@@ -11,17 +12,16 @@ class ModeloPropulsivo:
 
         :param builder: Objeto do tipo ModeloPropulsivoBuilder que contém os parâmetros de construção.
         """
-        self.impulso_especifico = None
-        self.tempos_de_separacao = None
-        self.tempos_de_fim_de_queima = None
-        self.tempos_de_ignicao = None
+        self.impulso_especifico = builder.impulso_especifico
+        self.tempos_de_separacao = None  #ts
+        self.tempos_de_fim_de_queima = None  #tq
+        self.tempos_de_ignicao = None  #ti
         self.massa_inicial_do_foguete = None
         self.distancia_radial_inicial = None
-        self.tempo_da_segunda_queima_3_estagio = None
+        self.duracao_da_segunda_queima_3_estagio = None
         self.velocidade_de_exaustao = None
-        self.impulso_especifico_por_estagio = np.array(builder.impulso_especifico)
-        self.massa_propelente_estagios_1_2 = np.array(builder.massa_propelente_estagios)
-        self.massa_propelente_terceiro_estagio = builder.massa_propelente_terceiro_estagio
+        self.massa_propelente_estagios = np.array(builder.massa_propelente_estagios)
+        self.massa_total_propelente_terceiro_estagio = builder.massa_total_propelente_terceiro_estagio
         self.duracao_de_queima_primeiro_estagio = builder.duracao_queima_estagios[0]
         self.duracao_de_queima_segundo_estagio = builder.duracao_queima_estagios[1]
         self.duracao_total_de_queima_do_terceiro_estagio = builder.duracao_queima_estagios[2]
@@ -30,150 +30,144 @@ class ModeloPropulsivo:
         self.tempo_de_espera_separacao_3_4 = builder.tempo_espera_separacao[2]
         self.tempo_espera_ignicao_2_estagio = builder.tempo_espera_ignicao[0]
         self.tempo_espera_ignicao_3_estagio = builder.tempo_espera_ignicao[1]
-        self.tempo_da_primeira_queima_3_estagio = builder.tempo_primeira_queima_terceiro_estagio
+        self.duracao_da_primeira_queima_3_estagio = builder.tempo_primeira_queima_terceiro_estagio
         self.massa_estrutural_por_estagio = np.array(builder.massa_estrutural_por_estagio)
         self.massa_de_carga_util = builder.massa_de_carga_util
         self.h0 = builder.h0
         self.planeta = builder.planeta
-        self._calcular_tempos()
+        self.calcular_tempos()
 
-    def _calcular_tempos(self) -> None:
+    def calcular_tempos(self) -> None:
         """
         Calcula os tempos de ignição, queima e separação para os estágios do foguete.
         """
-        self.tempo_da_segunda_queima_3_estagio = self.duracao_total_de_queima_do_terceiro_estagio - self.tempo_da_primeira_queima_3_estagio
+        self.duracao_da_segunda_queima_3_estagio = self.duracao_total_de_queima_do_terceiro_estagio - self.duracao_da_primeira_queima_3_estagio
 
-        self.tempos_de_fim_de_queima = np.zeros(4)
-        self.tempos_de_separacao = np.zeros(4)
-        self.tempos_de_ignicao = np.zeros(4)
+        self.tempos_de_fim_de_queima = np.zeros(5)
+        self.tempos_de_separacao = np.zeros(3)
+        self.tempos_de_ignicao = np.zeros(5)
 
+        self.tempos_de_ignicao[0] = 0
         self.tempos_de_fim_de_queima[0] = self.tempos_de_ignicao[0] + self.duracao_de_queima_primeiro_estagio
         self.tempos_de_separacao[0] = self.tempos_de_fim_de_queima[0] + self.tempo_de_espera_separacao_1_2
         self.tempos_de_ignicao[1] = self.tempos_de_separacao[0] + self.tempo_espera_ignicao_2_estagio
         self.tempos_de_fim_de_queima[1] = self.tempos_de_ignicao[1] + self.duracao_de_queima_segundo_estagio
         self.tempos_de_separacao[1] = self.tempos_de_fim_de_queima[1] + self.tempo_de_espera_separacao_2_3
-        self.tempos_de_ignicao[2] = self.tempos_de_separacao[1] + self.tempo_espera_ignicao_3_estagio
-        self.tempos_de_fim_de_queima[2] = self.tempos_de_ignicao[2] + self.tempo_da_primeira_queima_3_estagio
+        self.tempos_de_ignicao[2] = self.tempos_de_separacao[
+                                        1] + self.tempo_espera_ignicao_3_estagio  #cuidar se o tempo de espera ta correto
+        self.tempos_de_fim_de_queima[2] = self.tempos_de_ignicao[2] + self.duracao_da_primeira_queima_3_estagio
         self.tempos_de_ignicao[3] = TEMPO_DE_IGNICAO_3_ESTAGIO
-        self.tempos_de_fim_de_queima[3] = self.tempos_de_ignicao[3] + self.tempo_da_segunda_queima_3_estagio
+        self.tempos_de_fim_de_queima[3] = self.tempos_de_ignicao[
+                                              3] + self.duracao_da_segunda_queima_3_estagio  #atualizar?
         self.tempos_de_separacao[2] = self.tempos_de_fim_de_queima[3] + self.tempo_de_espera_separacao_3_4
 
-        self.massa_propelente_estagios_1_2[2] = (
-                self.massa_propelente_terceiro_estagio * self.tempo_da_primeira_queima_3_estagio /
+        self.massa_propelente_estagios[2] = (
+                self.massa_total_propelente_terceiro_estagio * self.duracao_da_primeira_queima_3_estagio /
                 self.duracao_total_de_queima_do_terceiro_estagio
         )
-        self.massa_propelente_estagios_1_2[3] = (
-                self.massa_propelente_terceiro_estagio * self.tempo_da_segunda_queima_3_estagio /
+        self.massa_propelente_estagios[3] = (
+                self.massa_total_propelente_terceiro_estagio * self.duracao_da_segunda_queima_3_estagio /
                 self.duracao_total_de_queima_do_terceiro_estagio
         )
 
-        self.massa_inicial_do_foguete = np.sum(self.massa_propelente_estagios_1_2) + np.sum(
+        self.massa_inicial_do_foguete = np.sum(self.massa_propelente_estagios) + np.sum(
             self.massa_estrutural_por_estagio) + self.massa_de_carga_util
-        # self.distancia_radial_inicial = terra.raio_equatorial_terrestre + self.h0
 
-    def calcular_empuxo_massa(self, tempo: float, tempos_de_ignicao: np.ndarray, tempos_de_fim_de_queima: np.ndarray,
-                              tempos_de_separacao: np.ndarray, impulso_especifico: np.ndarray,
-                              massa_propelente: np.ndarray,
-                              massa_estrutural: np.ndarray, massa_inicial: float, gravidade: float, estagio: int,
-                              massa_carga_util: float = None) -> tuple:
+        self.distancia_radial_inicial = self.planeta.raio_equatorial + self.h0
+        print("entrei uma vez")
+
+    def __str__(self):
+        return f"impulso_especifico: {self.impulso_especifico}\n" \
+               f"tempos_de_separacao: {self.tempos_de_separacao}\n" \
+               f"tempos_de_fim_de_queima: {self.tempos_de_fim_de_queima}\n" \
+               f"tempos_de_ignicao: {self.tempos_de_ignicao}\n" \
+               f"massa_inicial_do_foguete: {self.massa_inicial_do_foguete}\n" \
+               f"distancia_radial_inicial: {self.distancia_radial_inicial}\n" \
+               f"duracao_da_segunda_queima_3_estagio: {self.duracao_da_segunda_queima_3_estagio}\n" \
+               f"velocidade_de_exaustao: {self.velocidade_de_exaustao}\n" \
+               f"massa_propelente_estagios: {self.massa_propelente_estagios}\n" \
+               f"massa_total_propelente_terceiro_estagio: {self.massa_total_propelente_terceiro_estagio}\n" \
+               f"duracao_de_queima_primeiro_estagio: {self.duracao_de_queima_primeiro_estagio}\n" \
+               f"duracao_de_queima_segundo_estagio: {self.duracao_de_queima_segundo_estagio}\n" \
+               f"duracao_total_de_queima_do_terceiro_estagio: {self.duracao_total_de_queima_do_terceiro_estagio}\n" \
+               f"tempo_de_espera_separacao_1_2: {self.tempo_de_espera_separacao_1_2}\n" \
+               f"tempo_de_espera_separacao_2_3: {self.tempo_de_espera_separacao_2_3}\n" \
+               f"tempo_de_espera_separacao_3_4: {self.tempo_de_espera_separacao_3_4}\n" \
+               f"tempo_espera_ignicao_2_estagio: {self.tempo_espera_ignicao_2_estagio}\n" \
+               f"tempo_espera_ignicao_3_estagio: {self.tempo_espera_ignicao_3_estagio}\n" \
+               f"duracao_da_primeira_queima_3_estagio: {self.duracao_da_primeira_queima_3_estagio}\n" \
+
+    def propulsao_n_estagios(self, t: float, X: np.array) -> np.array:
         """
-        Calcula o empuxo e a massa para um determinado estágio do foguete.
-
-        :param tempo: Tempo atual.
-        :param tempos_de_ignicao: Array com os tempos de ignição dos estágios.
-        :param tempos_de_fim_de_queima: Array com os tempos de fim de queima dos estágios.
-        :param tempos_de_separacao: Array com os tempos de separação dos estágios.
-        :param impulso_especifico: Array com os impulsos específicos dos estágios.
-
-        :param massa_propelente: Array com as massas de propelente dos estágios.
-        :param massa_estrutural: Array com as massas estruturais dos estágios.
-        :param massa_inicial: Massa inicial do foguete.
-        :param gravidade: Valor da gravidade.
-        :param estagio: Número do estágio atual.
-        :param massa_carga_util: Massa da carga útil (opcional).
-        :return: Tupla de empuxo e massa.
+        Função para cálculo dos parâmetros propulsivos em função do tempo
+        Veículo de até 3 estágios com dupla ignição do terceiro estágio
+        Entrada:
+            t (s): tempo
+            X: vetor de estado
+            V = X[0] (m/s): módulo do vetor velocidade relativa com respeito ao planeta girante
+            A = X[1] (rad): ângulo de azimute do vetor velocidade relativa com respeito ao eixo z (que aponta para o norte) do sistema uen.
+            phi = X[2] (rad): ângulo de elevação do vetor velocidade relativa com respeito ao horizonte local (plano yz do referencial uen)
+            r = X[3] (m): distância radial até o centro do planeta
+            delta = X[4] (rad): latitude com respeito ao plano equatorial do planeta
+            lon = X[5] (rad): longitude planetária
+        Saídas:
+            ft (N): força propulsiva
+            m (kg): massa do foguete em função do tempo
+            mu, epsl (rad): Ângulos de apontamento da tubeira
+        Hipóteses:
+            - Em cada estágio, é assumida taxa de queima contínua, ou seja, não há controle da queima e a mesma é assumida uniforme do início ao fim do propelente
+            - A tração de cada estágio é assumida como um pulso retangular perfeito, ou seja, quando acionado, o propulsor vai de tração zero até a máxima, permanecendo nesse patamar constante. Ao fim da queima, a tração cai instantaneamente a zero
         """
-       # estagio -= 1  # Ajuste para arrays baseados em 0
-        if tempo <= tempos_de_ignicao[estagio]:
-            massa = massa_inicial if estagio == 0 else self.calcular_massa_apos_separacao(
-                massa_propelente, massa_estrutural,
-                massa_inicial, estagio)
-            empuxo = 0
-        elif tempo <= tempos_de_fim_de_queima[estagio]:
-            taxa_de_fluxo_de_massa = -massa_propelente[estagio] / (
-                    tempos_de_fim_de_queima[estagio] - tempos_de_ignicao[estagio])
-            massa = massa_inicial + taxa_de_fluxo_de_massa * (
-                    tempo - tempos_de_ignicao[estagio]) if estagio == 0 else self.calcular_massa_apos_separacao(
-                massa_propelente,
-                massa_estrutural,
-                massa_inicial, estagio) + taxa_de_fluxo_de_massa * (tempo - tempos_de_ignicao[estagio])
-            empuxo = -gravidade * impulso_especifico[estagio] * taxa_de_fluxo_de_massa
-        elif tempo <= tempos_de_separacao[estagio]:
-            massa = self.calcular_massa_apos_separacao(
-                massa_propelente, massa_estrutural,
-                massa_inicial, estagio)
-            empuxo = 0
+        # Número de estágios
+        N = len(self.tempos_de_ignicao)
+
+        if N == 1:
+            ft, m = propulsor_1_estagio(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
+                                        self.tempos_de_separacao,
+                                        self.impulso_especifico, self.massa_propelente_estagios,
+                                        self.massa_estrutural_por_estagio,
+                                        self.massa_inicial_do_foguete, self.planeta.gravidade)
+        elif N == 2:
+            ft, m = propulsor_2_estagios(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
+                                         self.tempos_de_separacao,
+                                         self.impulso_especifico, self.massa_propelente_estagios,
+                                         self.massa_estrutural_por_estagio,
+                                         self.massa_inicial_do_foguete, self.planeta.gravidade)
+        elif N == 3:
+            ft, m = propulsor_3_estagios(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
+                                         self.tempos_de_separacao,
+                                         self.impulso_especifico, self.massa_propelente_estagios,
+                                         self.massa_estrutural_por_estagio,
+                                         self.massa_inicial_do_foguete, self.planeta.gravidade)
         else:
-            massa = self.calcular_massa_apos_separacao(massa_propelente, massa_estrutural, massa_inicial, estagio + 1)
-            massa = massa_carga_util if massa_carga_util and estagio == len(tempos_de_ignicao) - 1 else massa
-            empuxo = 0
-        return empuxo, massa
+            ft, m = propulsor_3_estagios_2ig(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
+                                             self.tempos_de_separacao,
+                                             self.impulso_especifico, self.massa_propelente_estagios,
+                                             self.massa_estrutural_por_estagio, self.massa_inicial_do_foguete,
+                                             self.massa_de_carga_util, self.planeta.gravidade)
 
-    @staticmethod
-    def calcular_massa_apos_separacao(massa_propelente: np.ndarray,
-                                      massa_estrutural: np.ndarray, massa_inicial: float, estagio: int) -> float:
-        """
-        Calcula a massa do foguete após a separação de um determinado estágio.
+        # Para altitudes acima de 200km, alinha o vetor de tração com a velocidade inercial ao invés da relativa
+        # Desmembra o vetor de estado
+        V, A, phi, r, delta = X[0], X[1], X[2], X[3], X[4]
 
-        :param massa_propelente: Array com as massas de propelente dos estágios.
-        :param massa_estrutural: Array com as massas estruturais dos estágios.
-        :param massa_inicial: Massa inicial do foguete.
-        :param estagio: Número do estágio (baseado em 1).
-        :return: Massa após a separação do estágio.
-        """
-        massa = massa_inicial
-        for i in range(estagio):
-            massa -= massa_propelente[i] + massa_estrutural[i]
-        return massa
+        # Altitude
+        h = r - self.planeta.raio_equatorial
 
-    def propulsao_n_estagios(self, tempo: float, vetor_de_estados: tuple) -> tuple:
-        """
-        Calcula a propulsão para N estágios do foguete.
-
-        :param tempo: Tempo atual.
-        :param vetor_de_estados: Estado atual do foguete (velocidade, ângulo, etc.).
-        :return: Tupla de empuxo, massa, mu, epsl.
-        """
-        n_estagios = len(self.tempos_de_ignicao)
-
-        # Determina o estágio atual com base no tempo
-        estagio_atual = sum([tempo > self.tempos_de_separacao[i] for i in range(n_estagios)])
-
-        # Calcula empuxo e massa para o estágio atual
-        empuxo, massa = self.calcular_empuxo_massa(tempo, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
-                                                   self.tempos_de_separacao,
-                                                   self.impulso_especifico, self.massa_propelente_estagios_1_2,
-                                                   self.massa_estrutural_por_estagio,
-                                                   self.massa_inicial_do_foguete, self.planeta.gravidade, estagio_atual,
-                                                   self.massa_de_carga_util)
-
-        # Cálculos controle
-        velocidade, angulo, phi, raio, delta, long = vetor_de_estados
-        altura = raio - self.planeta.raio_equatorial
-        if altura < 200e3:
+        if h < 200e3:
             epsl = 0
-            mu = 0
+            mu = 0  # Tração alinhada com a velocidade relativa
         else:
-            _, phii, angulo_i = Vrel2Vine(velocidade, phi, angulo, self.planeta.velocidade_inercial_de_rotacao, raio, delta)
-            mu = np.arcsin(
-                np.cos(angulo) * np.cos(phii) * np.sin(angulo_i) - np.sin(angulo) * np.cos(phii) * np.cos(angulo_i))
-            epsl = -np.arctan2(
-                -np.cos(phi) * np.sin(phii) + np.sin(phi) * np.sin(angulo) * np.cos(phii) * np.sin(angulo_i) +
-                np.sin(phi) * np.cos(angulo) * np.cos(phii) * np.cos(angulo_i), np.sin(phi) * np.sin(phii) +
-                np.cos(phi) * np.sin(angulo) * np.cos(phii) * np.sin(angulo_i) + np.cos(phi) * np.cos(angulo) * np.cos(
-                    phii) * np.cos(angulo_i))
+            # Vetor velocidade inercial
+            _, phii, Ai = Vrel2Vine(V, phi, A, self.planeta.velocidade_inercial_de_rotacao, r, delta)
 
-        return empuxo, massa, mu, epsl
+            # Ângulos propulsivos para que a tração seja alinhada com a velocidade inercial
+            mu = np.arcsin(np.cos(A) * np.cos(phii) * np.sin(Ai) - np.sin(A) * np.cos(phii) * np.cos(Ai))
+            epsl = -np.arctan2(
+                -np.cos(phi) * np.sin(phii) + np.sin(phi) * np.sin(A) * np.cos(phii) * np.sin(Ai) + np.sin(
+                    phi) * np.cos(A) * np.cos(phii) * np.cos(Ai),
+                np.sin(phi) * np.sin(phii) + np.cos(phi) * np.sin(A) * np.cos(phii) * np.sin(Ai) + np.cos(
+                    phi) * np.cos(A) * np.cos(phii) * np.cos(Ai))
+        return ft, m, mu, epsl
 
 
 class ConstrutorModeloPropulsivo:
@@ -183,7 +177,7 @@ class ConstrutorModeloPropulsivo:
         """
         self.impulso_especifico = np.array([])
         self.massa_propelente_estagios = np.array([])
-        self.massa_propelente_terceiro_estagio = 0.0
+        self.massa_total_propelente_terceiro_estagio = 0.0
         self.duracao_queima_estagios = np.array([])
         self.tempo_espera_separacao = np.array([])
         self.tempo_espera_ignicao = np.array([])
@@ -213,15 +207,15 @@ class ConstrutorModeloPropulsivo:
         self.massa_propelente_estagios = np.array(massa_propelente_estagios)
         return self
 
-    def com_massa_propelente_terceiro_estagio(self,
-                                              massa_propelente_terceiro_estagio: float) -> 'ConstrutorModeloPropulsivo':
+    def com_massa_total_propelente_terceiro_estagio(self,
+                                                    massa_total_propelente_terceiro_estagio: float) -> 'ConstrutorModeloPropulsivo':
         """
         Define a massa de propelente do terceiro estágio.
 
-        :param massa_propelente_terceiro_estagio: Massa de propelente do terceiro estágio.
+        :param massa_total_propelente_terceiro_estagio: Massa de propelente do terceiro estágio.
         :return: Instância do builder.
         """
-        self.massa_propelente_terceiro_estagio = massa_propelente_terceiro_estagio
+        self.massa_total_propelente_terceiro_estagio = massa_total_propelente_terceiro_estagio
         return self
 
     def com_duracao_queima_estagios(self, duracao_queima_estagios: list) -> 'ConstrutorModeloPropulsivo':

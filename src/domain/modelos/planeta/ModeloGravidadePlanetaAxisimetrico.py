@@ -1,54 +1,32 @@
 import numpy as np
 
 
-def calcular_gravidade_axisimetrico(distancia_radial, colatitude, planeta):
-	"""
-    Calcula a gravidade de um planeta axissimétrico considerando as constantes de Jeffery (J2, J3, J4).
+def calcular_gravidade_axisimetrico(r, delta, planeta):
+	mut = planeta.mut
+	Requat = planeta.raio_equatorial
+	J2 = planeta.J2
+	J3 = planeta.J3
+	J4 = planeta.J4
 
-    Parâmetros:
-    distancia_radial (float): Distância radial ao centro de massa do planeta (m).
-    colatitude (float): Colatitude (rad).
-    planeta (object): Objeto contendo os parâmetros raio_equatorial, gravidade_padrao_nivel_do_mar,
-                      constante_gravitacional, J2, J3, J4.
+	phi = np.pi / 2 - delta
 
-    Retorna:
-    tuple: Componente radial da gravidade (m/s^2) e componente colatitudinal (m/s^2).
-    """
-	# Calculando a componente radial da gravidade
-	componente_radial = (
-			(1 / distancia_radial ** 6)
-			* planeta.gravidade
-			* planeta.mut
-			* (
-					-distancia_radial ** 4
-					- 1.5 * planeta.J2 * distancia_radial ** 2 * planeta.raio_equatorial ** 2
-					+ 1.875 * planeta.J4 * planeta.raio_equatorial ** 4
-					- 6 * planeta.J3 * distancia_radial * planeta.raio_equatorial ** 3 * np.cos(colatitude)
-					+ (
-								4.5 * planeta.J2 * distancia_radial ** 2 * planeta.raio_equatorial ** 2 - 18.75 * planeta.J4 * planeta.raio_equatorial ** 4) * np.cos(
-				colatitude) ** 2
-					+ 10 * planeta.J3 * distancia_radial * planeta.raio_equatorial ** 3 * np.cos(
-				colatitude) ** 3
-					+ 21.875 * planeta.J4 * planeta.raio_equatorial ** 4 * np.cos(colatitude) ** 4
-			)
-	)
+	gr = -(mut) / (r ** 2) - (1 / r) * mut * (
+			-((J2 * Requat ** 2 * (-1 + 3 * np.cos(phi) ** 2)) / (r ** 3)) - (
+			1.5 * J3 * Requat ** 3 * (-3 * np.cos(phi) + 5 * np.cos(phi) ** 3)) / (r ** 4) - (
+					J4 * Requat ** 4 * (3 - 30 * np.cos(phi) ** 2 + 35 * np.cos(phi) ** 4)) / (
+					2 * r ** 5)) + (mut / (r ** 2)) * (
+				 (0.5 * J2 * Requat ** 2 * (-1 + 3 * np.cos(phi) ** 2)) / (r ** 2) + (
+				 0.5 * J3 * Requat ** 3 * (-3 * np.cos(phi) + 5 * np.cos(phi) ** 3)) / (r ** 3) + (
+						 J4 * Requat ** 4 * (3 - 30 * np.cos(phi) ** 2 + 35 * np.cos(phi) ** 4)) / (
+						 8 * r ** 4))
 
-	# Calculando a componente colatitudinal da gravidade
-	componente_colatitudinal = (
-			(1 / distancia_radial ** 6)
-			* 3
-			* planeta.gravidade
-			* planeta.mut
-			* planeta.raio_equatorial ** 2
-			* (
-					-0.5 * planeta.J3 * distancia_radial * planeta.raio_equatorial
-					+ (
-								planeta.J2 * distancia_radial ** 2 - 2.5 * planeta.J4 * planeta.raio_equatorial ** 2) * np.cos(
-				colatitude)
-					+ 2.5 * planeta.J3 * distancia_radial * planeta.raio_equatorial * np.cos(colatitude) ** 2
-					+ 5.83333 * planeta.J4 * planeta.raio_equatorial ** 2 * np.cos(colatitude) ** 3
-			)
-			* np.sin(colatitude)
-	)
+	gphi = -(1 / r ** 2) * mut * (-((3 * J2 * Requat ** 2 * np.cos(phi) * np.sin(phi)) / r ** 2) + (
+			0.5 * J3 * Requat ** 3 * (3 * np.sin(phi) - 15 * np.cos(phi) ** 2 * np.sin(phi))) / r ** 3 + (
+										  J4 * Requat ** 4 * (
+										  60 * np.cos(phi) * np.sin(phi) - 140 * np.cos(
+									  phi) ** 3 * np.sin(phi))) / (8 * r ** 4))
 
-	return componente_radial, componente_colatitudinal
+	gc = -gr
+	gdel = -gphi
+
+	return gc, gdel

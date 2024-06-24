@@ -30,6 +30,9 @@ class ModeloEstrutural:
         self.comprimento_sem_1_estagio = comprimento_sem_1_estagio
         self.comprimento_sem_2_estagio = comprimento_sem_2_estagio
         self.comprimento_carga_util = comprimento_carga_util
+        (self.areas_de_referencia_para_calculo_do_arrasto,
+         self.comprimento_caracteristico,
+         self.fator_correcao) = self.calcula()
 
     def calcula(self):
         """

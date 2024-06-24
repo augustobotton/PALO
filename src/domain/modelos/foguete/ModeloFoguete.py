@@ -16,7 +16,6 @@ class ModeloFoguete:
         :param modelo_aerodinamico: Instância de ModeloAerodinamico
         """
         self.sinal_phi_inercial = None
-        self.acho_apogeu = None
         self.Dv = None
         self.velocidade_de_exaustao = None
         self.lambL = None
@@ -32,18 +31,19 @@ class ModeloFoguete:
         self.modelo_propulsivo = modelo_propulsivo
         self.modelo_estrutural = modelo_estrutural
         self.modelo_aerodinamico = modelo_aerodinamico
-        self.massa_propelente_estagios_1_2 = modelo_propulsivo.massa_propelente_estagios_1_2
-        self.massa_propelente_terceiro_estagio = modelo_propulsivo.massa_propelente_terceiro_estagio
+        self.massa_propelente_estagios_1_2 = modelo_propulsivo.massa_propelente_estagios
+        self.massa_propelente_terceiro_estagio = modelo_propulsivo.massa_total_propelente_terceiro_estagio
         self.massa_estrutural_por_estagio = modelo_estrutural.massa_estrutural_por_estagio
         self.massa_de_carga_util = modelo_estrutural.massa_de_carga_util
         self.massa_inicial_do_foguete = modelo_propulsivo.massa_inicial_do_foguete
-        self.impulso_especifico_por_estagio = modelo_propulsivo.impulso_especifico_por_estagio
-        self.Sr = [modelo_estrutural.area_secao_transversal_1_estagio, #TODO pegar Sr calculado
-                   modelo_estrutural.area_secao_transversal_2_estagio,
-                   modelo_estrutural.area_secao_transversal_3_estagio,
-                   modelo_estrutural.area_secao_transversal_carga_util]
+        self.impulso_especifico_por_estagio = modelo_propulsivo.impulso_especifico
+        self.areas_referencia = [modelo_estrutural.area_secao_transversal_1_estagio,
+                                 modelo_estrutural.area_secao_transversal_2_estagio,
+                                 modelo_estrutural.area_secao_transversal_3_estagio,
+                                 modelo_estrutural.area_secao_transversal_carga_util]
+        self._estudo_delta_v(modelo_propulsivo.planeta)
 
-    def estudo_delta_v(self, planeta):
+    def _estudo_delta_v(self, planeta):
         """
         Realiza um estudo simplificado pela equação de foguete.
 
@@ -87,10 +87,10 @@ class ModeloFoguete:
         """
         Exibe os dados do foguete na tela.
         """
-        print('Área de referência do foguete com primeiro estágio (m^2):', self.Sr[0])
-        print('Área de referência do foguete com segundo estágio (m^2):', self.Sr[1])
-        print('Área de referência do foguete com terceiro estágio (m^2):', self.Sr[2])
-        print('Área de referência da carga útil (m^2):', self.Sr[3])
+        print('Área de referência do foguete com primeiro estágio (m^2):', self.areas_referencia[0])
+        print('Área de referência do foguete com segundo estágio (m^2):', self.areas_referencia[1])
+        print('Área de referência do foguete com terceiro estágio (m^2):', self.areas_referencia[2])
+        print('Área de referência da carga útil (m^2):', self.areas_referencia[3])
         print('Massa inicial antes da queima do primeiro estágio (kg):', self.massa_inicial_do_foguete)
         print('Massa inicial antes da queima do segundo estágio (kg):', self.massa_total_na_ignicacao_2_estagio)
         print('Massa inicial antes da queima do terceiro estágio (kg):', self.m03)
@@ -100,7 +100,6 @@ class ModeloFoguete:
         print('Velocidades de exaustão (m/s):', self.velocidade_de_exaustao)
         print('Razão de carga útil total:', self.lambL)
         print('Impulso de velocidade total ideal (m/s):', self.Dv)
-
 
 
 class ConstrutorDeFoguete:

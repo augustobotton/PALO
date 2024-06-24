@@ -3,14 +3,15 @@ from scipy.interpolate import pchip_interpolate
 
 from src.domain.modelos.foguete.ModeloEstrutural import ModeloEstrutural
 
-#TODO fazer construtor
+
+#TODO: OK!
 class ModeloAerodinamico:
     def __init__(self):
         self.altitude = None
         self.numero_de_knudsen = None
         self.numero_de_mach = None
         self.temperatura = None
-        self.constante_do_gas_ideal =  None
+        self.constante_do_gas_ideal = None
         self.velocidade = None
 
     def calcula(self) -> float:
@@ -26,8 +27,9 @@ class ModeloAerodinamico:
                 coeficiente_de_arrasto = coeficiente_de_arrasto_interpolado
             elif self.numero_de_knudsen < 14.5:
                 coeficiente_de_arrasto = coeficiente_de_arrasto_interpolado + (
-                    coeficiente_de_arrasto_em_escoamento_livre_molecular - coeficiente_de_arrasto_interpolado) * (
-                                             (1 / 3) * np.log10(self.numero_de_knudsen / np.sin(30 * np.pi / 180)) + 0.05113)
+                        coeficiente_de_arrasto_em_escoamento_livre_molecular - coeficiente_de_arrasto_interpolado) * (
+                                                 (1 / 3) * np.log10(
+                                             self.numero_de_knudsen / np.sin(30 * np.pi / 180)) + 0.05113)
             else:
                 coeficiente_de_arrasto = coeficiente_de_arrasto_em_escoamento_livre_molecular
         else:
@@ -41,7 +43,8 @@ class ModeloAerodinamico:
 
         :return: Coeficiente de arrasto em escoamento livre molecular
         """
-        return 1.75 + np.sqrt(np.pi) / (2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
+        return 1.75 + np.sqrt(np.pi) / (
+                    2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
 
     @staticmethod
     def _interpola_coeficiente_de_arrasto(numero_de_mach: float) -> float:
@@ -132,9 +135,11 @@ class ModeloAerodinamico:
                                                     [11.2294, 0.4825],
                                                     [11.4809, 0.4825],
                                                     [11.7325, 0.4824]])
-        return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1], numero_de_mach)
+        return pchip_interpolate(coeficiente_de_arrasto_por_mach[:, 0], coeficiente_de_arrasto_por_mach[:, 1],
+                                 numero_de_mach)
 
-    def aerodinamica_multiplos_estagios(self, tempo: float, velocidade: float, area_de_referencia: list, tempo_limite_separacao: list,
+    def aerodinamica_multiplos_estagios(self, tempo: float, velocidade: float, area_de_referencia: list,
+                                        tempo_limite_separacao: list,
                                         densidade_do_ar: float):
         """
         Calcula as forças aerodinâmicas para foguetes de múltiplos estágios.
@@ -173,7 +178,6 @@ class ModeloAerodinamico:
                 setattr(self, key, value)
             else:
                 raise ValueError(f"Parâmetro '{key}' não é um atributo válido do ModeloAerodinamico")
-
 
     @staticmethod
     def define_area_referencia(tempo: float, tempo_limite_separacao: list, area_de_referencia: list) -> float:
