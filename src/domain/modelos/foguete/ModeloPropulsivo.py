@@ -35,9 +35,9 @@ class ModeloPropulsivo:
         self.massa_de_carga_util = builder.massa_de_carga_util
         self.h0 = builder.h0
         self.planeta = builder.planeta
-        self._calcular_tempos()
+        self.calcular_tempos()
 
-    def _calcular_tempos(self) -> None:
+    def calcular_tempos(self) -> None:
         """
         Calcula os tempos de ignição, queima e separação para os estágios do foguete.
         """
@@ -74,6 +74,7 @@ class ModeloPropulsivo:
             self.massa_estrutural_por_estagio) + self.massa_de_carga_util
 
         self.distancia_radial_inicial = self.planeta.raio_equatorial + self.h0
+        print("entrei uma vez")
 
     def __str__(self):
         return f"impulso_especifico: {self.impulso_especifico}\n" \

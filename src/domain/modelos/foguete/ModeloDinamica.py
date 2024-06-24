@@ -20,7 +20,6 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
     # Cálculo da massa e tração em função do tempo
     ft, massa, mu, epsl = foguete.modelo_propulsivo.propulsao_n_estagios(vetor_tempo,
                                                                          vetor_de_estados_foguete)
-
     # Cálculo do modelo atmosférico
     altitude = distancia_radial - planeta.raio_equatorial
 
@@ -28,11 +27,10 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
     T, _, _, densidade_do_ar, _, M, _, _, Kn, _, _, R = planeta.modelo_atmosferico.calcula(
         altitude, velocidade, foguete.modelo_estrutural.comprimento_caracteristico, planeta.delta_temperatura_atm
     )
+
     foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn, numero_de_mach=M,
                                                      temperatura=T, constante_do_gas_ideal=R, velocidade=velocidade)
-
     tempos_de_separacao = foguete.modelo_propulsivo.tempos_de_separacao
-
     # Cálculo da força de arrasto
     D, fy, L = foguete.modelo_aerodinamico.aerodinamica_multiplos_estagios(
         vetor_tempo, velocidade, foguete.modelo_estrutural.areas_de_referencia_para_calculo_do_arrasto,
@@ -95,5 +93,5 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
                                                      planeta)
 
     # Derivada do vetor de estado
-    Xp = [float(Vp), Ap, phip, rp, deltap, lonp]
+    Xp = np.array([float(Vp), Ap, phip, rp, deltap, lonp])
     return Xp

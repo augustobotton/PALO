@@ -16,7 +16,6 @@ class ModeloFoguete:
         :param modelo_aerodinamico: Instância de ModeloAerodinamico
         """
         self.sinal_phi_inercial = None
-        self.acho_apogeu = None
         self.Dv = None
         self.velocidade_de_exaustao = None
         self.lambL = None

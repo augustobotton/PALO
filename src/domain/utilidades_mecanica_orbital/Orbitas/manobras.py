@@ -57,25 +57,25 @@ def manobra_bieliptica(raio_intermediario, raio_da_orbita_desejada, orbita_inici
     return dv_a, dv_b, dv_c, t_trans1, t_trans2
 
 
-def manobra_coplanar(orbita_inicial: Orbita, orbita_final: Orbita):
-    semi_eixo_orbita_final = semi_eixo_maior(orbita_final.calcula_periastro(), orbita_final.calcula_apoastro())
-    r_f = np.linalg.norm(orbita_inicial.calcular_vetor_posicao_orbital())
-    v_i = calcula_velocidade_orbital(orbita_inicial.mu, r_f)
-    v_f = calcula_velocidade_orbital(orbita_final.mu, r_f, semi_eixo_orbita_final)
-
-    # Considerar possibilidade de orbita inicial eliptica
-    if orbita_inicial.excentricidade > 0:
-
-        # anomalia_verdadeira = calcula_anomalia_verdadeira(orbita_inicial, r_f) #TODO conferir equação para anomalia verdadeira
-        # angulo_alpha = np.arccos(
-        #     np.cos(anomalia_verdadeira) / (1 + orbita_inicial.excentricidade * np.cos(anomalia_verdadeira)))
-    else:
-        angulo_alpha = np.arccos((r_f * v_i) / (r_f * v_f))
-
-    delta_v = delta_velocidade(v_i, v_f, angulo_alpha)
-    betha = np.arcsin(v_f / delta_v * np.sin(angulo_alpha))
-
-    return delta_v, betha
+# def manobra_coplanar(orbita_inicial: Orbita, orbita_final: Orbita):
+#     semi_eixo_orbita_final = semi_eixo_maior(orbita_final.calcula_periastro(), orbita_final.calcula_apoastro())
+#     r_f = np.linalg.norm(orbita_inicial.calcular_vetor_posicao_orbital())
+#     v_i = calcula_velocidade_orbital(orbita_inicial.mu, r_f)
+#     v_f = calcula_velocidade_orbital(orbita_final.mu, r_f, semi_eixo_orbita_final)
+#
+#     # Considerar possibilidade de orbita inicial eliptica
+#     if orbita_inicial.excentricidade > 0:
+#
+#         # anomalia_verdadeira = calcula_anomalia_verdadeira(orbita_inicial, r_f) #TODO conferir equação para anomalia verdadeira
+#         # angulo_alpha = np.arccos(
+#         #     np.cos(anomalia_verdadeira) / (1 + orbita_inicial.excentricidade * np.cos(anomalia_verdadeira)))
+#     else:
+#         angulo_alpha = np.arccos((r_f * v_i) / (r_f * v_f))
+#
+#     delta_v = delta_velocidade(v_i, v_f, angulo_alpha)
+#     betha = np.arcsin(v_f / delta_v * np.sin(angulo_alpha))
+#
+#     return delta_v, betha
 
 
 def manobra_mudanca_de_plano(delta_inclinacao, vi):

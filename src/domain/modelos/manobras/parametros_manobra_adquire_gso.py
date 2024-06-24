@@ -68,7 +68,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
                                                                         3]
                     modelo_propulsivo.tempos_de_separacao[-1] = modelo_propulsivo.tempos_de_fim_de_queima[-1] + \
                                                                 modelo_propulsivo.tempos_de_separacao[2]
-
+                    modelo_propulsivo.calcular_tempos()
         self.sinal_phi_inercial = np.sign(
             phii)  # Guarda o sinal de phi inercial para verificar mudança na próxima iteração
         return 0
