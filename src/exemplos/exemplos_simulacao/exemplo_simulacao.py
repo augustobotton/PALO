@@ -31,7 +31,7 @@ alcantara = construtor_base_de_lancamento.com_altitude_base(
 
 construtor_propulsivo = ConstrutorModeloPropulsivo()
 meuModeloPropulsivo = construtor_propulsivo.com_impulso_especifico([251, 271, 315]).com_massa_propelente_estagios(
-    [5.5262e4, 11058, 0, 0]).com_massa_propelente_terceiro_estagio(243.6).com_duracao_queima_estagios(
+    [5.5262e4, 11058, 0, 0]).com_massa_total_propelente_terceiro_estagio(243.6).com_duracao_queima_estagios(
     [62, 62.62, 301]).com_tempo_primeira_queima_terceiro_estagio(262).com_tempo_espera_separacao(
     [2, 2, 2]).com_tempo_espera_ignicao([5, 1360]).com_massa_estrutural_por_estagio(
     [7750, 1367, 64.7544]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
@@ -48,18 +48,18 @@ fogueteConceitual = ConstrutorDeFoguete().com_modelo_propulsivo(meuModeloPropuls
     meuModeloEstrutural).com_modelo_aerodinamico(
     ModeloAerodinamico()).construir()
 
-print(fogueteConceitual.modelo_propulsivo.tempos_de_separacao)
-# # Condições iniciais
-# tempo_simulacao = 6000
-# velocidade_inicial = 0.1
-# angulo_elevacao_inicial = 76
-#
-# # Criar uma órbita alvo
-# orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
-# condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
-# simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
-# with open('../../construtorderesultados/simulacao.pkl', 'wb') as f:
-#     pickle.dump(simulacao, f)
-# resposta = simulacao.simular()
+
+# Condições iniciais
+tempo_simulacao = 10000
+velocidade_inicial = 0.1
+angulo_elevacao_inicial = np.deg2rad(80)
+
+# Criar uma órbita alvo
+orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
+condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial,  orbita_alvo]
+simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
+with open('../../construtorderesultados/simulacao.pkl', 'wb') as f:
+    pickle.dump(simulacao, f)
+resposta = simulacao.simular()
 
 

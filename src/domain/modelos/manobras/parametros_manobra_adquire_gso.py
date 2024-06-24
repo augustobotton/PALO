@@ -32,7 +32,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
         g = planeta.gravidade
 
         velocidade_orbital_desejada = calculos_orbitais.calcula_velocidade_orbital(planeta.mut,
-                                                                                    orbita_transferencia.semi_eixo_maior)
+                                                                                   orbita_transferencia.semi_eixo_maior)
 
         # Desmenbra o vetor de estado
         V = X[0]
@@ -50,13 +50,13 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
             if not self.achou_apogeu:
                 if np.sign(phii) != self.sinal_phi_inercial:
                     # Se o sinal for diferente, phii passou por zero, o foguete chegou no apogeu
-                    self.achou_apogeu = 1  # Encontrou o apogeu, ao setar essa variável, só vai entrar aqui uma vez
+                    self.achou_apogeu = True  # Encontrou o apogeu, ao setar essa variável, só vai entrar aqui uma vez
                     modelo_propulsivo.tempos_de_ignicao[-1] = t  # Guarda o tempo de ignição
                     dv_transferencia = velocidade_orbital_desejada - Vi
                     mp32 = (m * np.exp(dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g)) - m) / np.exp(
                         dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g))
                     modelo_propulsivo.tempos_de_fim_de_queima[-1] = modelo_propulsivo.tempos_de_ignicao[
-                                                                        -1] + mp32 / modelo_propulsivo.massa_propelente_terceiro_estagio
+                                                                        -1] + mp32 / modelo_propulsivo.massa_total_propelente_terceiro_estagio
                     if modelo_propulsivo.tempos_de_fim_de_queima[2] + modelo_propulsivo.tempos_de_fim_de_queima[
                         3] > modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio:
                         modelo_propulsivo.tempos_de_fim_de_queima[
