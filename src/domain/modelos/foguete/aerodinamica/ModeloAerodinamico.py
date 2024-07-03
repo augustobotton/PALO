@@ -42,7 +42,7 @@ class ModeloAerodinamico:
         :return: Coeficiente de arrasto em escoamento livre molecular
         """
         return 1.75 + np.sqrt(np.pi) / (
-                    2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
+                2 * (self.velocidade / np.sqrt(2 * self.constante_do_gas_ideal * self.temperatura)))
 
     @staticmethod
     def _interpola_coeficiente_de_arrasto(numero_de_mach: float) -> float:
@@ -155,7 +155,7 @@ class ModeloAerodinamico:
         coeficiente_arrasto_ajustado = fator_correcao_arrasto * coeficiente_arrasto
 
         # Determinar a área de referência com base no estágio
-        area_do_estagio = self.define_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
+        area_do_estagio = self._define_area_referencia(tempo, tempo_limite_separacao, area_de_referencia)
 
         # Calcular as forças
         arrasto = 0.5 * densidade_do_ar * velocidade ** 2 * area_do_estagio * coeficiente_arrasto_ajustado
@@ -177,8 +177,7 @@ class ModeloAerodinamico:
             else:
                 raise ValueError(f"Parâmetro '{key}' não é um atributo válido do ModeloAerodinamico")
 
-    @staticmethod
-    def define_area_referencia(tempo: float, tempo_limite_separacao: list, area_de_referencia: list) -> float:
+    def _define_area_referencia(self, tempo: float, tempo_limite_separacao: list, area_de_referencia: list) -> float:
         """
         Calcula a área de referência com base no estágio do foguete.
 

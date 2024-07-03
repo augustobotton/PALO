@@ -27,21 +27,17 @@ terra = (ConstrutorPlaneta()
          .construir())
 
 
-meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico([260, 260]).com_massa_propelente_estagios(
-    [677, 898]).com_duracao_queima_estagios(
-    [62, 64.62,0]).com_tempo_espera_separacao(
-    [2, 2,0]).com_tempo_espera_ignicao([5,0]).com_massa_estrutural_por_estagio(
+meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico([260.6, 261.1]).com_massa_propelente_estagios(
+    [677, 898]).com_duracao_queima_estagios([62, 64.62]).com_tempo_espera_separacao(
+    [2, 2]).com_tempo_espera_ignicao([5]).com_massa_estrutural_por_estagio(
     [284, 320]).com_massa_de_carga_util(400).com_h0(0.0).com_planeta(terra).construir()
 
 #TODO estou criando dois atributos para dois modelos diferentes, mas o que eu quero é criar um atributo que seja comum para os dois modelos.
 
 meuModeloEstrutural = ConstrutorModeloEstrutural().com_massa_estrutural_por_estagio(
-    [7750, 1367, 64.7544]).com_massa_de_carga_util(
-    13).com_area_secao_transversal_1_estagio(4.6 * 5 / 3).com_area_secao_transversal_2_estagio(
-    1.5).com_area_secao_transversal_3_estagio(1.5).com_area_secao_transversal_carga_util(
-    1.5).com_comprimento_carga_util(1).com_comprimento_total_do_foguete(
-    7.33 + 7.1 + 6.28).com_comprimento_sem_1_estagio(7.1 + 6.28).com_comprimento_sem_2_estagio(
-    6.28).construir()
+    [284, 320]).com_massa_de_carga_util(400).com_area_secao_transversal_1_estagio(np.pi*(0.557/2)**2).com_area_secao_transversal_2_estagio(
+    np.pi*(0.557/2)**2).com_area_secao_transversal_carga_util(
+    np.pi*(0.46/2)**2).com_comprimento_total_do_foguete(12.6).com_comprimento_sem_1_estagio(12.6-3.214).com_comprimento_carga_util(12.6-3.294).construir()
 
 fogueteConceitual = ConstrutorDeFoguete().com_modelo_propulsivo(meuModeloPropulsivo).com_modelo_estrutural(
     meuModeloEstrutural).com_modelo_aerodinamico(

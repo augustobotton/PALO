@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import matriz_rotacao_orbital_inercial
 from src.domain.utilidades_mecanica_orbital.orbitalUtils.calculos_orbitais import determina_parametros_orbitais
 
 
@@ -102,39 +103,13 @@ class Orbita:
             # Órbita equatorial
             self.raan = 0
 
-        matriz_rotacao = self._matriz_rotacao_orbital()
+        matriz_rotacao = matriz_rotacao_orbital_inercial(self.raan, self.arg_periastro, self.inclinacao)
 
         posicao_inercial = np.dot(matriz_rotacao, posicao_orbital)
         velocidade_inercial = np.dot(matriz_rotacao, velocidade_orbital)
 
         return posicao_inercial, velocidade_inercial
 
-    def _matriz_rotacao_orbital(self) -> np.ndarray:
-        """
-        Calcula a matriz de rotação do plano orbital para o sistema inercial.
-
-        :return: Matriz de rotação.
-        """
-        cos_raan = np.cos(self.raan)
-        sin_raan = np.sin(self.raan)
-        cos_arg_periastro = np.cos(self.arg_periastro)
-        sin_arg_periastro = np.sin(self.arg_periastro)
-        cos_inclinacao = np.cos(self.inclinacao)
-        sin_inclinacao = np.sin(self.inclinacao)
-
-        matriz_rotacao = np.array([
-            [cos_raan * cos_arg_periastro - sin_raan * sin_arg_periastro * cos_inclinacao,
-             -cos_raan * sin_arg_periastro - sin_raan * cos_arg_periastro * cos_inclinacao,
-             sin_raan * sin_inclinacao],
-            [sin_raan * cos_arg_periastro + cos_raan * sin_arg_periastro * cos_inclinacao,
-             -sin_raan * sin_arg_periastro + cos_raan * cos_arg_periastro * cos_inclinacao,
-             -cos_raan * sin_inclinacao],
-            [sin_arg_periastro * sin_inclinacao,
-             cos_arg_periastro * sin_inclinacao,
-             cos_inclinacao]
-        ])
-
-        return matriz_rotacao
 
     def calcula_apoastro(self):
 

@@ -68,7 +68,6 @@ for i in range(N):
 
 
 
-
 plt.close("all")
 #
 plt.figure(1);
