@@ -64,7 +64,7 @@ class Simulacao:
 
         opcoes_integracao = {'rtol': 1e-8, 'atol': 1e-10, 'max_step': 1}
         print(f'Simulando por {self.tempo_simulacao} segundos')
-        # Create a progress bar
+
         with tqdm(total=self.tempo_simulacao) as bar:
             def fun(t, y):
                 bar.update(t - bar.n)

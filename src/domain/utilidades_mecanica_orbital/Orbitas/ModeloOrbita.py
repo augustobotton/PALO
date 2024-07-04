@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.domain.utilidades_mecanica_orbital.Orbitas.coe_from_sv import coe_from_sv
 from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import matriz_rotacao_orbital_inercial
 from src.domain.utilidades_mecanica_orbital.orbitalUtils.calculos_orbitais import determina_parametros_orbitais
 
@@ -7,7 +8,7 @@ from src.domain.utilidades_mecanica_orbital.orbitalUtils.calculos_orbitais impor
 class Orbita:
     def __init__(self, semi_eixo_maior: float = None, excentricidade: float = None, inclinacao: float = None,
                  raan: float = None, argumento_periastro: float = None, anomalia_verdadeira: float = None,
-                 tempo_de_periastro: float = 0, parametro: float = None):
+                 tempo_de_periastro: float = 0, parametro: float = None, quantidade_momento_angular = None):
         """
         Inicializa a classe Orbita com os parâmetros orbitais básicos.
 
@@ -26,18 +27,22 @@ class Orbita:
         self.anomalia_verdadeira = anomalia_verdadeira
         self.tempo_de_periastro = tempo_de_periastro
         self.parametro = parametro
-        self.mu = 398600.4418e9  # Constante gravitacional da Terra, em m^3/s^2. É o padrão
+        self.quantidade_momento_angular = quantidade_momento_angular
+        self.mu = 398600.4418  # Constante gravitacional da Terra, em km^3/s^2.
+
+    def retorna_parametros(self):
+        return self.semi_eixo_maior, self.excentricidade, self.inclinacao, self.raan, self.arg_periastro, self.anomalia_verdadeira, self.quantidade_momento_angular
 
     def __repr__(self):
         return (f"Orbita(semi_eixo_maior={self.semi_eixo_maior}, excentricidade={self.excentricidade}, "
                 f"inclinacao={self.inclinacao}, raan={self.raan}, arg_periastro={self.arg_periastro}, "
-                f"anomalia_verdadeira={self.anomalia_verdadeira}, tempo_periastro={self.tempo_de_periastro})")
+                f"anomalia_verdadeira={self.anomalia_verdadeira})")
 
     def define_mu(self, mu: float):
         """
         Define a constante gravitacional para outro corpo celeste.
 
-        :param mu: Nova constante gravitacional (em m^3/s^2).
+        :param mu: Nova constante gravitacional (em km^3/s^2).
         """
         self.mu = mu
 
@@ -110,7 +115,6 @@ class Orbita:
 
         return posicao_inercial, velocidade_inercial
 
-
     def calcula_apoastro(self):
 
         apoastro = self.semi_eixo_maior * (1 + self.excentricidade)
@@ -142,6 +146,8 @@ class Orbita:
                    tempo_de_periastro=tempo_de_periastro)
 
     @classmethod
-    def criar_pelo_vetor_de_estado(cls, tempo_observacao, mu, posicao, velocidade):
-        eixo, exc, inclinacao, raan, argumento_de_periastro, anomalia_verdadeira, tempo_periastro = determina_parametros_orbitais(tempo_observacao, mu, posicao, velocidade)
-        return cls (semi_eixo_maior=eixo, excentricidade=exc, inclinacao=inclinacao, raan=raan, argumento_periastro= argumento_de_periastro, anomalia_verdadeira=anomalia_verdadeira, tempo_de_periastro= tempo_periastro)
+    def criar_pelo_vetor_de_estado(cls, posicao, velocidade, mu):
+        eixo, exc, inclinacao, raan, argumento_de_periastro, anomalia_verdadeira, quantidade_momento_angular = coe_from_sv(posicao, velocidade, mu)
+        return cls(semi_eixo_maior=eixo, excentricidade=exc, inclinacao=inclinacao, raan=raan,
+                   argumento_periastro=argumento_de_periastro, anomalia_verdadeira=anomalia_verdadeira,
+                   quantidade_momento_angular=quantidade_momento_angular)

@@ -5,29 +5,25 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # Definindo variáveis globais
 G = 6.6742e-20  # Universal gravitational constant (km^3/kg/s^2)
-m1 = 5.974e24   # Planet mass (kg)
-m2 = 1000       # Spacecraft mass (kg)
-R = 6378        # Planet radius (km)
+m1 = 5.974e24  # Planet mass (kg)
+m2 = 1000  # Spacecraft mass (kg)
+R = 6378  # Planet radius (km)
 mu = G * (m1 + m2)
 
-def rates(t, f):
-    x, y, z, vx, vy, vz = f
-    r = np.sqrt(x**2 + y**2 + z**2)
-    ax = -mu * x / r**3
-    ay = -mu * y / r**3
-    az = -mu * z / r**3
-    return [vx, vy, vz, ax, ay, az]
 
-def orbit():
+
+
+
+def orbit(ti, tf, r0, v0):
     hours = 3600
     r0 = [8000, 0, 6000]
     v0 = [0, 7, 0]
-    t0 = 0
+    ti = 0
     tf = 4 * hours
 
     y0 = np.array(r0 + v0)
     opts = {'rtol': 1e-8, 'atol': 1e-8}
-    sol = solve_ivp(rates, [t0, tf], y0, **opts)
+    sol = solve_ivp(dinamica_lambert, [ti, tf], y0, **opts)
 
     t = sol.t
     y = sol.y.T
@@ -46,13 +42,14 @@ def orbit():
     print("Magnitude =", np.linalg.norm(r0), "km")
     print("The initial velocity is", v0)
     print("Magnitude =", np.linalg.norm(v0), "km/s")
-    print("Initial time = {:.2f} h. Final time = {:.2f} h.".format(t0 / hours, tf / hours))
+    print("Initial time = {:.2f} h. Final time = {:.2f} h.".format(ti / hours, tf / hours))
     print("The minimum altitude is {:.2f} km at time = {:.2f} h.".format(rmin - R, t[imin] / hours))
     print("The speed at that point is {:.2f} km/s.".format(v_at_rmin))
     print("The maximum altitude is {:.2f} km at time = {:.2f} h.".format(rmax - R, t[imax] / hours))
     print("The speed at that point is {:.2f} km/s.".format(v_at_rmax))
 
     plot_orbit(y, R, r0)
+
 
 def plot_orbit(y, R, r0):
     fig = plt.figure()
