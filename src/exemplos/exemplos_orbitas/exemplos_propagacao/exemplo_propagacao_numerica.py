@@ -1,8 +1,7 @@
-from src.domain.utilidades_mecanica_orbital.Orbitas.coe_from_sv import coe_from_sv
-from src.domain.utilidades_mecanica_orbital.Utilidades.calculos_orbitais import calcular_periodo_orbital
-from src.domain.utilidades_mecanica_orbital.propagacao.numerica.propagadores.propaganumerica import propagacao_numerica
 import numpy as np
 
+from src.domain.modelos.orbitas.propagacao.numerica.propagadores.propagacao_numerica import propagacao_numerica
+from src.domain.modelos.orbitas.utilidades import calcular_periodo_orbital
 
 r0 = [8200, 8200, 0]
 v0 = [-4.5, 4.5, 1]

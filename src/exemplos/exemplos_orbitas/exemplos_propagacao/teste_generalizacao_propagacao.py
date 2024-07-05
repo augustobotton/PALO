@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from src.domain.utilidades_mecanica_orbital.propagacao.analitica.propagacao import *
 
 # Constantes gerais do problema
 G = 6.67384e-11  # [m^3/kg*s^2] Constante de gravitação universal

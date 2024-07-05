@@ -1,8 +1,8 @@
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.Utilidades import calculos_orbitais
-from src.domain.utilidades_mecanica_orbital.Orbitas import ModeloOrbita
-from src.domain.utilidades_mecanica_orbital.Utilidades.Converte import Vrel2Vine
+from src.domain.modelos.orbitas.utilidades import calculos_orbitais
+from src.domain.modelos.orbitas import Orbita
+from src.domain.modelos.orbitas.utilidades.funcoes_conversao import Vrel2Vine
 from src.domain.modelos.foguete.propulsao.ModeloPropulsivo import ModeloPropulsivo
 
 

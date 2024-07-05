@@ -5,7 +5,7 @@ from scipy.integrate import solve_ivp
 
 from src.domain.modelos.foguete.ModeloDinamica import dinamica_foguete
 from src.domain.modelos.manobras.parametros_manobra_adquire_gso import ParametrosManobraAdquireOrbitaDeTransferencia
-from src.domain.modelos.planeta.ModeloPlaneta import ModeloPlaneta as Planeta
+from src.domain.modelos.planeta.Planeta import ModeloPlaneta as Planeta
 
 class Simulacao:
     def __init__(self, planeta: Planeta, base_de_lancamento, foguete, condicoes_iniciais):

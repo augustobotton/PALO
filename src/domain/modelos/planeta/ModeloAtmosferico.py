@@ -4,34 +4,73 @@ import os
 
 
 class ModeloAtmosferico:
+    """
+    Modelo atmosférico baseado em dados de um arquivo JSON que define camadas atmosféricas e constantes físicas.
+
+    Attributes:
+        hi (np.ndarray): Alturas das camadas atmosféricas em metros.
+        Ti (np.ndarray): Temperaturas de base para cada camada em Kelvin.
+        Ri (np.ndarray): Constante de gás ideal para cada camada em J/(kg·K).
+        a (np.ndarray): Gradiente térmico em °C por metro.
+        Mi (np.ndarray): Massa molar média para cada camada em kg/mol.
+        g0 (float): Aceleração da gravidade ao nível do mar em m/s².
+        Na (float): Número de Avogadro.
+        sigma (float): Diâmetro de colisão molecular em metros.
+        m0 (float): Massa molar do ar ao nível do mar em kg/mol.
+        P0 (float): Pressão atmosférica ao nível do mar em N/m².
+        Requat (float): Raio médio da Terra em metros.
+        gamma (float): Razão de calores específicos.
+        beta (float): Coeficiente relacionado ao raio médio da Terra.
+    """
+
     def __init__(self, json_file_path):
-        # Verifica se o arquivo existe no caminho especificado
+        """
+        Inicializa o ModeloAtmosferico carregando dados de um arquivo JSON.
+
+        Args:
+            json_file_path (str): Caminho do arquivo JSON com dados atmosféricos.
+
+        Raises:
+            FileNotFoundError: Se o arquivo JSON não for encontrado.
+        """
         if not os.path.exists(json_file_path):
             raise FileNotFoundError(f"O arquivo {json_file_path} não foi encontrado.")
 
-        # Carrega os dados do arquivo JSON
         with open(json_file_path, 'r') as file:
             data = json.load(file)
 
-        # Converte os dados do JSON em arrays numpy
-        self.hi = np.array(data['hi']) * 1e3  # km para m
+        self.hi = np.array(data['hi']) * 1e3  # Convertendo km para m
         self.Ti = np.array(data['Ti'])
         self.Ri = np.array(data['Ri'])
-        self.a = np.array(data['a']) * 1e-3  # °C/km para °C/m
+        self.a = np.array(data['a']) * 1e-3  # Convertendo °C/km para °C/m
         self.Mi = np.array(data['Mi'])
 
-        # Carrega as constantes do JSON
-        self.g0 = data['constantes']['aceleracao_gravidade']  # Aceleração da gravidade ao nível do mar (m/s²)
-        self.Na = data['constantes']['numero_avogadro']  # Número de Avogadro
-        self.sigma = data['constantes']['diametro_colisao']  # Diâmetro de colisão para o ar (m)
-        self.m0 = data['constantes']['massa_molar_ar']  # Massa molar do ar ao nível do mar (kg/mol)
-        self.P0 = data['constantes']['pressao_nivel_mar']  # Pressão ao nível do mar (N/m²)
-        self.Requat = data['constantes']['raio_medio_terra']  # Raio médio da Terra (m)
-        self.gamma = data['constantes'][
-            'razao_calores_especificos']  # Razão de calores específicos ao nível do mar
-        self.beta = 2 / self.Requat  # Número beta associado à distância radial média do nível do mar
+        self.g0 = data['constantes']['aceleracao_gravidade']
+        self.Na = data['constantes']['numero_avogadro']
+        self.sigma = data['constantes']['diametro_colisao']
+        self.m0 = data['constantes']['massa_molar_ar']
+        self.P0 = data['constantes']['pressao_nivel_mar']
+        self.Requat = data['constantes']['raio_medio_terra']
+        self.gamma = data['constantes']['razao_calores_especificos']
+        self.beta = 2 / self.Requat
 
     def calcula(self, altitude_geometrica, v, lc, dT):
+
+        """
+                Calcula e retorna várias propriedades atmosféricas em uma dada altitude.
+
+                Args:
+                    altitude_geometrica (float): Altitude geométrica em metros.
+                    v (float): Velocidade em m/s.
+                    lc (float): Comprimento característico em metros.
+                    dT (float): Variação de temperatura local em Kelvin.
+
+                Returns:
+                    tuple: Contém temperatura cinética, temperatura escala molecular, pressão, densidade do ar,
+                           velocidade do som, número de Mach, viscosidade dinâmica, número de Prandtl,
+                           número de Knudsen, parâmetro regime de escoamento, número de Reynolds e constante de gás ideal.
+                """
+
         if altitude_geometrica < 0:
             i = 0
             altitude_geometrica = 0

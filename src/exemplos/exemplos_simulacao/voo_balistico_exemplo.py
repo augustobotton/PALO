@@ -10,7 +10,7 @@ from src.domain.modelos.foguete.veiculo_lancador.ConstrutorFoguete import Constr
 from src.domain.modelos.planeta.ConstrutorBaseDeLancamento import ConstrutorBaseDeLancamento
 from src.domain.modelos.planeta.ConstrutorPlaneta import ConstrutorPlaneta
 from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.utilidades_mecanica_orbital.Orbitas.ModeloOrbita import Orbita
+from src.domain.modelos.orbitas import Orbita
 
 json_modelo_atm_terrestre = r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'
 terra = (ConstrutorPlaneta()

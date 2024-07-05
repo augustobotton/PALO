@@ -1,7 +1,18 @@
-from src.domain.modelos.planeta.ModeloBaseDeLancamento import BaseDeLancamento
+from src.domain.modelos.planeta.BaseDeLancamento import BaseDeLancamento
 import numpy as np
 
+
 class ConstrutorBaseDeLancamento:
+    """
+    Uma classe construtora para criar uma base de lançamento com parâmetros personalizáveis.
+
+    Esta classe permite a configuração da altitude, latitude, longitude e comprimento do trilho de uma base de lançamento
+    através do Builder Pattern. Cada método retorna a própria instância, permitindo o encadeamento de métodos.
+
+    Por padrão, a latitude e longitude da base de lançamento são configuradas para a latitude e longitude da base de
+    lançamento de Alcântara, no Brasil.
+    """
+
     DEFAULT_LATITUDE = -2.3267844 * np.pi / 180  # Latitude padrão em radianos
     DEFAULT_LONGITUDE = -44.4111042 * np.pi / 180  # Longitude padrão em radianos
 

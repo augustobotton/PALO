@@ -1,8 +1,17 @@
 from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.modelos.planeta.ModeloPlaneta import ModeloPlaneta
+from src.domain.modelos.planeta.Planeta import ModeloPlaneta
 
 
 class ConstrutorPlaneta:
+    """
+    Uma classe para construir modelos de planetas com características atmosféricas e físicas específicas.
+
+    Esta classe permite a construção passo a passo de um modelo de planeta, definindo vários parâmetros,
+    como a variação de temperatura da atmosfera, raio equatorial, velocidade de rotação inercial, gravidade
+    e modelo atmosférico, entre outros. Ela garante que todos os parâmetros necessários sejam definidos antes
+    da construção do modelo do planeta.
+    """
+
     def __init__(self):
         # Inicializa os atributos do construtor
         self.delta_temperatura_atm = None
