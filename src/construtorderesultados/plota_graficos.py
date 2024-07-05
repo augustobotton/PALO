@@ -3,8 +3,8 @@ import pickle
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.domain.utilidades_mecanica_orbital.orbitalUtils import Converte
-from src.domain.utilidades_mecanica_orbital.orbitalUtils import calculos_orbitais
+from src.domain.utilidades_mecanica_orbital.Utilidades import Converte
+from src.domain.utilidades_mecanica_orbital.Utilidades import calculos_orbitais
 from src.domain.modelos.Simulacao import Simulacao
 
 

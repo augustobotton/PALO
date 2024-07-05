@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.CoeficientesDeLagrange import f_and_g, fDot_and_gDot
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.KeplerUniversal import kepler_U
+from src.domain.utilidades_mecanica_orbital.Utilidades.CoeficientesDeLagrange import f_and_g, fDot_and_gDot
+from src.domain.utilidades_mecanica_orbital.Utilidades.KeplerUniversal import kepler_U
 
 
 def rv_from_r0v0(R0, V0, delta_t, mu):

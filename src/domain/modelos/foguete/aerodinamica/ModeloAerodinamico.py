@@ -18,7 +18,7 @@ class ModeloAerodinamico:
 
         :return: Coeficiente de arrasto
         """
-        coeficiente_de_arrasto_em_escoamento_livre_molecular = self._computa_coef_de_arrasto_em_escoamento_livre_molecular()
+        coeficiente_de_arrasto_em_escoamento_livre_molecular = self.computa_coef_de_arrasto_em_escoamento_livre_molecular()
         coeficiente_de_arrasto_interpolado = self._interpola_coeficiente_de_arrasto(self.numero_de_mach)
         if self.altitude < 2000e3:
             if self.numero_de_knudsen < 0.0146:
@@ -35,7 +35,7 @@ class ModeloAerodinamico:
 
         return coeficiente_de_arrasto
 
-    def _computa_coef_de_arrasto_em_escoamento_livre_molecular(self) -> float:
+    def computa_coef_de_arrasto_em_escoamento_livre_molecular(self) -> float:
         """
         Computa o coeficiente de arrasto em escoamento livre molecular.
 

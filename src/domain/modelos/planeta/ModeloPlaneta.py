@@ -13,11 +13,10 @@ class ModeloPlaneta:
         self.J4 = J4  # Constante de Jeffery J4
         self.tempo_longitude_celeste_nula = tempo_longitude_celeste_nula  # s - Tempo de longitude celeste nula
         self.modelo_atmosferico = modelo_atmosferico
+
     def __str__(self):
         return f"ModeloPlaneta(ΔT_atm={self.delta_temperatura_atm}, R_eq={self.raio_equatorial}, " \
                f"ω={self.velocidade_inercial_de_rotacao}, g_0={self.gravidade}, " \
                f"μ={self.mut}, J2={self.J2}, J3={self.J3}, J4={self.J4}, t_λ=0={self.tempo_longitude_celeste_nula})"
-
-
 
 

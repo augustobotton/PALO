@@ -1,6 +1,6 @@
 from src.domain.utilidades_mecanica_orbital.Orbitas.ModeloOrbita import Orbita
-from src.domain.utilidades_mecanica_orbital.orbitalUtils import Converte
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.calculos_orbitais import *
+from src.domain.utilidades_mecanica_orbital.Utilidades import Converte
+from src.domain.utilidades_mecanica_orbital.Utilidades.calculos_orbitais import *
 
 
 def manobra_hohmann(orbita_inicial, raio_da_orbita_desejada):

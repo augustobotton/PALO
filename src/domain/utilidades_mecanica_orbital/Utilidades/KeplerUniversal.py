@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.funcoes_stump import stumpC, stumpS
+from src.domain.utilidades_mecanica_orbital.Utilidades.funcoes_stump import stumpC, stumpS
 
 
 def kepler_U(dt, ro, vro, a, mu):

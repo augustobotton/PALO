@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+from src.domain.utilidades_mecanica_orbital.Orbitas.ConstrutorOrbita import ConstrutorOrbita
 from src.domain.utilidades_mecanica_orbital.propagacao.analitica.propagacao import *
 
 #

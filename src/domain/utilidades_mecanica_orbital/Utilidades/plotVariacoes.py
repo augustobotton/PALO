@@ -1,16 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-from src.domain.utilidades_mecanica_orbital.Orbitas.ModeloOrbita import Orbita
 from src.domain.utilidades_mecanica_orbital.Orbitas.coe_from_sv import coe_from_sv
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.calculos_orbitais import determina_parametros_orbitais
 
 RA0 = 0.7853868763995575
 w0 = 0.5236311392230265
 h0 = 55839.27186487775
 i0 = 0.48869352872783733,  # Inclinação inicial (rad)
 e0 = 0.17136945687836064  # Excentricidade inicial
-
+#TODO arrumar como passar dados iniciais
 
 def elementos_orbitais_resposta(y, t, mu):
     n_times = len(t)

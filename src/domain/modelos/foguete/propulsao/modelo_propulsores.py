@@ -1,5 +1,5 @@
 import numpy as np
-from src.domain.utilidades_mecanica_orbital.orbitalUtils.Converte import Vrel2Vine
+from src.domain.utilidades_mecanica_orbital.Utilidades.Converte import Vrel2Vine
 
 
 # Modelo do propulsor de foguete de 1 estágio
