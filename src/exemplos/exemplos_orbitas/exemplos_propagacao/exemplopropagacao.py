@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.propagacao.propagacao import *
+from src.domain.utilidades_mecanica_orbital.Orbitas.ConstrutorOrbita import ConstrutorOrbita
+from src.domain.utilidades_mecanica_orbital.propagacao.analitica.propagacao import *
 
 #
 # Script com exemplos_propagacao de propagacao de orbita

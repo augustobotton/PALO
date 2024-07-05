@@ -1,9 +1,5 @@
 import numpy as np
 
-# Constantes globais
-raio_da_terra = 6378.137 * 1000  # [km]
-parametro_gravitacional = 3.986e14  # [m^2/s^2]
-
 
 def calcula_velocidade_orbital(parametro_gravitacional, raio, semi_eixo_maior=None):
     """
@@ -207,7 +203,7 @@ def calcula_tempo_de_periastro_anomalia_verdadeira(momento_angular, excentricida
 
 
 def calcula_quantidade_movimento_angular(paramentro, mu):
-    return np.sqrt(paramentro*mu)
+    return np.sqrt(paramentro * mu)
 
 
 def calcula_inclinacao_raan_argumento_de_periastro(momento_angular, excentricidade):
@@ -267,3 +263,18 @@ def determina_parametros_orbitais(tempo_observacao, parametro_gravitacional, pos
                                                                                               excentricidade)
 
     return eixo, exc, inclinacao, raan, argumento_de_periastro, anomalia_verdadeira, tempo_periastro
+
+
+def calcular_periodo_orbital(a, mu):
+    """
+    Calcula o período orbital.
+
+    Parameters:
+    semi_eixo_maior (float): O semi-eixo maior da órbita (km).
+    mu (float): O parâmetro gravitacional (km^3/s^2).
+
+    Returns:
+    float: O período orbital (s).
+    """
+    return 2 * np.pi * np.sqrt((a ** 3) / mu)
+

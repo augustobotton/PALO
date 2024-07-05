@@ -1,3 +1,4 @@
+from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
 from src.domain.modelos.planeta.ModeloPlaneta import ModeloPlaneta
 
 
@@ -74,5 +75,20 @@ class ConstrutorPlaneta:
             self.J3,
             self.J4,
             self.tempo_longitude_celeste_nula,
-			self.modelo_atmosferico
+            self.modelo_atmosferico
         )
+
+
+terra = (ConstrutorPlaneta()
+         .com_delta_temperatura_atm(10)
+         .com_raio_equatorial(6378.1370)
+         .com_velocidade_inercial_de_rotacao(7.2921150e-5)
+         .com_gravidade(9.80665)
+         .com_mut(398600.4418)
+         .com_J2(0.00108263)
+         .com_J3(-0.00000254)
+         .com_J4(-0.00000161)
+         .com_tempo_longitude_celeste_nula(0)
+         .com_modelo_atmosferico(
+    ModeloAtmosferico(r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'))
+         .construir())

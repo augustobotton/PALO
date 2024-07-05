@@ -76,6 +76,7 @@ def propagaEliptica(t, orbita):
 
     return theta, R_inercial, V_inercial
 
+#TODO colocar funcao no lugar dela
 def perifocal_to_inercial(vector, OMEGA, i, omega):
     """
     Converte um vetor do referencial perifocal para o referencial inercial.
