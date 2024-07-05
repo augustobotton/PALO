@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.optimize import fsolve
+
 from src.domain.modelos.orbitas.Orbita import Orbita
+
 
 def resolveEqKepler(t, orbita: Orbita):
     """
@@ -34,6 +36,7 @@ def resolveEqKepler(t, orbita: Orbita):
     # Resolve a equação de Kepler usando fsolve
     E = fsolve(Kepler, E0, args=dados)
     return E[0]
+
 
 def propagaEliptica(t, orbita):
     """
@@ -71,13 +74,14 @@ def propagaEliptica(t, orbita):
     V_perifocal = np.array([-np.sin(E), np.sqrt(1 - e ** 2) * np.cos(E), 0]) * np.sqrt(mu * a) / r
 
     # Converte para o referencial inercial
-    R_inercial = perifocal_to_inercial(R_perifocal, OMEGA, i, omega)
-    V_inercial = perifocal_to_inercial(V_perifocal, OMEGA, i, omega)
+    R_inercial = perifocal_para_inercial(R_perifocal, OMEGA, i, omega)
+    V_inercial = perifocal_para_inercial(V_perifocal, OMEGA, i, omega)
 
     return theta, R_inercial, V_inercial
 
+
 #TODO colocar funcao no lugar dela
-def perifocal_to_inercial(vector, OMEGA, i, omega):
+def perifocal_para_inercial(vector, OMEGA, i, omega):
     """
     Converte um vetor do referencial perifocal para o referencial inercial.
 
@@ -91,7 +95,7 @@ def perifocal_to_inercial(vector, OMEGA, i, omega):
     np.array: Vetor no referencial inercial.
     """
     # Matriz de rotação composta
-    rotation_matrix = np.array([
+    matriz_rotacao = np.array([
         [np.cos(OMEGA) * np.cos(omega) - np.sin(OMEGA) * np.sin(omega) * np.cos(i),
          -np.cos(OMEGA) * np.sin(omega) - np.sin(OMEGA) * np.cos(omega) * np.cos(i),
          np.sin(OMEGA) * np.sin(i)],
@@ -104,7 +108,8 @@ def perifocal_to_inercial(vector, OMEGA, i, omega):
     ])
 
     # Aplica a matriz de rotação ao vetor
-    return np.dot(rotation_matrix, vector)
+    return np.dot(matriz_rotacao, vector)
+
 
 def Kepler(E, dados):
     """
@@ -120,6 +125,7 @@ def Kepler(E, dados):
     e, M = dados
     return E - e * np.sin(E) - M
 
+
 def KeplerHiperbolica(H, dados):
     """
     Função objetivo para resolver a equação de Kepler para órbitas hiperbólicas.
@@ -133,6 +139,7 @@ def KeplerHiperbolica(H, dados):
     """
     e, Mh = dados
     return e * np.sinh(H) - H - Mh
+
 
 def resolveEqKeplerHiperbolica(tempo: float, orbita: Orbita):
     """
@@ -153,6 +160,7 @@ def resolveEqKeplerHiperbolica(tempo: float, orbita: Orbita):
     H0 = Mh
     H = fsolve(KeplerHiperbolica, H0, args=dados)
     return H
+
 
 def matrizTransicaoEstado(theta, theta0, orbita):
     """

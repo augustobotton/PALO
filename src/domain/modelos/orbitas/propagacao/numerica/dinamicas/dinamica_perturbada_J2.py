@@ -1,7 +1,23 @@
-from src.domain.modelos.orbitas.utilidades.rv_from_r0v0 import rv_from_r0v0
 import numpy as np
 
+from src.domain.modelos.orbitas.utilidades.rv_from_r0v0 import rv_from_r0v0
+
+
 def dinamica_perturbada_J2(t, f, *args):
+    """
+    Calcula a dinâmica de uma órbita perturbada pelo efeito J2 da Terra.
+
+    :param t: Tempo atual da integração (em segundos).
+    :param f: Vetor de estado atual (6x1) contendo posição e velocidade perturbadas.
+    :param args: Argumentos adicionais:
+        - mu: Parâmetro gravitacional da Terra (km^3/s^2).
+        - R0: Vetor de posição inicial (km).
+        - V0: Vetor de velocidade inicial (km/s).
+        - t0: Tempo inicial da integração (s).
+        - RE: Raio equatorial da Terra (km).
+        - J2: Coeficiente J2 da Terra.
+    :return: Vetor concatenado de derivadas de posição e velocidade (6x1).
+    """
     mu = args[0]
     R0 = args[1]
     V0 = args[2]
@@ -9,18 +25,20 @@ def dinamica_perturbada_J2(t, f, *args):
     RE = args[4]
     J2 = args[5]
 
-    # Unpack the state vector
+    # Desempacota o vetor de estado
     del_r = f[:3]
     del_v = f[3:6]
-    # Compute the state vector on the osculating orbit at time t
+
+    # Computa o vetor de estado na órbita osculadora no tempo t
     Rosc, Vosc = rv_from_r0v0(R0, V0, t - t0, mu)
-    # Calculate the components of the state vector on the perturbed orbit
+
+    # Calcula os componentes do vetor de estado na órbita perturbada
     Rpp = Rosc + del_r
     Vpp = Vosc + del_v
     rosc = np.linalg.norm(Rosc)
     rpp = np.linalg.norm(Rpp)
 
-    # Compute the J2 perturbing acceleration
+    # Computa a aceleração perturbativa devido ao efeito J2
     xx = Rpp[0]
     yy = Rpp[1]
     zz = Rpp[2]
@@ -31,7 +49,7 @@ def dinamica_perturbada_J2(t, f, *args):
         (3 - 5 * (zz / rpp) ** 2) * (zz / rpp)
     ])
 
-    # Compute the total perturbing acceleration
+    # Computa a aceleração perturbativa total
     F = 1 - (rosc / rpp) ** 3
     del_a = (-mu / rosc ** 3) * (del_r - F * Rpp) + ap
 

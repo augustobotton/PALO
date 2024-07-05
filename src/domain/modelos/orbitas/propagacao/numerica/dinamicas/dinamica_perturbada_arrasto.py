@@ -1,4 +1,5 @@
 import numpy as np
+
 from src.domain.modelos.orbitas.utilidades.densidade_altitude import densidade_altitude
 
 
@@ -6,7 +7,7 @@ def dinamica_perturbada_arrasto(t, f, *args):
     """
     Calcula as taxas de variação da posição e da velocidade.
 
-    Inputs:
+    Argumentos:
         t  - Tempo (s)
         f  - Vetor de estado [x, y, z, vx, vy, vz] (km e km/s)
         RE - Raio da Terra (km)
@@ -16,7 +17,7 @@ def dinamica_perturbada_arrasto(t, f, *args):
         m  - Massa do objeto (kg)
         mu - Parâmetro gravitacional (km^3/s^2)
 
-    Outputs:
+    Retorna:
         dfdt - Vetor de derivadas [vx, vy, vz, ax, ay, az] (km/s e km/s^2)
     """
 

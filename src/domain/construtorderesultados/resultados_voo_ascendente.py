@@ -3,9 +3,10 @@ import pickle
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.domain.modelos.orbitas.utilidades import funcoes_conversao
-from src.domain.modelos.orbitas.utilidades import calculos_orbitais
 from src.domain.modelos.Simulacao import Simulacao
+from src.domain.modelos.orbitas.utilidades import calculos_orbitais
+from src.domain.modelos.orbitas.utilidades.funcoes_conversao import componentes_vel_relativa_para_inercial, \
+    rvel_polar_para_rvel_retangular, converte_longitude_fixa_planeta_para_longitude_celeste
 
 
 def plotaresultados(resposta_sim, simulacao: Simulacao):
@@ -69,13 +70,13 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
         # Pressao dinamica
         q[i] = 0.5 * rho[i] * V[i] ** 2
         # Coordenadas da velocidade inercial no referencial LVLH
-        Vi[i], phii[i], Ai[i] = Converte.Vrel2Vine(V[i], phi[i], A[i], we, r[i], delta[i])
+        Vi[i], phii[i], Ai[i] = componentes_vel_relativa_para_inercial(V[i], phi[i], A[i], we, r[i], delta[i])
         # Longitude celeste
-        longc[i] = Converte.converte_longitudeFixaPlaneta_para_longitude_celeste(t[i], long[i], we, 0)
+        longc[i] = converte_longitude_fixa_planeta_para_longitude_celeste(t[i], long[i], we, 0)
         # Energia especifica da orbita
         ee[i] = Vi[i] ** 2 / 2 - mut / r[i]
         # Posicao e velocidade inercial no referencial ICP
-        rc0, vc0 = Converte.RvelPolar2RvelRet(Vi[i], Ai[i], phii[i], r[i], delta[i], longc[i])
+        rc0, vc0 = rvel_polar_para_rvel_retangular(Vi[i], Ai[i], phii[i], r[i], delta[i], longc[i])
         R0[i, :] = rc0.T
         rc01 =np.array([rc0[0], rc0[1], rc0[2]]).flatten()
         vc01 = np.array([vc0[0], vc0[1], vc0[2]]).flatten()

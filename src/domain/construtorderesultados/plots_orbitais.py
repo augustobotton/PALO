@@ -5,14 +5,13 @@ from scipy.signal import find_peaks
 from src.domain.modelos.orbitas.utilidades.vetor_de_estados_para_coe import vetor_de_estados_para_coe
 
 
-def plota_variacao_elementos_orbitais(y, t, mu, orbita):
+def plota_variacao_elementos_orbitais(t, y,orbita):
     """
     Calcula e plota a variação dos elementos orbitais ao longo do tempo.
 
     Args:
         y (np.ndarray): Array contendo as posições e velocidades.
         t (np.ndarray): Array de tempos correspondentes às posições e velocidades.
-        mu (float): Parâmetro gravitacional padrão do corpo central.
         orbita (Orbita): Instância da classe Orbita contendo os elementos orbitais iniciais.
 
     Plota:
@@ -45,7 +44,7 @@ def plota_variacao_elementos_orbitais(y, t, mu, orbita):
         r[j] = np.linalg.norm(R)
         v[j] = np.linalg.norm(V)
 
-        _, e[j], i[j], ra[j], w[j], ta[j], h[j] = vetor_de_estados_para_coe(R, V, mu)
+        _, e[j], i[j], ra[j], w[j], ta[j], h[j] = vetor_de_estados_para_coe(R, V, orbita.mu)
 
     # Plotando as variações
     plt.figure(1)
@@ -106,15 +105,15 @@ def set_axes_equal(ax):
     ax.set_zlim3d([centers[2] - max_range, centers[2] + max_range])
 
 
-def plot_orbit(y, R, r0):
+def plota_orbita(y, raio_equatorial, r0):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
     # Criação da esfera representando o planeta
     u, v = np.mgrid[0:2 * np.pi:100j, 0:np.pi:50j]
-    x = R * np.cos(u) * np.sin(v)
-    y_sphere = R * np.sin(u) * np.sin(v)
-    z = R * np.cos(v)
+    x = raio_equatorial * np.cos(u) * np.sin(v)
+    y_sphere = raio_equatorial * np.sin(u) * np.sin(v)
+    z = raio_equatorial * np.cos(v)
     ax.plot_surface(x, y_sphere, z, color='grey', alpha=0.5)  # Desenha o planeta
 
     # Plota a trajetória da órbita
@@ -136,7 +135,8 @@ def plot_orbit(y, R, r0):
 
     plt.show()
 
-def constroe_resultados(RE, r0, t, v0, y):
+
+def constroe_resultados(t, y, RE, r0, v0):
     r = np.linalg.norm(y[:, :3], axis=1)
     v = np.linalg.norm(y[:, 3:6], axis=1)
     # Máximo e mínimo globais da altitude
@@ -168,6 +168,7 @@ def constroe_resultados(RE, r0, t, v0, y):
     plt.legend()
     plt.tight_layout()
     plt.show()
+
     # Impressão de resultados
     print("\nÓrbita Terrestre")
     print("A posição inicial é", r0)
@@ -179,4 +180,3 @@ def constroe_resultados(RE, r0, t, v0, y):
     print("A velocidade nesse ponto é {:.2f} km/s.".format(v_at_rmin))
     print("A altitude máxima é {:.2f} km no tempo = {:.2f} h.".format(rmax - RE, t[imax] / 3600))
     print("A velocidade nesse ponto é {:.2f} km/s.".format(v_at_rmax))
-

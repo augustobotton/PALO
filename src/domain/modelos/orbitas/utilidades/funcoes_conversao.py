@@ -16,7 +16,7 @@ def converte_longitude_fixa_planeta_para_longitude_celeste(
     return longitude_relativa_ref_fixo_planeta
 
 
-def rvel_polar_para_rvel_retangular(  #TODO: Refatorar nome da função
+def rvel_polar_para_rvel_retangular(
         modulo_vetor_velocidade: float,
         azimute_da_velocidade: float,
         elevacao_da_velocidade: float,
@@ -55,7 +55,7 @@ def rvel_polar_para_rvel_retangular(  #TODO: Refatorar nome da função
     return vetor_posicao_coord_retangular, vetor_velocidade_coord_retangular
 
 
-def velocidade_relativa_para_inercial(
+def componentes_vel_relativa_para_inercial(
         velocidade_relativa: float,
         inclinacao_velocidade_relativa: float,
         azimute_da_velocidade_relativa: float,

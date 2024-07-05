@@ -1,14 +1,15 @@
 import numpy as np
 
-from src.domain.modelos.orbitas import Orbita
+from src.domain.modelos.orbitas.Orbita import Orbita
 from src.domain.modelos.orbitas.manobras import manobra_hohmann
+
 Re = 6378.137*1000  #[km]
 mu = 3.986e14       #[m^2/s^2]
 h_i = 250*1000      #[km]
 r_i = Re + h_i
 T_d = 86164         #[s]
 
-r_f = np.cbrt(mu*(T_d/(2*np.pi))**2) #TODO add isso em calculos orbitais ou orbital utils
+r_f = np.cbrt(mu*(T_d/(2*np.pi))**2)
 
 orbita_inicial = Orbita.circular(semi_eixo_maior=(h_i + Re),inclinacao=0)
 d1,d2,t = manobra_hohmann(orbita_inicial, r_f)

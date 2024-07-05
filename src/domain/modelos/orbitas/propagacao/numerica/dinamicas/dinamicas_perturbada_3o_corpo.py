@@ -1,5 +1,7 @@
 import numpy as np
 
+from src.domain.modelos.orbitas.propagacao.analitica.propagacao import propagaEliptica
+
 
 def aceleracao_perturbativa_terceiro_corpo(
         posicao_m2: np.ndarray,
@@ -29,43 +31,31 @@ def aceleracao_perturbativa_terceiro_corpo(
     return aceleracao_perturbativa
 
 
-#TODO arrumar
-def dinamica_perturbada_por_terceiro_corpo(t, f, orbita):
+def dinamica_perturbada_por_terceiro_corpo(t, f, *args):
     """
-    Entradas:
-    t: [s] - tempo
-    X: vetor de estado, 6x1
-    Saída
-    xp: derivada de x
+    Calcula a dinâmica perturbada de um terceiro corpo em relação a uma órbita.
+
+    :param t: Tempo (s).
+    :param f: Vetor de estado, 6x1.
+    :param orbita: Objeto de órbita contendo parâmetros orbitais.
+    :param mu3: Parâmetro gravitacional do terceiro corpo (m^3/s^2).
+    :return: Vetor derivada de estado.
     """
+    orbita, mu3 = args
+
     # Posição e velocidade
     R = np.array(f[0:3])
     V = np.array(f[3:6])
-    #Distância
+    # Distância
     r = np.linalg.norm(R)
     # Posição do terceiro corpo com respeito ao primário
-    _, R31, _ = propagacao.propagaEliptica(t, mu, orbita)
+    _, R31, _ = propagaEliptica(t, orbita)
     # Aceleração perturbativa
     ad = aceleracao_perturbativa_terceiro_corpo(R, R31, mu3)
     # Cinemática
     Rp = V
     # Dinâmica
-    Vp = -mu * R / r ** 3 + ad
-    #Saída
+    Vp = -orbita.mu * R / r ** 3 + ad
+    # Saída
     Xp = np.concatenate((Rp, Vp))
     return Xp
-
-
-
-
-
-def dinamica_lambert(t, f, *args):
-    mu = args[0]
-    x, y, z, vx, vy, vz = f
-    r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
-    ax = -mu * x / r ** 3
-    ay = -mu * y / r ** 3
-    az = -mu * z / r ** 3
-    return [vx, vy, vz, ax, ay, az]
-
-

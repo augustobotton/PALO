@@ -37,6 +37,7 @@ def excentricidade_orbital(periapsis, apoapsis):
 def delta_velocidade(velocidade_inicial, velocidade_final, angulo=None):
     """
     Calcula a variação de velocidade (delta-v).
+
     Retorna:
     float: Variação de velocidade (delta-v).
     """

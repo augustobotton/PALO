@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.domain.modelos.orbitas import Orbita
+from src.domain.modelos.orbitas.Orbita import Orbita
 
 #
 # Exemplo 5.2 do Tewari

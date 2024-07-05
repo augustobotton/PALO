@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 from src.domain.modelos.orbitas import ConstrutorOrbita
 

@@ -7,10 +7,10 @@ from src.domain.modelos.foguete.aerodinamica.ModeloAerodinamico import ModeloAer
 from src.domain.modelos.foguete.estrutura.ConstrutorModeloEstrutural import ConstrutorModeloEstrutural
 from src.domain.modelos.foguete.propulsao.ConstrutorModeloPropulsivo import ConstrutorModeloPropulsivo
 from src.domain.modelos.foguete.veiculo_lancador.ConstrutorFoguete import ConstrutorDeFoguete
+from src.domain.modelos.orbitas import Orbita
 from src.domain.modelos.planeta.ConstrutorBaseDeLancamento import ConstrutorBaseDeLancamento
 from src.domain.modelos.planeta.ConstrutorPlaneta import ConstrutorPlaneta
 from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
-from src.domain.modelos.orbitas import Orbita
 
 json_modelo_atm_terrestre = r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'
 terra = (ConstrutorPlaneta()
@@ -61,6 +61,6 @@ orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo, phi_inicial]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
-with open('../../construtorderesultados/simulacao.pkl', 'wb') as f:
+with open('../../domain/construtorderesultados/simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()

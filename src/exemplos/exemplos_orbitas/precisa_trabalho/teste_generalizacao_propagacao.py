@@ -1,4 +1,9 @@
 import matplotlib.pyplot as plt
+import numpy as np
+
+from src.domain.modelos.orbitas.ConstrutorOrbita import ConstrutorOrbita
+from src.domain.modelos.orbitas.propagacao.analitica.propagacao import resolveEqKepler, resolveEqKeplerHiperbolica, \
+    matrizTransicaoEstado
 
 # Constantes gerais do problema
 G = 6.67384e-11  # [m^3/kg*s^2] Constante de gravitação universal
@@ -89,7 +94,8 @@ def calcular_orbita(t, orbita, e, R0, V0, tipo='eliptica'):
     return E if tipo == 'eliptica' else H, theta, R, V
 
 
-# Função para calcular órbita parabólica
+
+
 def calcular_orbita_parabolica(t, orbita, R0, V0):
     N = len(t)
     theta, R, V = np.zeros(N), np.zeros((2, N)), np.zeros((2, N))

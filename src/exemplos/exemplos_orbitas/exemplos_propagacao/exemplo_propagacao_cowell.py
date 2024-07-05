@@ -1,8 +1,8 @@
 import numpy as np
 
+from src.domain.construtorderesultados.plots_orbitais import plota_orbita, constroe_resultados
 from src.domain.modelos.orbitas.Orbita import Orbita
 from src.domain.modelos.orbitas.propagacao.numerica.propagadores.propagacao_cowell import propaga_cowell
-from src.domain.modelos.orbitas.utilidades.plots import plot_orbit, constroe_resultados
 from src.domain.modelos.planeta.ConstrutorPlaneta import terra
 
 # Vetor de posição inicial em km
@@ -28,7 +28,7 @@ tf = (24 * 60 * 60 * 120)
 t, y = propaga_cowell(0, tf, orbita, args)
 
 # Plotagem da órbita
-plot_orbit(y, terra.raio_equatorial, r0)
+plota_orbita(y, terra.raio_equatorial, r0)
 
 # Construção e exibição dos resultados
 constroe_resultados(terra.raio_equatorial, r0, t, v0, y)

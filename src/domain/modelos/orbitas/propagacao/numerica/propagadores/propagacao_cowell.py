@@ -2,7 +2,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 from src.domain.modelos.orbitas.Orbita import Orbita
-from src.domain.modelos.orbitas.propagacao.numerica.dinamicas.dinamica_p_arrasto import \
+from src.domain.modelos.orbitas.propagacao.numerica.dinamicas.dinamica_perturbada_arrasto import \
     dinamica_perturbada_arrasto
 from src.domain.modelos.orbitas.utilidades.calculos_orbitais import calcular_periodo_orbital
 from src.domain.modelos.orbitas.utilidades.coe_para_vetor_de_estados import coe_para_vetor_de_estados
@@ -17,8 +17,6 @@ def terminate(t, y, *args):
         Tempo atual da integração.
     y : array_like
         Vetor de estado atual.
-    *args : tuple
-        Argumentos adicionais.
 
     Returns:
     float
@@ -65,8 +63,6 @@ def propaga_cowell(ti, tf, orbita: Orbita, atributos_dinamica):
     sol = solve_ivp(dinamica_perturbada_arrasto, [ti, tf], y0, events=terminate, args=atributos_dinamica, **opts)
     t = sol.t
     y = sol.y.T
-
-
 
     return t, y
 

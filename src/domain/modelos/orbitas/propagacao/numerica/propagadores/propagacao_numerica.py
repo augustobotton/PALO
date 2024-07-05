@@ -1,14 +1,13 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from src.domain.modelos.orbitas.utilidades.plots import plot_orbit
-from src.domain.modelos.orbitas.propagacao.numerica.dinamicas.dinamicas_orbitais import \
+from src.domain.modelos.orbitas.propagacao.numerica.dinamicas.dinamica_lambert import \
     dinamica_lambert
 
 
-def propagacao_numerica(ti, tf, r0, v0):
-    hours = 3600
-    R = 6378  # Planet radius (km)
+def propagacao_numerica(ti, tf, orbita):
+
+    r0, v0 = orbita.calcular_estado()
     y0 = np.array(r0 + v0)
     opts = {'rtol': 1e-8, 'atol': 1e-8}
 
@@ -18,25 +17,6 @@ def propagacao_numerica(ti, tf, r0, v0):
     t = sol.t
     y = sol.y.T
 
-    r = np.linalg.norm(y[:, :3], axis=1)
-    rmax = np.max(r)
-    rmin = np.min(r)
-    imax = np.argmax(r)
-    imin = np.argmin(r)
 
-    v_at_rmax = np.linalg.norm(y[imax, 3:6])
-    v_at_rmin = np.linalg.norm(y[imin, 3:6])
-
-    print("\nEarth Orbit")
-    print("The initial position is", r0)
-    print("Magnitude =", np.linalg.norm(r0), "km")
-    print("The initial velocity is", v0)
-    print("Magnitude =", np.linalg.norm(v0), "km/s")
-    print("Initial time = {:.2f} h. Final time = {:.2f} h.".format(ti / hours, tf / hours))
-    print("The minimum altitude is {:.2f} km at time = {:.2f} h.".format(rmin - R, t[imin] / hours))
-    print("The speed at that point is {:.2f} km/s.".format(v_at_rmin))
-    print("The maximum altitude is {:.2f} km at time = {:.2f} h.".format(rmax - R, t[imax] / hours))
-    print("The speed at that point is {:.2f} km/s.".format(v_at_rmax))
-    plot_orbit(y, R, r0)
 
 
