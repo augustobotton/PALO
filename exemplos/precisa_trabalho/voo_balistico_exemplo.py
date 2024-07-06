@@ -61,6 +61,6 @@ orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo, phi_inicial]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
-with open('../../domain/construtorderesultados/simulacao.pkl', 'wb') as f:
+with open('../../src/domain/construtorderesultados/simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()

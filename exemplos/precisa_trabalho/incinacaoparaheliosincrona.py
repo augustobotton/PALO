@@ -12,11 +12,17 @@ OMpm=2*np.pi/365.25 # rad por dia
 OMpm=OMpm/(24*60*60) # rad/s
 # Velocidade angular da órbita
 n=np.sqrt(mu/(a**3))
+
 print(n)
+
 # Parâmetro da órbita
 p=a*(1-e**2)
 print(p)
+
 # Inclinação necessária para a órbita hélio síncrona
+
 inc=np.arccos(-OMpm*(2/(3*n*J2))*(p/Re)**2)
+
 print("Inclinação para obter a órbita hélio síncrona do exercício")
+
 print("i = ",inc*180/np.pi,"°")

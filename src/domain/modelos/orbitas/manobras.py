@@ -1,4 +1,5 @@
 import numpy as np
+
 from src.domain.modelos.orbitas.utilidades.funcoes_conversao import matriz_rotacao_orbital_inercial
 
 
@@ -55,12 +56,12 @@ def manobra_bieliptica(raio_intermediario, raio_da_orbita_desejada, orbita_inici
 
     return dv_a, dv_b, dv_c, t_trans1, t_trans2
 
+
 def manobra_mudanca_de_plano(delta_inclinacao, vi):
     delta_v = 2 * vi * np.sin(delta_inclinacao / 2)
     betha = np.pi / 2 + delta_inclinacao / 2
 
     return delta_v, betha
-
 
 #TODO olhar exemplo resolvido na aula 27 e criar apenas as equacoes e n criar uma funcao
 
@@ -83,6 +84,3 @@ def manobra_mudanca_de_plano(delta_inclinacao, vi):
 #     betha = np.arcsin(v_f / delta_v * np.sin(angulo_alpha))
 #
 #     return delta_v, betha
-# def manobra_mudanca_de_plano_generica():
-#     return 0
-

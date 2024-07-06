@@ -18,7 +18,7 @@ class ModeloPlaneta:
     def __init__(self, delta_temperatura_atm: float, raio_equatorial: float,
                  velocidade_inercial_de_rotacao: float, gravidade: float, mut: float,
                  J2: float, J3: float, J4: float, tempo_longitude_celeste_nula: float,
-                 modelo_atmosferico):
+                 modelo_atmosferico, massa: float):
         self.delta_temperatura_atm = delta_temperatura_atm
         self.raio_equatorial = raio_equatorial
         self.velocidade_inercial_de_rotacao = velocidade_inercial_de_rotacao
@@ -29,6 +29,7 @@ class ModeloPlaneta:
         self.J4 = J4
         self.tempo_longitude_celeste_nula = tempo_longitude_celeste_nula
         self.modelo_atmosferico = modelo_atmosferico
+        self.massa = massa
 
     def __str__(self):
         return (f"ModeloPlaneta(ΔT_atm={self.delta_temperatura_atm} K, R_eq={self.raio_equatorial} m, "

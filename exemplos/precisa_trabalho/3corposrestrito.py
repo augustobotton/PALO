@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
+
 
 def res3body(t,X):
     m = 0.01215  # massa não dimensional do segundo primário
@@ -30,8 +31,6 @@ comp_velocidade = [
     [0.1, 0, -3.6, 3],    # (g)
 ]
 
-
-#X0 = np.array([0.1, 0, -3.5, 3])
 for i, X0 in enumerate(comp_velocidade, 1):
     sol = solve_ivp(res3body, t_span, X0, t_eval=np.linspace(t_span[0], t_span[1], 1000000),dense_output=True,method='RK45')
     x, y = sol.y[0], sol.y[1]

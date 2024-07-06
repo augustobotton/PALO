@@ -187,3 +187,33 @@ def matriz_inercial_para_perifocal(
     """
     matriz_rotacao = rotacao_z(argumento_perigeu) @ rotacao_x(inclinacao_orbita) @ rotacao_z(longitude_no_ascendente)
     return matriz_rotacao
+
+
+def perifocal_para_inercial(vector, OMEGA, i, omega):
+    """
+    Converte um vetor do referencial perifocal para o referencial inercial.
+
+    Parâmetros:
+    vector (np.array): Vetor no referencial perifocal.
+    OMEGA (float): Longitude do nodo ascendente em radianos.
+    i (float): Inclinação da órbita em radianos.
+    omega (float): Argumento do periastro em radianos.
+
+    Retorna:
+    np.array: Vetor no referencial inercial.
+    """
+    # Matriz de rotação composta
+    matriz_rotacao = np.array([
+        [np.cos(OMEGA) * np.cos(omega) - np.sin(OMEGA) * np.sin(omega) * np.cos(i),
+         -np.cos(OMEGA) * np.sin(omega) - np.sin(OMEGA) * np.cos(omega) * np.cos(i),
+         np.sin(OMEGA) * np.sin(i)],
+        [np.sin(OMEGA) * np.cos(omega) + np.cos(OMEGA) * np.sin(omega) * np.cos(i),
+         -np.sin(OMEGA) * np.sin(omega) + np.cos(OMEGA) * np.cos(omega) * np.cos(i),
+         -np.cos(OMEGA) * np.sin(i)],
+        [np.sin(omega) * np.sin(i),
+         np.cos(omega) * np.sin(i),
+         np.cos(i)]
+    ])
+
+    # Aplica a matriz de rotação ao vetor
+    return np.dot(matriz_rotacao, vector)
