@@ -1,9 +1,9 @@
 import numpy as np
 
-from src.domain.utilidades_mecanica_orbital.Utilidades import calculos_orbitais
-from src.domain.utilidades_mecanica_orbital.Orbitas import ModeloOrbita
-from src.domain.utilidades_mecanica_orbital.Utilidades.Converte import Vrel2Vine
 from src.domain.modelos.foguete.propulsao.ModeloPropulsivo import ModeloPropulsivo
+from src.domain.modelos.orbitas.Orbita import Orbita
+from src.domain.modelos.orbitas.utilidades import calculos_orbitais
+from src.domain.modelos.orbitas.utilidades.funcoes_conversao import componentes_vel_relativa_para_inercial
 
 
 class ParametrosManobraAdquireOrbitaDeTransferencia():
@@ -12,7 +12,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
         self.achou_apogeu = 0
         self.sinal_phi_inercial = np.sign
 
-    def parametros_manobra_adquire_gso(self, t, m, X, orbita_transferencia: ModeloOrbita,
+    def parametros_manobra_adquire_gso(self, t, m, X, orbita_transferencia: Orbita,
                                        modelo_propulsivo: ModeloPropulsivo, planeta):
         """
         Função para calcular os parâmetros da manobra mono impulsiva de aquisição de órbita GSO.
@@ -42,7 +42,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
         delta = X[4]
 
         # Vetor velocidade inercial
-        Vi, phii, _ = Vrel2Vine(V, phi, A, we, r, delta)
+        Vi, phii, _ = componentes_vel_relativa_para_inercial(V, phi, A, we, r, delta)
 
         # Realização de uma sequência de testes para verificar a ocorrência do apogeu da órbita GTO.
         # Quando ele ocorre, determina os parâmetros da manobra.

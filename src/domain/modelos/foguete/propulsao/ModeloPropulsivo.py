@@ -1,4 +1,8 @@
+import numpy as np
+
 from src.domain.modelos.foguete.propulsao.modelo_propulsores import *
+from src.domain.modelos.orbitas.utilidades.funcoes_conversao import \
+    componentes_vel_relativa_para_inercial as relativo_para_inercial
 
 TEMPO_DE_IGNICAO_3_ESTAGIO = 1e10
 
@@ -156,7 +160,7 @@ class ModeloPropulsivo:
             mu = 0  # Tração alinhada com a velocidade relativa
         else:
             # Vetor velocidade inercial
-            _, phii, Ai = Vrel2Vine(V, phi, A, self.planeta.velocidade_inercial_de_rotacao, r, delta)
+            _, phii, Ai =relativo_para_inercial(V, phi, A, self.planeta.velocidade_inercial_de_rotacao, r, delta)
 
             # Ângulos propulsivos para que a tração seja alinhada com a velocidade inercial
             mu = np.arcsin(np.cos(A) * np.cos(phii) * np.sin(Ai) - np.sin(A) * np.cos(phii) * np.cos(Ai))

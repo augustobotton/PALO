@@ -1,4 +1,4 @@
-# mecvooespacial
+# Pacote de Análise de Lançamento e Órbitas
 
-Repositório para a Biblioteca de Utilidades para cálculos de mecânica de voo espacial
+
 

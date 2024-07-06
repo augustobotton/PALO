@@ -1,7 +1,3 @@
-import numpy as np
-from src.domain.utilidades_mecanica_orbital.Utilidades.Converte import Vrel2Vine
-
-
 # Modelo do propulsor de foguete de 1 estágio
 def propulsor_1_estagio(t, tempos_de_ignicao, tempos_de_fim_de_queima, tempos_de_separacao, impulso_especifico,
                         massa_propelente_estagios, massa_estrutural_por_estagio
