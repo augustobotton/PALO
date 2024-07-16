@@ -23,7 +23,6 @@ class ModeloPropulsivo:
         self.duracao_da_segunda_queima_3_estagio = None
         self.velocidade_de_exaustao = None
         self.massa_propelente_estagios = np.array(builder.massa_propelente_estagios)
-        self.massa_total_propelente_terceiro_estagio = builder.massa_total_propelente_terceiro_estagio
         self.duracao_de_queima_primeiro_estagio = builder.duracao_queima_estagios[0]
         self.duracao_de_queima_segundo_estagio = builder.duracao_queima_estagios[1]
         self.duracao_total_de_queima_do_terceiro_estagio = builder.duracao_queima_estagios[2]
@@ -33,7 +32,7 @@ class ModeloPropulsivo:
         self.tempo_espera_ignicao_2_estagio = builder.tempo_espera_ignicao[0]
         self.tempo_espera_ignicao_3_estagio = builder.tempo_espera_ignicao[1]
         self.duracao_da_primeira_queima_3_estagio = builder.tempo_primeira_queima_terceiro_estagio
-        self.massa_estrutural_por_estagio = np.array(builder.massa_estrutural_por_estagio)
+
         self.massa_de_carga_util = builder.massa_de_carga_util
         self.h0 = builder.h0
         self.planeta = builder.planeta
@@ -64,31 +63,27 @@ class ModeloPropulsivo:
         self.tempos_de_separacao[2] = self.tempos_de_fim_de_queima[3] + self.tempo_de_espera_separacao_3_4
 
         self.massa_propelente_estagios[2] = (
-                self.massa_total_propelente_terceiro_estagio * self.duracao_da_primeira_queima_3_estagio /
+                self.massa_propelente_estagios[2] * self.duracao_da_primeira_queima_3_estagio /
                 self.duracao_total_de_queima_do_terceiro_estagio
         )
-        self.massa_propelente_estagios[3] = (
-                self.massa_total_propelente_terceiro_estagio * self.duracao_da_segunda_queima_3_estagio /
-                self.duracao_total_de_queima_do_terceiro_estagio
-        )
-
-        self.massa_inicial_do_foguete = np.sum(self.massa_propelente_estagios) + np.sum(
-            self.massa_estrutural_por_estagio) + self.massa_de_carga_util
+        self.massa_propelente_estagios = np.append(self.massa_propelente_estagios,
+                                                   self.massa_propelente_estagios[
+                                                       2] * self.duracao_da_segunda_queima_3_estagio /
+                                                   self.duracao_total_de_queima_do_terceiro_estagio
+                                                   )
 
         self.distancia_radial_inicial = self.planeta.raio_equatorial + self.h0
-
 
     def __str__(self):
         return f"impulso_especifico: {self.impulso_especifico}\n" \
                f"tempos_de_separacao: {self.tempos_de_separacao}\n" \
                f"tempos_de_fim_de_queima: {self.tempos_de_fim_de_queima}\n" \
                f"tempos_de_ignicao: {self.tempos_de_ignicao}\n" \
-               f"massa_inicial_do_foguete: {self.massa_inicial_do_foguete}\n" \
                f"distancia_radial_inicial: {self.distancia_radial_inicial}\n" \
                f"duracao_da_segunda_queima_3_estagio: {self.duracao_da_segunda_queima_3_estagio}\n" \
                f"velocidade_de_exaustao: {self.velocidade_de_exaustao}\n" \
                f"massa_propelente_estagios: {self.massa_propelente_estagios}\n" \
-               f"massa_total_propelente_terceiro_estagio: {self.massa_total_propelente_terceiro_estagio}\n" \
+               f"massa_total_propelente_terceiro_estagio: {self.massa_propelente_estagios[2]}\n" \
                f"duracao_de_queima_primeiro_estagio: {self.duracao_de_queima_primeiro_estagio}\n" \
                f"duracao_de_queima_segundo_estagio: {self.duracao_de_queima_segundo_estagio}\n" \
                f"duracao_total_de_queima_do_terceiro_estagio: {self.duracao_total_de_queima_do_terceiro_estagio}\n" \
@@ -99,7 +94,7 @@ class ModeloPropulsivo:
                f"tempo_espera_ignicao_3_estagio: {self.tempo_espera_ignicao_3_estagio}\n" \
                f"duracao_da_primeira_queima_3_estagio: {self.duracao_da_primeira_queima_3_estagio}\n" \
 
-    def propulsao_n_estagios(self, t: float, X: np.array) -> np.array:
+    def propulsao_n_estagios(self, t: float, X: np.array, modeloestrutural) -> np.array:
         """
         Função para cálculo dos parâmetros propulsivos em função do tempo
         Veículo de até 3 estágios com dupla ignição do terceiro estágio
@@ -127,25 +122,26 @@ class ModeloPropulsivo:
             ft, m = propulsor_1_estagio(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
                                         self.tempos_de_separacao,
                                         self.impulso_especifico, self.massa_propelente_estagios,
-                                        self.massa_estrutural_por_estagio,
+                                        modeloestrutural.massa_estrutural_por_estagio,
                                         self.massa_inicial_do_foguete, self.planeta.gravidade)
         elif N == 2:
             ft, m = propulsor_2_estagios(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
                                          self.tempos_de_separacao,
                                          self.impulso_especifico, self.massa_propelente_estagios,
-                                         self.massa_estrutural_por_estagio,
+                                         modeloestrutural.massa_estrutural_por_estagio,
                                          self.massa_inicial_do_foguete, self.planeta.gravidade)
         elif N == 3:
             ft, m = propulsor_3_estagios(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
                                          self.tempos_de_separacao,
                                          self.impulso_especifico, self.massa_propelente_estagios,
-                                         self.massa_estrutural_por_estagio,
+                                         modeloestrutural.massa_estrutural_por_estagio,
                                          self.massa_inicial_do_foguete, self.planeta.gravidade)
         else:
             ft, m = propulsor_3_estagios_2ig(t, self.tempos_de_ignicao, self.tempos_de_fim_de_queima,
                                              self.tempos_de_separacao,
                                              self.impulso_especifico, self.massa_propelente_estagios,
-                                             self.massa_estrutural_por_estagio, self.massa_inicial_do_foguete,
+                                             modeloestrutural.massa_estrutural_por_estagio,
+                                             self.massa_inicial_do_foguete,
                                              self.massa_de_carga_util, self.planeta.gravidade)
 
         # Para altitudes acima de 200km, alinha o vetor de tração com a velocidade inercial ao invés da relativa
@@ -160,7 +156,7 @@ class ModeloPropulsivo:
             mu = 0  # Tração alinhada com a velocidade relativa
         else:
             # Vetor velocidade inercial
-            _, phii, Ai =relativo_para_inercial(V, phi, A, self.planeta.velocidade_inercial_de_rotacao, r, delta)
+            _, phii, Ai = relativo_para_inercial(V, phi, A, self.planeta.velocidade_inercial_de_rotacao, r, delta)
 
             # Ângulos propulsivos para que a tração seja alinhada com a velocidade inercial
             mu = np.arcsin(np.cos(A) * np.cos(phii) * np.sin(Ai) - np.sin(A) * np.cos(phii) * np.cos(Ai))
@@ -170,5 +166,3 @@ class ModeloPropulsivo:
                 np.sin(phi) * np.sin(phii) + np.cos(phi) * np.sin(A) * np.cos(phii) * np.sin(Ai) + np.cos(
                     phi) * np.cos(A) * np.cos(phii) * np.cos(Ai))
         return ft, m, mu, epsl
-
-

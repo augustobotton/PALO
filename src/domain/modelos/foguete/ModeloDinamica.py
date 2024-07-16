@@ -19,7 +19,7 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 
     # Cálculo da massa e tração em função do tempo
     ft, massa, mu, epsl = foguete.modelo_propulsivo.propulsao_n_estagios(vetor_tempo,
-                                                                         vetor_de_estados_foguete)
+                                                                         vetor_de_estados_foguete, foguete.modelo_estrutural)
     # Cálculo do modelo atmosférico
     altitude = distancia_radial - planeta.raio_equatorial
 

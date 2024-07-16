@@ -1,5 +1,3 @@
-import pickle
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -50,19 +48,19 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
         # Posicao no referencial PCPF
         h[i] = r[i] - simulacao.planeta.raio_equatorial
         # Forca propulsiva, massa e angulos
-        ft[i], m[i], mu[i], epsl[i] = simulacao.foguete.modelo_propulsivo.propulsao_n_estagios(t[i], vetor_parametros)
+        ft[i], m[i], mu[i], epsl[i] = simulacao.foguete.modelo_propulsivo.propulsao_n_estagios(t[i], vetor_parametros, simulacao.foguete.modelo_estrutural)
         # Parametros atmosfericos
         T[i], _, _, rho[i], _, Mach[i], _, _, Kn, _, _, R = simulacao.planeta.modelo_atmosferico.calcula(h[i], V[i],
                                                                                                          1.5, 10)
-        altitude = r[i] - simulacaoa.planeta.raio_equatorial
+        altitude = r[i] - simulacao.planeta.raio_equatorial
 
-        simulacaoa.foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn,
+        simulacao.foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn,
                                                                     numero_de_mach=Mach[i],
                                                                     temperatura=T[i], constante_do_gas_ideal=R,
                                                                     velocidade=V[i])
         # Forcas aerodinamicas
         areas_de_referencia_para_calculo_do_arrasto, comprimento_caracteristico, fator_correcao = (
-            simulacaoa.foguete.modelo_estrutural.calcula())
+            simulacao.foguete.modelo_estrutural.calcula())
         D[i], _, _ = simulacao.foguete.modelo_aerodinamico.aerodinamica_multiplos_estagios(t[i], V[i],
                                                                                            areas_de_referencia_para_calculo_do_arrasto,
                                                                                            simulacao.foguete.modelo_propulsivo.tempos_de_separacao,
@@ -401,14 +399,3 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.show()
 
 
-with open('resposta_simulacao.pkl', 'rb') as f:
-    loaded_resposta = pickle.load(f)
-
-with open('simulacao.pkl', 'rb') as f:
-    simulacaoa = pickle.load(f)
-
-print(loaded_resposta)
-t = loaded_resposta.t
-X = loaded_resposta.y
-resp = t, X
-plotaresultados(resp, simulacaoa)

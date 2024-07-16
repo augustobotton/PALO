@@ -15,33 +15,20 @@ class ModeloFoguete:
         :param modelo_estrutural: Instância de ModeloEstrutural
         :param modelo_aerodinamico: Instância de ModeloAerodinamico
         """
-        self.sinal_phi_inercial = None
-        self.Dv = None
-        self.velocidade_de_exaustao = None
-        self.lambL = None
-        self.lamb = None
-        self.lamb2 = None
-        self.lamb1 = None
-        self.lamb0 = None
-        self.m03 = None
-        self.massa_total_na_ignicacao_2_estagio = None
-        self.sigma = None
-        self.ms_mpx_sum = None
-        self.mpx = None
+
         self.modelo_propulsivo = modelo_propulsivo
         self.modelo_estrutural = modelo_estrutural
         self.modelo_aerodinamico = modelo_aerodinamico
-        self.massa_propelente_estagios_1_2 = modelo_propulsivo.massa_propelente_estagios
-        self.massa_propelente_terceiro_estagio = modelo_propulsivo.massa_total_propelente_terceiro_estagio
+        self.massa_propelente_por_estagio = modelo_propulsivo.massa_propelente_estagios
         self.massa_estrutural_por_estagio = modelo_estrutural.massa_estrutural_por_estagio
         self.massa_de_carga_util = modelo_estrutural.massa_de_carga_util
-        self.massa_inicial_do_foguete = modelo_propulsivo.massa_inicial_do_foguete
+        self.massa_inicial_do_foguete = self.massa_inicial()
+        self.modelo_propulsivo.massa_inicial_do_foguete = self.massa_inicial()
         self.impulso_especifico_por_estagio = modelo_propulsivo.impulso_especifico
         self.areas_referencia = [modelo_estrutural.area_secao_transversal_1_estagio,
                                  modelo_estrutural.area_secao_transversal_2_estagio,
                                  modelo_estrutural.area_secao_transversal_3_estagio,
                                  modelo_estrutural.area_secao_transversal_carga_util]
-        self._estudo_delta_v(modelo_propulsivo.planeta)
 
     def _estudo_delta_v(self, planeta):
         """
@@ -49,56 +36,57 @@ class ModeloFoguete:
 
         :param planeta: Instância do planeta com o atributo gravidade
         """
-        razao_estrutural_1_2 = np.array([self.massa_propelente_estagios_1_2[0], self.massa_propelente_estagios_1_2[1],
-                        self.massa_propelente_terceiro_estagio])
-        ms_mpx_sum = self.massa_estrutural_por_estagio + razao_estrutural_1_2
-        sigma = self.massa_estrutural_por_estagio / ms_mpx_sum
+        massa_por_estagio = np.array(self.massa_estrutural_por_estagio[1:2])
+        razoes_estruturais = self.massa_estrutural_por_estagio / (
+                self.massa_estrutural_por_estagio + massa_por_estagio)
 
-        massa_total_na_ignicacao_2_estagio = self.massa_estrutural_por_estagio[1] + razao_estrutural_1_2[1] + \
-                                             self.massa_estrutural_por_estagio[2] + razao_estrutural_1_2[2] + self.massa_de_carga_util
-        m03 = self.massa_estrutural_por_estagio[2] + razao_estrutural_1_2[2] + self.massa_de_carga_util
+        massa_total_na_ignicacao_2_estagio = self.massa_estrutural_por_estagio[1] + self.massa_propelente_por_estagio[
+            1] + \
+                                             self.massa_estrutural_por_estagio[2] + self.massa_propelente_por_estagio[
+                                                 2] + self.massa_de_carga_util
+        massa_total_na_ignicao_3_estagio = self.massa_estrutural_por_estagio[2] + self.massa_propelente_por_estagio[
+            2] + self.massa_de_carga_util
 
         razao_carga_util_primeiro_estagio = massa_total_na_ignicacao_2_estagio / self.massa_inicial_do_foguete
-        razao_carga_util_segundo_estagio = m03 / massa_total_na_ignicacao_2_estagio
-        razao_carga_util_terceiro_estagio = self.massa_de_carga_util / m03
-        razoes_carga_util = np.array([razao_carga_util_primeiro_estagio, razao_carga_util_segundo_estagio, razao_carga_util_terceiro_estagio])
+        razao_carga_util_segundo_estagio = massa_total_na_ignicao_3_estagio / massa_total_na_ignicacao_2_estagio
+        razao_carga_util_terceiro_estagio = self.massa_de_carga_util / massa_total_na_ignicao_3_estagio
+        razoes_carga_util = np.array(
+            [razao_carga_util_primeiro_estagio, razao_carga_util_segundo_estagio, razao_carga_util_terceiro_estagio])
 
         razao_carga_util_total = np.prod(razoes_carga_util)
 
         velocidade_de_exaustao = planeta.gravidade * self.impulso_especifico_por_estagio
 
-        delta_v_ideal = -np.sum(velocidade_de_exaustao * np.log(sigma + (1 - sigma) * razoes_carga_util))
+        delta_v_ideal = -np.sum(
+            velocidade_de_exaustao * np.log(razoes_estruturais + (1 - razoes_estruturais) * razoes_carga_util))
 
-        # Armazena os resultados como atributos da classe
-        self.mpx = razao_estrutural_1_2
-        self.ms_mpx_sum = ms_mpx_sum
-        self.sigma = sigma
-        self.massa_total_na_ignicacao_2_estagio = massa_total_na_ignicacao_2_estagio
-        self.m03 = m03
-        self.lamb0 = razao_carga_util_primeiro_estagio
-        self.lamb1 = razao_carga_util_segundo_estagio
-        self.lamb2 = razao_carga_util_terceiro_estagio
-        self.lamb = razoes_carga_util
-        self.lambL = razao_carga_util_total
-        self.velocidade_de_exaustao = velocidade_de_exaustao
-        self.Dv = delta_v_ideal
+        return delta_v_ideal, razoes_carga_util, razoes_estruturais, velocidade_de_exaustao, razao_carga_util_total, massa_total_na_ignicacao_2_estagio, massa_total_na_ignicao_3_estagio
+
+    def massa_inicial(self):
+        return np.sum(self.massa_propelente_por_estagio) + np.sum(
+            self.massa_estrutural_por_estagio) + self.massa_de_carga_util
 
     def mostra_dados(self):
         """
         Exibe os dados do foguete na tela.
         """
+
+        delta_v_ideal, razoes_carga_util, razoes_estruturais, velocidade_de_exaustao, razao_carga_util_total, massa_total_na_ignicacao_2_estagio, massa_total_na_ignicao_3_estagio = self._estudo_delta_v(
+            self.modelo_propulsivo.planeta)
+        print(" ")
+
+        print('Estudo de delta-v ideal do foguete:')
         print('Área de referência do foguete com primeiro estágio (m^2):', self.areas_referencia[0])
         print('Área de referência do foguete com segundo estágio (m^2):', self.areas_referencia[1])
         print('Área de referência do foguete com terceiro estágio (m^2):', self.areas_referencia[2])
         print('Área de referência da carga útil (m^2):', self.areas_referencia[3])
         print('Massa inicial antes da queima do primeiro estágio (kg):', self.massa_inicial_do_foguete)
-        print('Massa inicial antes da queima do segundo estágio (kg):', self.massa_total_na_ignicacao_2_estagio)
-        print('Massa inicial antes da queima do terceiro estágio (kg):', self.m03)
+        print('Massa inicial antes da queima do segundo estágio (kg):', massa_total_na_ignicacao_2_estagio)
+        print('Massa inicial antes da queima do terceiro estágio (kg):', massa_total_na_ignicao_3_estagio)
         print('Massa da carga útil (kg):', self.massa_de_carga_util)
-        print('Razões estruturais:', self.sigma)
-        print('Razões de carga útil:', self.lamb)
-        print('Velocidades de exaustão (m/s):', self.velocidade_de_exaustao)
-        print('Razão de carga útil total:', self.lambL)
-        print('Impulso de velocidade total ideal (m/s):', self.Dv)
-
-
+        print('Razões estruturais:', razoes_estruturais)
+        print('Razões de carga útil:', razoes_carga_util)
+        print('Velocidades de exaustão (m/s):', velocidade_de_exaustao)
+        print('Razão de carga útil total:', razao_carga_util_total)
+        print('Impulso de velocidade total ideal (m/s):', delta_v_ideal)
+        print('')

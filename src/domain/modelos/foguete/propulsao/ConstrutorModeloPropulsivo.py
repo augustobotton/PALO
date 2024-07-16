@@ -10,12 +10,10 @@ class ConstrutorModeloPropulsivo:
         """
         self.impulso_especifico = np.array([])
         self.massa_propelente_estagios = np.array([])
-        self.massa_total_propelente_terceiro_estagio = 0.0
         self.duracao_queima_estagios = np.array([])
         self.tempo_espera_separacao = np.array([])
         self.tempo_espera_ignicao = np.array([])
         self.tempo_primeira_queima_terceiro_estagio = 0.0
-        self.massa_estrutural_por_estagio = np.array([])
         self.massa_de_carga_util = 0.0
         self.planeta = None
         self.h0 = 0.0
@@ -40,16 +38,6 @@ class ConstrutorModeloPropulsivo:
         self.massa_propelente_estagios = np.array(massa_propelente_estagios)
         return self
 
-    def com_massa_total_propelente_terceiro_estagio(self,
-                                                    massa_total_propelente_terceiro_estagio: float) -> 'ConstrutorModeloPropulsivo':
-        """
-        Define a massa de propelente do terceiro estágio.
-
-        :param massa_total_propelente_terceiro_estagio: Massa de propelente do terceiro estágio.
-        :return: Instância do builder.
-        """
-        self.massa_total_propelente_terceiro_estagio = massa_total_propelente_terceiro_estagio
-        return self
 
     def com_duracao_queima_estagios(self, duracao_queima_estagios: list) -> 'ConstrutorModeloPropulsivo':
         """
@@ -92,15 +80,6 @@ class ConstrutorModeloPropulsivo:
         self.tempo_primeira_queima_terceiro_estagio = tempo_primeira_queima_terceiro_estagio
         return self
 
-    def com_massa_estrutural_por_estagio(self, massa_estrutural_por_estagio: list) -> 'ConstrutorModeloPropulsivo':
-        """
-        Define a massa estrutural por estágio.
-
-        :param massa_estrutural_por_estagio: Lista de massas estruturais.
-        :return: Instância do builder.
-        """
-        self.massa_estrutural_por_estagio = np.array(massa_estrutural_por_estagio)
-        return self
 
     def com_massa_de_carga_util(self, massa_de_carga_util: float) -> 'ConstrutorModeloPropulsivo':
         """

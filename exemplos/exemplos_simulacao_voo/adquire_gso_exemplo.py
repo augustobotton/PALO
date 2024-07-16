@@ -2,6 +2,7 @@ import pickle
 
 import numpy as np
 
+from src.domain.construtorderesultados.resultados_voo_ascendente import plotaresultados
 from src.domain.modelos.Simulacao import Simulacao
 from src.domain.modelos.foguete.aerodinamica.ModeloAerodinamico import ModeloAerodinamico
 from src.domain.modelos.foguete.estrutura.ConstrutorModeloEstrutural import ConstrutorModeloEstrutural
@@ -28,10 +29,9 @@ terra = (ConstrutorPlaneta()
 
 
 meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico([251, 271, 315]).com_massa_propelente_estagios(
-    [5.5262e4, 11058, 0, 0]).com_massa_total_propelente_terceiro_estagio(243.6).com_duracao_queima_estagios(
+    [5.5262e4, 11058, 243.6]).com_duracao_queima_estagios(
     [62, 64.62, 301]).com_tempo_primeira_queima_terceiro_estagio(262).com_tempo_espera_separacao(
-    [2, 2, 2]).com_tempo_espera_ignicao([5, 1360]).com_massa_estrutural_por_estagio(
-    [7750, 1367, 64.7544]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
+    [2, 2, 2]).com_tempo_espera_ignicao([5, 1360]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
 
 #TODO estou criando dois atributos para dois modelos diferentes, mas o que eu quero é criar um atributo que seja comum para os dois modelos.
 
@@ -64,6 +64,19 @@ orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
-with open('../../src/domain/construtorderesultados/simulacao.pkl', 'wb') as f:
+with open('../../exemplos/exemplos_simulacao_voo/simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()
+
+
+with open('resposta_simulacao.pkl', 'rb') as f:
+    loaded_resposta = pickle.load(f)
+
+with open('simulacao.pkl', 'rb') as f:
+    simulacaoa = pickle.load(f)
+
+print(loaded_resposta)
+t = loaded_resposta.t
+X = loaded_resposta.y
+resp = t, X
+plotaresultados(resp, simulacaoa)
