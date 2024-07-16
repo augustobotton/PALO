@@ -42,7 +42,9 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 
     # Equações de cinemática de translação
     rp = velocidade * np.sin(phi)
+
     deltap = (velocidade / distancia_radial) * np.cos(phi) * np.cos(azimute)
+
     lonp = (velocidade * np.cos(phi) * np.sin(azimute)) / (distancia_radial * np.cos(latitude))
 
     # Equações de dinâmica de translação

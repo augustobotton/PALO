@@ -1,4 +1,5 @@
 import numpy as np
+
 from src.domain.modelos.foguete.aerodinamica.ModeloAerodinamico import ModeloAerodinamico
 from src.domain.modelos.foguete.estrutura.ModeloEstrutural import ModeloEstrutural
 from src.domain.modelos.foguete.propulsao.ModeloPropulsivo import ModeloPropulsivo
@@ -48,39 +49,39 @@ class ModeloFoguete:
 
         :param planeta: Instância do planeta com o atributo gravidade
         """
-        mpx = np.array([self.massa_propelente_estagios_1_2[0], self.massa_propelente_estagios_1_2[1],
+        razao_estrutural_1_2 = np.array([self.massa_propelente_estagios_1_2[0], self.massa_propelente_estagios_1_2[1],
                         self.massa_propelente_terceiro_estagio])
-        ms_mpx_sum = self.massa_estrutural_por_estagio + mpx
+        ms_mpx_sum = self.massa_estrutural_por_estagio + razao_estrutural_1_2
         sigma = self.massa_estrutural_por_estagio / ms_mpx_sum
 
-        massa_total_na_ignicacao_2_estagio = self.massa_estrutural_por_estagio[1] + mpx[1] + \
-                                             self.massa_estrutural_por_estagio[2] + mpx[2] + self.massa_de_carga_util
-        m03 = self.massa_estrutural_por_estagio[2] + mpx[2] + self.massa_de_carga_util
+        massa_total_na_ignicacao_2_estagio = self.massa_estrutural_por_estagio[1] + razao_estrutural_1_2[1] + \
+                                             self.massa_estrutural_por_estagio[2] + razao_estrutural_1_2[2] + self.massa_de_carga_util
+        m03 = self.massa_estrutural_por_estagio[2] + razao_estrutural_1_2[2] + self.massa_de_carga_util
 
-        lamb0 = massa_total_na_ignicacao_2_estagio / self.massa_inicial_do_foguete
-        lamb1 = m03 / massa_total_na_ignicacao_2_estagio
-        lamb2 = self.massa_de_carga_util / m03
-        lamb = np.array([lamb0, lamb1, lamb2])
+        razao_carga_util_primeiro_estagio = massa_total_na_ignicacao_2_estagio / self.massa_inicial_do_foguete
+        razao_carga_util_segundo_estagio = m03 / massa_total_na_ignicacao_2_estagio
+        razao_carga_util_terceiro_estagio = self.massa_de_carga_util / m03
+        razoes_carga_util = np.array([razao_carga_util_primeiro_estagio, razao_carga_util_segundo_estagio, razao_carga_util_terceiro_estagio])
 
-        lambL = np.prod(lamb)
+        razao_carga_util_total = np.prod(razoes_carga_util)
 
         velocidade_de_exaustao = planeta.gravidade * self.impulso_especifico_por_estagio
 
-        Dv = -np.sum(velocidade_de_exaustao * np.log(sigma + (1 - sigma) * lamb))
+        delta_v_ideal = -np.sum(velocidade_de_exaustao * np.log(sigma + (1 - sigma) * razoes_carga_util))
 
         # Armazena os resultados como atributos da classe
-        self.mpx = mpx
+        self.mpx = razao_estrutural_1_2
         self.ms_mpx_sum = ms_mpx_sum
         self.sigma = sigma
         self.massa_total_na_ignicacao_2_estagio = massa_total_na_ignicacao_2_estagio
         self.m03 = m03
-        self.lamb0 = lamb0
-        self.lamb1 = lamb1
-        self.lamb2 = lamb2
-        self.lamb = lamb
-        self.lambL = lambL
+        self.lamb0 = razao_carga_util_primeiro_estagio
+        self.lamb1 = razao_carga_util_segundo_estagio
+        self.lamb2 = razao_carga_util_terceiro_estagio
+        self.lamb = razoes_carga_util
+        self.lambL = razao_carga_util_total
         self.velocidade_de_exaustao = velocidade_de_exaustao
-        self.Dv = Dv
+        self.Dv = delta_v_ideal
 
     def mostra_dados(self):
         """
