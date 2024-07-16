@@ -1,6 +1,7 @@
-import numpy as np
 import json
 import os
+
+import numpy as np
 
 
 class ModeloAtmosferico:
@@ -46,9 +47,9 @@ class ModeloAtmosferico:
         self.Mi = np.array(data['Mi'])
 
         self.g0 = data['constantes']['aceleracao_gravidade']
-        self.Na = data['constantes']['numero_avogadro']
-        self.sigma = data['constantes']['diametro_colisao']
-        self.m0 = data['constantes']['massa_molar_ar']
+        self.Na = 6.0220978e23
+        self.sigma = 3.65e-10
+        self.m0 = self.Mi[0]
         self.P0 = data['constantes']['pressao_nivel_mar']
         self.Requat = data['constantes']['raio_medio_terra']
         self.gamma = data['constantes']['razao_calores_especificos']
@@ -79,7 +80,9 @@ class ModeloAtmosferico:
             altitude_geometrica = 2000e3
         else:
             for i in range(21):
-                if i == 20 or (altitude_geometrica >= self.hi[i] and altitude_geometrica < self.hi[i + 1]):
+                if (i == 20):
+                    break
+                elif ((altitude_geometrica >= self.hi[i]) and (altitude_geometrica < self.hi[i + 1])):
                     break
 
         # Calcula a pressão inicial da camada i
@@ -99,7 +102,8 @@ class ModeloAtmosferico:
                             1 - (self.beta / 2) * (self.hi[j] - self.hi[j - 1])))
                 px = Pi
 
-        temperatura_escala_molecular = self.Ti[i] + self.a[i] * (altitude_geometrica - self.hi[i]) + dT
+        temperatura_escala_molecular = self.Ti[i] + self.a[i] * (altitude_geometrica - self.hi[i]) 
+        temperatura_escala_molecular = temperatura_escala_molecular +dT
         if i >= 20:
             constante_de_gas_ideal = self.Ri[i]
             M = self.Mi[i]
@@ -133,7 +137,7 @@ class ModeloAtmosferico:
                 temperatura_escala_molecular + 245.4 * (10 ** (-12 / temperatura_escala_molecular)))
         numero_de_prandtl = viscosidade_dinamica * cp / kT
         lam = self.m0 / (np.sqrt(2) * np.pi * self.sigma ** 2 * densidade_do_ar * self.Na)
-        numero_de_knudsen = lam / lc
+        numero_de_knudsen = lam / lc/1000
         if numero_de_knudsen >= 10:
             parametro_regime_de_escoamento = 1
         elif numero_de_knudsen <= 0.01:

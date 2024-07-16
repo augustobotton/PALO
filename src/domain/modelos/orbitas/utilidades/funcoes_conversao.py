@@ -55,28 +55,18 @@ def rvel_polar_para_rvel_retangular(
     return vetor_posicao_coord_retangular, vetor_velocidade_coord_retangular
 
 
-def componentes_vel_relativa_para_inercial(
-        velocidade_relativa: float,
-        inclinacao_velocidade_relativa: float,
-        azimute_da_velocidade_relativa: float,
-        velocidade_rotacao_ref_girante: float,
-        distancia_radial_origem_inercial: float,
-        latitude: float
-) -> tuple[float, float, float]:
-    """
-    Converte a velocidade, elevação e azimute da velocidade relativa para a velocidade inercial.
-
-    :return: Magnitude da velocidade em relação ao referencial inercial, ângulo de elevação e ângulo de azimute da velocidade inercial.
-    """
+def componentes_vel_relativa_para_inercial(velocidade_relativa, inclinacao_velocidade_relativa, azimute_da_velocidade_relativa,
+                                 velocidade_rotacao_ref_girante, distancia_radial_origem_inercial, latitude):
+    # Cálculos do ângulo de azimute da velocidade inercial
     angulo_azimute_velocidade_inercial = np.arctan2(
         velocidade_relativa * np.cos(inclinacao_velocidade_relativa) * np.sin(azimute_da_velocidade_relativa) +
         velocidade_rotacao_ref_girante * distancia_radial_origem_inercial * np.cos(latitude),
         velocidade_relativa * np.cos(inclinacao_velocidade_relativa) * np.cos(azimute_da_velocidade_relativa)
     )
-
     if angulo_azimute_velocidade_inercial < 0:
         angulo_azimute_velocidade_inercial += 2 * np.pi
 
+    # Cálculo da magnitude da velocidade referencial inercial
     magnitude_velocidade_referencial_inercial = np.sqrt(
         velocidade_relativa ** 2 +
         2 * velocidade_relativa * np.cos(inclinacao_velocidade_relativa) * np.sin(azimute_da_velocidade_relativa) *
@@ -84,10 +74,16 @@ def componentes_vel_relativa_para_inercial(
         distancia_radial_origem_inercial ** 2 * velocidade_rotacao_ref_girante ** 2 * np.cos(latitude) ** 2
     )
 
-    angulo_de_trajetoria = np.arctan(
-        np.sin(inclinacao_velocidade_relativa) * np.cos(angulo_azimute_velocidade_inercial) /
+    # Cálculo do ângulo de trajetória
+    angulo_de_trajetoria = np.arctan2(
+        np.sin(inclinacao_velocidade_relativa) * np.cos(angulo_azimute_velocidade_inercial),
         np.cos(inclinacao_velocidade_relativa) * np.cos(azimute_da_velocidade_relativa)
     )
+    if abs(angulo_de_trajetoria) > np.pi / 2:
+        if angulo_de_trajetoria < np.pi / 2:
+            angulo_de_trajetoria += np.pi
+        if angulo_de_trajetoria > np.pi / 2:
+            angulo_de_trajetoria -= np.pi
 
     return magnitude_velocidade_referencial_inercial, angulo_de_trajetoria, angulo_azimute_velocidade_inercial
 
