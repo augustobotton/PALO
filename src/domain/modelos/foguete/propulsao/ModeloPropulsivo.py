@@ -76,7 +76,7 @@ class ModeloPropulsivo:
             self.massa_estrutural_por_estagio) + self.massa_de_carga_util
 
         self.distancia_radial_inicial = self.planeta.raio_equatorial + self.h0
-        print("entrei uma vez")
+
 
     def __str__(self):
         return f"impulso_especifico: {self.impulso_especifico}\n" \
