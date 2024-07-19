@@ -43,7 +43,6 @@ def calcular_gravidade_axisimetrico(r, delta, planeta):
     )
     )
 
-
     gc = -gr
     gdel = -gphi
 

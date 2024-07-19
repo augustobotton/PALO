@@ -27,13 +27,11 @@ terra = (ConstrutorPlaneta()
          .com_modelo_atmosferico(ModeloAtmosferico(json_modelo_atm_terrestre))
          .construir())
 
-
-meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico([251, 271, 315]).com_massa_propelente_estagios(
-    [5.5262e4, 11058, 243.6]).com_duracao_queima_estagios(
-    [62, 64.62, 301]).com_tempo_primeira_queima_terceiro_estagio(262).com_tempo_espera_separacao(
-    [2, 2, 2]).com_tempo_espera_ignicao([5, 1360]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
-
-#TODO estou criando dois atributos para dois modelos diferentes, mas o que eu quero é criar um atributo que seja comum para os dois modelos.
+meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico(
+    [251, 271, 315]).com_massa_propelente_estagios(
+    [77366, 11058, 225.33]).com_duracao_queima_estagios(
+    [62, 64.62, 279]).com_tempo_primeira_queima_terceiro_estagio(213).com_tempo_espera_separacao(
+    [2, 2, 2]).com_tempo_espera_ignicao([5, 580]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
 
 meuModeloEstrutural = ConstrutorModeloEstrutural().com_massa_estrutural_por_estagio(
     [7750, 1367, 64.7544]).com_massa_de_carga_util(
@@ -67,6 +65,7 @@ simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 with open('../../exemplos/exemplos_simulacao_voo/simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()
+
 
 
 with open('resposta_simulacao.pkl', 'rb') as f:

@@ -52,9 +52,8 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
         # Parametros atmosfericos
         T[i], _, _, rho[i], _, Mach[i], _, _, Kn, _, _, R = simulacao.planeta.modelo_atmosferico.calcula(h[i], V[i],
                                                                                                          1.5, 10)
-        altitude = r[i] - simulacao.planeta.raio_equatorial
 
-        simulacao.foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn,
+        simulacao.foguete.modelo_aerodinamico.atualizar_parametros(altitude=h[i], numero_de_knudsen=Kn,
                                                                     numero_de_mach=Mach[i],
                                                                     temperatura=T[i], constante_do_gas_ideal=R,
                                                                     velocidade=V[i])
@@ -99,9 +98,9 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     P = 2 * np.pi * np.sqrt((Requat + hfq[0]) ** 3 / mut)
     print('*** Parametros da Orbita Obtida ***')
     print('Velocidade no momento da insercao orbital (km/s)', Vfq[0] / 1e3)
-    print('Altitude no momento da insercao orbital (km)', hfq[0] / 1e3)
-    print('Distancia radial no momento da insercao orbital (km)', (hfq[0] + Requat) / 1e3)
-    print('Semi eixo maior (km)', a[ifq] / 1e3)
+    print('Altitude no momento da insercao orbital (km)', hfq[0])
+    print('Distancia radial no momento da insercao orbital (km)', (hfq[0] + Requat))
+    print('Semi eixo maior (km)', a[ifq])
     print('Periodo(min): ', P / 60)
     # Raio do perigeu
     rp = a[ifq] * (1 - e[ifq])
@@ -290,12 +289,12 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('q (N/m^2)')
 
-    # plt.subplot(324)
+    plt.subplot(324)
     # plt.plot(t, M, linewidth=2)
-    # plt.grid(True)
-    # plt.axis('tight')
-    # plt.xlabel('t (s)')
-    # plt.ylabel('M (-)')
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xlabel('t (s)')
+    plt.ylabel('M (-)')
 
     plt.subplot(325)
     plt.plot(t, T - 273.15, linewidth=2)
@@ -354,12 +353,12 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03A9 (º)')
 
-    # plt.subplot(338)
+    plt.subplot(338)
     # plt.plot(t, inclinacao * 180 / np.pi, linewidth=2)
-    # plt.grid(True)
-    # plt.axis('tight')
-    # plt.xlabel('t (s)')
-    # plt.ylabel('i (º)')
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xlabel('t (s)')
+    plt.ylabel('i (º)')
 
     plt.subplot(339)
     plt.plot(t, om * 180 / np.pi, linewidth=2)

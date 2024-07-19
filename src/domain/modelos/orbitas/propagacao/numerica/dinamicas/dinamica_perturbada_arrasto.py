@@ -21,7 +21,7 @@ def dinamica_perturbada_arrasto(t, f, *args):
         dfdt - Vetor de derivadas [vx, vy, vz, ax, ay, az] (km/s e km/s^2)
     """
 
-    planeta, m, A, CD = args
+    planeta, m, A, CD,_ = args
     wE = np.array([0, 0, 7.2921159e-5])  # Velocidade angular da Terra (rad/s)
 
     # Vetor posição (km)

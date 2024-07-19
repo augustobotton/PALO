@@ -70,7 +70,7 @@ class Simulacao:
 
         :return: Azimute inicial estimado (rad).
         """
-        apogeu_transferencia = self.planeta.raio_equatorial + 250e3
+        apogeu_transferencia = self.planeta.raio_equatorial + 250
         semi_eixo_maior_transferencia = (self.altitude_alvo + apogeu_transferencia) / 2
         velocidade_transferencia = np.sqrt(
             self.planeta.mut * (2 / apogeu_transferencia - 1 / semi_eixo_maior_transferencia))

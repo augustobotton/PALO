@@ -1,13 +1,13 @@
 import numpy as np
 
-from src.domain.modelos.orbitas.utilidades.vetor_de_estados_para_coe import vetor_de_estados_para_coe
 from src.domain.modelos.orbitas.utilidades.funcoes_conversao import matriz_rotacao_orbital_inercial
+from src.domain.modelos.orbitas.utilidades.vetor_de_estados_para_coe import vetor_de_estados_para_coe
 
 
 class Orbita:
     def __init__(self, semi_eixo_maior: float = None, excentricidade: float = None, inclinacao: float = None,
                  raan: float = None, argumento_periastro: float = None, anomalia_verdadeira: float = None,
-                 tempo_de_periastro: float = 0, parametro: float = None, quantidade_momento_angular = None):
+                 tempo_de_periastro: float = 0, parametro: float = None, quantidade_momento_angular = None, vetor_velocidade=None, vetor_posicao=None):
         """
         Inicializa a classe Orbita com os parâmetros orbitais básicos.
         A unidade de comprimento padrão é km.
@@ -22,6 +22,8 @@ class Orbita:
         self.tempo_de_periastro = tempo_de_periastro
         self.parametro = parametro
         self.quantidade_momento_angular = quantidade_momento_angular
+        self.vetor_velocidade = vetor_velocidade
+        self.vetor_posicao = vetor_posicao
         self.mu = 398600.4418  # Constante gravitacional da Terra, em km^3/s^2.
 
     def retorna_parametros(self):
@@ -30,7 +32,8 @@ class Orbita:
     def __repr__(self):
         return (f"Orbita(semi_eixo_maior={self.semi_eixo_maior}, excentricidade={self.excentricidade}, "
                 f"inclinacao={self.inclinacao}, raan={self.raan}, arg_periastro={self.arg_periastro}, "
-                f"anomalia_verdadeira={self.anomalia_verdadeira})")
+                f"anomalia_verdadeira={self.anomalia_verdadeira}, quantidade_momento_angular={self.quantidade_momento_angular}, "
+                f"vetor_velocidade={self.vetor_velocidade}, vetor_posicao={self.vetor_posicao})")
 
     def define_mu(self, mu: float):
         """
@@ -113,4 +116,4 @@ class Orbita:
         eixo, exc, inclinacao, raan, argumento_de_periastro, anomalia_verdadeira, quantidade_momento_angular = vetor_de_estados_para_coe(posicao, velocidade, mu)
         return cls(semi_eixo_maior=eixo, excentricidade=exc, inclinacao=inclinacao, raan=raan,
                    argumento_periastro=argumento_de_periastro, anomalia_verdadeira=anomalia_verdadeira,
-                   quantidade_momento_angular=quantidade_momento_angular)
+                   quantidade_momento_angular=quantidade_momento_angular, vetor_velocidade=velocidade, vetor_posicao=posicao)

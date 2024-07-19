@@ -16,6 +16,8 @@ setup(
         "scipy",
         "matplotlib",
         'tqdm',
+        'plotly',
+        'pickle'
 
     ],
 )

@@ -34,17 +34,7 @@ def excentricidade_orbital(periapsis, apoapsis):
     return (apoapsis / eixo) - 1
 
 
-def delta_velocidade(velocidade_inicial, velocidade_final, angulo=None):
-    """
-    Calcula a variação de velocidade (delta-v).
 
-    Retorna:
-    float: Variação de velocidade (delta-v).
-    """
-    if angulo is None:
-        return abs(velocidade_final - velocidade_inicial)
-    cosphi = np.cos(np.deg2rad(angulo))
-    return np.sqrt(velocidade_inicial ** 2 + velocidade_final ** 2 - 2 * velocidade_inicial * velocidade_final * cosphi)
 
 
 def calcula_distancia_radial(posicao_celeste):
@@ -74,8 +64,7 @@ def calcula_excentricidade(velocidade_celeste, momento_angular, parametro_gravit
     Retorna:
     array: Excentricidade da órbita.
     """
-    return (np.cross(velocidade_celeste,
-                     momento_angular) / parametro_gravitacional - posicao_celeste / distancia_radial)
+    return np.cross(velocidade_celeste, momento_angular) / parametro_gravitacional - posicao_celeste / distancia_radial
 
 
 def calcula_parametro_e_semi_eixo_maior(momento_angular, parametro_gravitacional, excentricidade):
@@ -211,4 +200,4 @@ def calcular_periodo_orbital(a, mu):
     Returns:
     float: O período orbital (s).
     """
-    return 2 * np.pi * np.sqrt((a ** 3) / mu)
+    return 2 * np.pi / np.sqrt(mu) * a**1.5

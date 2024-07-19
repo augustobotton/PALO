@@ -22,10 +22,10 @@ def terminate(t, y, *args):
     float
         A diferença entre a altitude atual e 100 km.
     """
-
+    altitude_limite = args[4]
     r = np.linalg.norm(y[:3])
     altitude = r - 6378
-    return altitude - 100
+    return altitude - altitude_limite
 
 
 terminate.terminal = True

@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.domain.modelos.orbitas.utilidades.calculos_orbitais import calcula_velocidade_orbital
 from src.domain.modelos.orbitas.utilidades.funcoes_conversao import matriz_rotacao_orbital_inercial
 
 
@@ -63,24 +64,62 @@ def manobra_mudanca_de_plano(delta_inclinacao, vi):
 
     return delta_v, betha
 
-#TODO olhar exemplo resolvido na aula 27 e criar apenas as equacoes e n criar uma funcao
+def delta_velocidade(velocidade_inicial, velocidade_final, angulo=None):
+    """
+    Calcula a variação de velocidade (delta-v).
 
-# def manobra_coplanar(orbita_inicial: Orbita, orbita_final: Orbita):
-#     semi_eixo_orbita_final = semi_eixo_maior(orbita_final.calcula_periastro(), orbita_final.calcula_apoastro())
-#     r_f = np.linalg.norm(orbita_inicial.calcular_vetor_posicao_orbital())
-#     v_i = calcula_velocidade_orbital(orbita_inicial.mu, r_f)
-#     v_f = calcula_velocidade_orbital(orbita_final.mu, r_f, semi_eixo_orbita_final)
-#
-#     # Considerar possibilidade de orbita inicial eliptica
-#     if orbita_inicial.excentricidade > 0:
-#
-#         # anomalia_verdadeira = calcula_anomalia_verdadeira(orbita_inicial, r_f) #TODO conferir equação para anomalia verdadeira
-#         # angulo_alpha = np.arccos(
-#         #     np.cos(anomalia_verdadeira) / (1 + orbita_inicial.excentricidade * np.cos(anomalia_verdadeira)))
-#     else:
-#         angulo_alpha = np.arccos((r_f * v_i) / (r_f * v_f))
-#
-#     delta_v = delta_velocidade(v_i, v_f, angulo_alpha)
-#     betha = np.arcsin(v_f / delta_v * np.sin(angulo_alpha))
-#
-#     return delta_v, betha
+    Retorna:
+    float: Variação de velocidade (delta-v).
+    """
+    if angulo is None:
+        return abs(velocidade_final - velocidade_inicial)
+    cosphi = np.cos(np.deg2rad(angulo))
+    return np.sqrt(velocidade_inicial ** 2 + velocidade_final ** 2 - 2 * velocidade_inicial * velocidade_final * cosphi)
+
+def aplicar_delta_v(v, delta_v):
+    """
+    Aplica o delta_v ao vetor de velocidade atual.
+
+    Parâmetros:
+    v (ndarray): Vetor de velocidade atual.
+    delta_v (float): Valor de delta_v a ser aplicado (km/s).
+
+    Retorna:
+    ndarray: Novo vetor de velocidade após aplicar delta_v.
+    """
+    # Considera delta_v na direção da velocidade atual
+    v_unitario = v / np.linalg.norm(v)
+    return v + delta_v * v_unitario
+
+
+
+
+def delta_v_perigee_raise(r_p, r_a, r_p_prime, mu):
+    """
+    Calcula o delta_v necessário para uma manobra de aumento de perigeu.
+
+    Parâmetros:
+    r_p (float): Raio do perigeu inicial (km).
+    r_a (float): Raio do apogeu (km).
+    r_p_prime (float): Novo raio do perigeu desejado (km).
+    mu (float): Parâmetro gravitacional do corpo central (km^3/s^2).
+
+    Retorna:
+    float: Delta_v necessário para a manobra (km/s).
+    """
+    # Semi-eixo maior da órbita inicial
+    a = (r_p + r_a) / 2
+
+    # Semi-eixo maior da nova órbita
+    a_prime = (r_p_prime + r_a) / 2
+
+    # Velocidade orbital no apogeu da órbita inicial
+    v_a = calcula_velocidade_orbital(mu,r_a, a)
+
+    # Velocidade orbital no apogeu da nova órbita
+    v_a_prime = calcula_velocidade_orbital(mu, r_a, a_prime)
+
+    # Delta_v necessário
+    delta_v = v_a_prime - v_a
+
+    return delta_v

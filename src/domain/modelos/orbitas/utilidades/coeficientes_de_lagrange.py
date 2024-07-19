@@ -18,10 +18,10 @@ def f_and_g(x, t, ro, a, mu):
         float: Coeficiente de Lagrange g (s)
     """
     z = a * x ** 2
-    C = stumpC(z)
-    S = stumpS(z)
-    f = 1 - x ** 2 / ro * C
-    g = t - 1 / np.sqrt(mu) * x ** 3 * S
+
+    # Compute the Lagrange f and g coefficients
+    f = 1 - x ** 2 / ro * stumpC(z)
+    g = t - (1 / np.sqrt(mu)) * x ** 3 * stumpS(z)
 
     return f, g
 
@@ -40,10 +40,13 @@ def fDot_and_gDot(x, r, ro, a, mu):
         float: Derivada temporal do coeficiente de Lagrange f (1/s)
         float: Derivada temporal do coeficiente de Lagrange g (adimensional)
     """
+    # Compute the Stumpff functions
     z = a * x ** 2
-    S = stumpS(z)
-    C = stumpC(z)
-    fdot = np.sqrt(mu) / (r * ro) * (z * S - 1) * x
-    gdot = 1 - x ** 2 / r * C
+
+    # Equation 3.69c:
+    fdot = np.sqrt(mu) / (r * ro) * (z * stumpS(z) - 1) * x
+
+    # Equation 3.69d:
+    gdot = 1 - x ** 2 / r * stumpC(z)
 
     return fdot, gdot

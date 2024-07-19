@@ -16,3 +16,4 @@ print("Periodo orbital:", tf)
 
 t, y = propagacao_numerica(ti, tf, orbita)
 plota_orbita(y, 6378, r)
+

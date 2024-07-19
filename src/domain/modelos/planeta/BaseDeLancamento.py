@@ -9,10 +9,10 @@ class BaseDeLancamento:
         Inicializa uma nova instância da classe BaseDeLancamento com todos os parâmetros definidos como None.
         Deve ser usado 'ConstrutorBaseDeLancamento 'para configurar os parâmetros da base de lançamento.
         """
-        self.altitude_base_de_lancamento = None  # Altitude da base de lançamento (em metros)
-        self.latitude_base_de_lancamento = None  # Latitude inicial da base de lançamento (em radianos)
-        self.longitude_base_de_lancamento = None  # Longitude inicial da base de lançamento (em radianos)
-        self.comprimento_do_trilho = None  # Comprimento do trilho de lançamento (em metros)
+        self.altitude_base_de_lancamento = None
+        self.latitude_base_de_lancamento = None
+        self.longitude_base_de_lancamento = None
+        self.comprimento_do_trilho = None
 
     def __str__(self):
         """

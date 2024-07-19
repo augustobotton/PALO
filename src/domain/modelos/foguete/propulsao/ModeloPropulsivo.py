@@ -55,11 +55,11 @@ class ModeloPropulsivo:
         self.tempos_de_fim_de_queima[1] = self.tempos_de_ignicao[1] + self.duracao_de_queima_segundo_estagio
         self.tempos_de_separacao[1] = self.tempos_de_fim_de_queima[1] + self.tempo_de_espera_separacao_2_3
         self.tempos_de_ignicao[2] = self.tempos_de_separacao[
-                                        1] + self.tempo_espera_ignicao_3_estagio  #cuidar se o tempo de espera ta correto
+                                        1] + self.tempo_espera_ignicao_3_estagio
         self.tempos_de_fim_de_queima[2] = self.tempos_de_ignicao[2] + self.duracao_da_primeira_queima_3_estagio
         self.tempos_de_ignicao[3] = TEMPO_DE_IGNICAO_3_ESTAGIO
         self.tempos_de_fim_de_queima[3] = self.tempos_de_ignicao[
-                                              3] + self.duracao_da_segunda_queima_3_estagio  #atualizar?
+                                              3] + self.duracao_da_segunda_queima_3_estagio
         self.tempos_de_separacao[2] = self.tempos_de_fim_de_queima[3] + self.tempo_de_espera_separacao_3_4
 
         self.massa_propelente_estagios[2] = (
