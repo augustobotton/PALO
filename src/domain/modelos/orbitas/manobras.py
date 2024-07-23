@@ -94,7 +94,7 @@ def aplicar_delta_v(v, delta_v):
 
 
 
-def delta_v_perigee_raise(r_p, r_a, r_p_prime, mu):
+def calcula_delta_v_eleva_perigeu(r_p, r_a, r_p_prime, mu):
     """
     Calcula o delta_v necessário para uma manobra de aumento de perigeu.
 

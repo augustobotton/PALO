@@ -6,30 +6,24 @@ from src.domain.modelos.orbitas.Orbita import Orbita
 from src.domain.modelos.orbitas.propagacao.numerica.propagadores.propagacao_encke import propagacao_encke
 from src.domain.modelos.orbitas.propagacao.numerica.propagadores.propagacao_numerica import propagacao_numerica
 
-r0 = np.array([-2384.46, 5729.01, 3050.46])
-v0 = np.array([-7.36138, -2.98997, 1.64354])
-mu = 398600
-orbita_inicial = Orbita.criar_pelo_vetor_de_estado(r0, v0, mu)
-print(orbita_inicial.__repr__())
-t, sol = propagacao_encke(0, (48*3600), orbita_inicial)
+posicao_inicial = np.array([-2384.46, 5729.01, 3050.46])
+velocidade_inicial = np.array([-7.36138, -2.98997, 1.64354])
+parametro_gravitacional = 398600
 
+# Criação do objeto órbita inicial utilizando os vetores de estado
+orbita = Orbita.criar_pelo_vetor_de_estado(posicao_inicial, velocidade_inicial, parametro_gravitacional)
 
-plota_orbita(sol,6378.1370, r0)
-plota_variacao_elementos_orbitais(t, sol, orbita_inicial)
-ground_track(t, sol)
+# Impressão dos dados da órbita inicial
+print(orbita.__repr__())
 
+# Propagação da órbita utilizando o método de Encke
+tempo, solucao_encke = propagacao_encke(0, (48*3600), orbita)
+plota_orbita(solucao_encke, 6378.1370, posicao_inicial)
+plota_variacao_elementos_orbitais(tempo, solucao_encke, orbita)
+ground_track(tempo, solucao_encke)
 
-r0 = np.array([-2384.46, 5729.01, 3050.46])
-v0 = np.array([-7.36138, -2.98997, 1.64354])
-mu = 398600
-orbita_inicial = Orbita.criar_pelo_vetor_de_estado(r0, v0, mu)
-print(orbita_inicial.__repr__())
-t, sol = propagacao_numerica(0, (48*3600), orbita_inicial)
-
-plota_orbita(sol,6378.1370, r0)
-plota_variacao_elementos_orbitais(t, sol, orbita_inicial)
-ground_track(t, sol)
-
-
-
-t
+# Propagação da órbita utilizando um método numérico
+tempo2, solucao_numerica = propagacao_numerica(0, (48*3600), orbita)
+plota_orbita(solucao_numerica, 6378.1370, posicao_inicial)
+plota_variacao_elementos_orbitais(tempo2, solucao_numerica, orbita)
+ground_track(tempo2, solucao_numerica)

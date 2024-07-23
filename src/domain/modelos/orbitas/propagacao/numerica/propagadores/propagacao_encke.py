@@ -18,7 +18,6 @@ def propagacao_encke(t0, tf, orbita):
 
     R0 = orbita.vetor_posicao
     V0 = orbita.vetor_velocidade
-    print(R0, V0)
     T0 = calcular_periodo_orbital(orbita.semi_eixo_maior, orbita.mu)
     # Passo de tempo para o procedimento de Encke
     del_t = T0 / 800

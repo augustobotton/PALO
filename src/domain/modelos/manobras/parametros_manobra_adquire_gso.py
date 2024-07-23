@@ -46,7 +46,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
 
         # Realização de uma sequência de testes para verificar a ocorrência do apogeu da órbita GTO.
         # Quando ele ocorre, determina os parâmetros da manobra.
-        if r > 0.9 * orbita_transferencia.semi_eixo_maior:
+        if r > 0.99 * orbita_transferencia.semi_eixo_maior:
             if not self.achou_apogeu:
                 if np.sign(phii) != self.sinal_phi_inercial:
                     # Se o sinal for diferente, phii passou por zero, o foguete chegou no apogeu
@@ -62,7 +62,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
                         modelo_propulsivo.tempos_de_fim_de_queima[
                             3] = modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio - \
                                  modelo_propulsivo.tempos_de_fim_de_queima[2]
-                        print('CUUUUUUUUUUUUUUUUUUU')
+                        print('manobra')
                     modelo_propulsivo.tempos_de_fim_de_queima[-1] = modelo_propulsivo.tempos_de_fim_de_queima[-1] + \
                                                                     modelo_propulsivo.tempos_de_fim_de_queima[
                                                                         3]

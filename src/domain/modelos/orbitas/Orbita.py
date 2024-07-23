@@ -30,11 +30,19 @@ class Orbita:
         return self.semi_eixo_maior, self.excentricidade, self.inclinacao, self.raan, self.arg_periastro, self.anomalia_verdadeira, self.quantidade_momento_angular
 
     def __repr__(self):
-        return (f"Orbita(semi_eixo_maior={self.semi_eixo_maior}, excentricidade={self.excentricidade}, "
-                f"inclinacao={self.inclinacao}, raan={self.raan}, arg_periastro={self.arg_periastro}, "
-                f"anomalia_verdadeira={self.anomalia_verdadeira}, quantidade_momento_angular={self.quantidade_momento_angular}, "
-                f"vetor_velocidade={self.vetor_velocidade}, vetor_posicao={self.vetor_posicao})")
-
+        return (
+            f"Orbita(\n"
+            f"  semi_eixo_maior={self.semi_eixo_maior},\n"
+            f"  excentricidade={self.excentricidade},\n"
+            f"  inclinacao={self.inclinacao},\n"
+            f"  raan={self.raan},\n"
+            f"  arg_periastro={self.arg_periastro},\n"
+            f"  anomalia_verdadeira={self.anomalia_verdadeira},\n"
+            f"  quantidade_momento_angular={self.quantidade_momento_angular},\n"
+            f"  vetor_velocidade={self.vetor_velocidade},\n"
+            f"  vetor_posicao={self.vetor_posicao}\n"
+            f")"
+        )
     def define_mu(self, mu: float):
         """
         Define a constante gravitacional para outro corpo celeste.

@@ -29,7 +29,7 @@ class Simulacao:
         :param foguete: Objeto que representa o foguete.
         :param condicoes_iniciais: Lista de condições iniciais para a simulação.
         """
-        self.distancia_radial_inicial = foguete.modelo_propulsivo.distancia_radial_inicial
+        self.distancia_radial_inicial = planeta.raio_equatorial + base_de_lancamento.altitude_base_de_lancamento
         self.tempo_simulacao = condicoes_iniciais[0]
         self.velocidade_inicial = condicoes_iniciais[1]
         self.angulo_elevacao_inicial = condicoes_iniciais[2]
@@ -70,7 +70,7 @@ class Simulacao:
 
         :return: Azimute inicial estimado (rad).
         """
-        apogeu_transferencia = self.planeta.raio_equatorial + 250
+        apogeu_transferencia = self.planeta.raio_equatorial + 250e3
         semi_eixo_maior_transferencia = (self.altitude_alvo + apogeu_transferencia) / 2
         velocidade_transferencia = np.sqrt(
             self.planeta.mut * (2 / apogeu_transferencia - 1 / semi_eixo_maior_transferencia))

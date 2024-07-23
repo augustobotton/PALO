@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import find_peaks
 
+RE=6378
 
 def calcular_magnitudes(y):
     """
@@ -22,7 +23,7 @@ def encontrar_extremos(r, t, RE):
     Encontra os valores extremos de altitude e suas correspondentes velocidades e tempos.
 
     Parâmetros:
-    r (ndarray): Magnitudes dos vetores posição.
+    r (ndarray): Array vetor Posição normalizado.
     t (ndarray): Vetor de tempos.
     RE (float): Raio da Terra.
 
@@ -45,7 +46,7 @@ def encontrar_extremos(r, t, RE):
 
     return rmax, rmin, imax, imin, apogee, perigee
 
-def plotar_altitude(apogee, perigee):
+def plotar_apogeu_perigeu(apogee, perigee):
     """
     Plota as altitudes máximas e mínimas ao longo do tempo.
 
@@ -54,13 +55,18 @@ def plotar_altitude(apogee, perigee):
     perigee (ndarray): Tempos e altitudes dos perigeus.
     """
     plt.figure(1)
-    plt.plot(apogee[:, 0], apogee[:, 1], 'b', linewidth=2, label='Apogee')
-    plt.plot(perigee[:, 0], perigee[:, 1], 'r', linewidth=2, label='Perigee')
+
+    # Convertendo o tempo de segundos para dias
+    tempo_apogee_horas = apogee[:, 0] / (3600*24)
+    tempo_perigee_horas = perigee[:, 0] / (3600*24)
+
+    plt.plot(tempo_apogee_horas, apogee[:, 1], 'b', linewidth=2, label='Apogeu')
+    plt.plot(tempo_perigee_horas, perigee[:, 1], 'r', linewidth=2, label='Perigeu')
     plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-    plt.xlabel('Time (seconds)')
+    plt.xlabel('Tempo (Dias)')
     plt.ylabel('Altitude (km)')
     plt.ylim([0, 1000])
-    plt.title('Altitude Over Time for Orbital Path', fontsize=14, fontweight='bold')
+    plt.title('Altitude na Trajetória Orbital', fontsize=14, fontweight='bold')
     plt.legend()
     plt.tight_layout()
     plt.show()
@@ -136,7 +142,7 @@ def constroi_resultados(t, y, RE, r0, v0):
 
     r, v = calcular_magnitudes(y)
     rmax, rmin, imax, imin, apogee, perigee = encontrar_extremos(r, t, RE)
-    plotar_altitude(apogee, perigee)
+    plotar_apogeu_perigeu(apogee, perigee)
     imprimir_resultados(r0, v0, t, r, rmax, rmin, imax, imin, apogee, perigee, y)
 
     pos_apoastro, vel_apoastro = obter_vetor_estado_apoastro(t, y, apogee)
@@ -144,8 +150,6 @@ def constroi_resultados(t, y, RE, r0, v0):
         print("\nVetor posição no apoastro:", pos_apoastro)
         print("Vetor velocidade no apoastro:", vel_apoastro)
 
-# Exemplo de uso:
-# constroi_resultados(t, y, RE, r0, v0)
 
 
 

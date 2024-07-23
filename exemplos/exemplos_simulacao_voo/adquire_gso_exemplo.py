@@ -29,7 +29,7 @@ terra = (ConstrutorPlaneta()
 
 meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico(
     [251, 271, 315]).com_massa_propelente_estagios(
-    [77366, 11058, 225.33]).com_duracao_queima_estagios(
+    [77366, 5000, 225.33]).com_duracao_queima_estagios(
     [62, 64.62, 279]).com_tempo_primeira_queima_terceiro_estagio(213).com_tempo_espera_separacao(
     [2, 2, 2]).com_tempo_espera_ignicao([5, 580]).com_massa_de_carga_util(13).com_h0(0.0).com_planeta(terra).construir()
 
@@ -53,12 +53,13 @@ alcantara = ConstrutorBaseDeLancamento().com_altitude_base(
 fogueteConceitual.mostra_dados()
 
 # Condições iniciais
-tempo_simulacao = 75000
+tempo_simulacao = 20000
 velocidade_inicial = 1
-angulo_elevacao_inicial = np.deg2rad(80)
+angulo_elevacao_inicial = np.deg2rad(70)
 
 # Criar uma órbita alvo
-orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
+orbita_alvo = Orbita.circular(1000.164e3 + terra.raio_equatorial, np.deg2rad(40))
+print(orbita_alvo.semi_eixo_maior)
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 

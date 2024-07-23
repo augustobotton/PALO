@@ -27,7 +27,6 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
     h0 = orbita.quantidade_momento_angular
     e0 = orbita.excentricidade
     i0 = orbita.inclinacao
-    print(RA0, w0, h0, e0, i0)
 
     # Extração dos elementos orbitais
     n_times = len(tsave)
@@ -54,7 +53,6 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
         TA[j] = coe[5]
         h[j] = coe[6]
 
-    # Plotagem dos elementos osculantes selecionados
     plt.figure(figsize=(10, 8))
 
     # Variação da Ascensão Reta
@@ -62,7 +60,7 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
     plt.plot(np.array(tsave) / 3600, np.rad2deg(RA - RA0))
     plt.title('Variação da Ascensão Reta')
     plt.xlabel('Horas')
-    plt.ylabel('{\it\Delta\Omega} (graus)')
+    plt.ylabel(r'$\Delta\Omega$ (graus)')
     plt.grid(True)
 
     # Variação do Argumento do Perigeu
@@ -70,7 +68,7 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
     plt.plot(np.array(tsave) / 3600, np.rad2deg(w - w0))
     plt.title('Variação do Argumento do Perigeu')
     plt.xlabel('Horas')
-    plt.ylabel('{\it\Delta\omega} (graus)')
+    plt.ylabel(r'$\Delta\omega$ (graus)')
     plt.grid(True)
 
     plt.tight_layout()
@@ -83,7 +81,7 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
     plt.plot(np.array(tsave) / 3600, h - h0)
     plt.title('Variação do Momento Angular')
     plt.xlabel('Horas')
-    plt.ylabel('{\it\Delta h} (km²/s)')
+    plt.ylabel(r'$\Delta h$ (km²/s)')
     plt.grid(True)
 
     # Variação da Excentricidade
@@ -91,7 +89,7 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
     plt.plot(np.array(tsave) / 3600, e - e0)
     plt.title('Variação da Excentricidade')
     plt.xlabel('Horas')
-    plt.ylabel('{\it\Delta e}')
+    plt.ylabel(r'$\Delta e$')
     plt.grid(True)
 
     # Variação da Inclinação
@@ -99,7 +97,7 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
     plt.plot(np.array(tsave) / 3600, np.rad2deg(i - i0))
     plt.title('Variação da Inclinação')
     plt.xlabel('Horas')
-    plt.ylabel('{\it\Delta i} (graus)')
+    plt.ylabel(r'$\Delta i$ (graus)')
     plt.grid(True)
 
     plt.tight_layout()
@@ -140,7 +138,7 @@ def plota_orbita(y, raio_equatorial, r0):
     ax.plot_surface(x, y_sphere, z, color='lightgrey', alpha=0.6, shade=True)  # Desenha o planeta
 
     # Plota a trajetória da órbita
-    ax.plot(y[:, 0], y[:, 1], y[:, 2], color='#1f77b4', linewidth=2, label='Órbita')  # Cor azul suave
+    ax.plot(y[:, 0], y[:, 1], y[:, 2], color='#1f77b4', linewidth=0.5, label='Órbita')  # Cor azul suave
 
     # Linha radial do ponto inicial
     ax.plot([0, r0[0]], [0, r0[1]], [0, r0[2]], 'm--', linewidth=2, label='Linha Radial')  # Cor magenta
@@ -149,6 +147,7 @@ def plota_orbita(y, raio_equatorial, r0):
     ax.scatter(y[0, 0], y[0, 1], y[0, 2], color='green', s=100, label='Ponto Inicial', edgecolors='black')
 
     # Marca o ponto final
+    ax.scatter(y[-1, 0], y[-1, 1], y[-1, 2], color='blue', s=100, label='Ponto Final')
     ax.text(y[-1, 0], y[-1, 1], y[-1, 2], ' Fim', color='darkred', fontsize=12, weight='bold')
 
     ax.set_xlabel('X (km)')

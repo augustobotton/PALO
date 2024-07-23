@@ -19,7 +19,6 @@ class ModeloPropulsivo:
         self.tempos_de_fim_de_queima = None  #tq
         self.tempos_de_ignicao = None  #ti
         self.massa_inicial_do_foguete = None
-        self.distancia_radial_inicial = None
         self.duracao_da_segunda_queima_3_estagio = None
         self.velocidade_de_exaustao = None
         self.massa_propelente_estagios = np.array(builder.massa_propelente_estagios)
@@ -72,14 +71,12 @@ class ModeloPropulsivo:
                                                    self.duracao_total_de_queima_do_terceiro_estagio
                                                    )
 
-        self.distancia_radial_inicial = self.planeta.raio_equatorial + self.h0
 
     def __str__(self):
         return f"impulso_especifico: {self.impulso_especifico}\n" \
                f"tempos_de_separacao: {self.tempos_de_separacao}\n" \
                f"tempos_de_fim_de_queima: {self.tempos_de_fim_de_queima}\n" \
                f"tempos_de_ignicao: {self.tempos_de_ignicao}\n" \
-               f"distancia_radial_inicial: {self.distancia_radial_inicial}\n" \
                f"duracao_da_segunda_queima_3_estagio: {self.duracao_da_segunda_queima_3_estagio}\n" \
                f"velocidade_de_exaustao: {self.velocidade_de_exaustao}\n" \
                f"massa_propelente_estagios: {self.massa_propelente_estagios}\n" \
