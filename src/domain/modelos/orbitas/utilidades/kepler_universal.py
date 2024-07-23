@@ -16,9 +16,14 @@ def kepler_U(dt, ro, vro, a, mu):
     Retorna:
         float: A anomalia universal (km^0.5)
     """
+    # Set an error tolerance and a limit on the number of iterations
     error = 1.e-8
     nMax = 1000
-    x = np.sqrt(mu) * abs(a) * dt
+
+    # Starting value for x
+    x = np.sqrt(mu) * np.abs(a) * dt
+
+    # Iterate on Equation 3.65 until convergence occurs within the error tolerance
     n = 0
     ratio = 1
 
@@ -29,10 +34,11 @@ def kepler_U(dt, ro, vro, a, mu):
         F = ro * vro / np.sqrt(mu) * x ** 2 * C + (1 - a * ro) * x ** 3 * S + ro * x - np.sqrt(mu) * dt
         dFdx = ro * vro / np.sqrt(mu) * x * (1 - a * x ** 2 * S) + (1 - a * ro) * x ** 2 * C + ro
         ratio = F / dFdx
-        x = x - ratio
+        x -= ratio
 
+    # Deliver a value for x, but report that nMax was reached
     if n > nMax:
-        print("\n **No. iterations of Kepler’s equation = %g" % n)
-        print("\n F/dFdx = %g \n" % ratio)
+        print(f"\n **No. iterations of Kepler’s equation = {n}")
+        print(f"\n F/dFdx = {ratio} \n")
 
     return x

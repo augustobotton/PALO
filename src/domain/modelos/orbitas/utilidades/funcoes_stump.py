@@ -11,12 +11,15 @@ def stumpC(z):
     Retorna:
         float: Resultado da função Stumpff C(z).
     """
+    # Evaluate the Stumpff function C(z)
     if z > 0:
-        return (1 - np.cos(np.sqrt(z))) / z
+        c = (1 - np.cos(np.sqrt(z))) / z
     elif z < 0:
-        return (np.cosh(np.sqrt(-z)) - 1) / (-z)
+        c = (np.cosh(np.sqrt(-z)) - 1) / (-z)
     else:
-        return 0.5
+        c = 1 / 2
+
+    return c
 
 
 def stumpS(z):
@@ -30,8 +33,8 @@ def stumpS(z):
         float: Resultado da função Stumpff S(z).
     """
     if z > 0:
-        return (np.sqrt(z) - np.sin(np.sqrt(z))) / (z * np.sqrt(z))
+        return (np.sqrt(z) - np.sin(np.sqrt(z))) / (np.sqrt(z)**3)
     elif z < 0:
-        return (np.sinh(np.sqrt(-z)) - np.sqrt(-z)) / (-z * np.sqrt(-z))
+        return (np.sinh(np.sqrt(-z)) - np.sqrt(-z)) / (np.sqrt(-z)**3)
     else:
         return 1 / 6

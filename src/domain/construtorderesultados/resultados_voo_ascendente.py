@@ -1,5 +1,3 @@
-import pickle
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -50,19 +48,18 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
         # Posicao no referencial PCPF
         h[i] = r[i] - simulacao.planeta.raio_equatorial
         # Forca propulsiva, massa e angulos
-        ft[i], m[i], mu[i], epsl[i] = simulacao.foguete.modelo_propulsivo.propulsao_n_estagios(t[i], vetor_parametros)
+        ft[i], m[i], mu[i], epsl[i] = simulacao.foguete.modelo_propulsivo.propulsao_n_estagios(t[i], vetor_parametros, simulacao.foguete.modelo_estrutural)
         # Parametros atmosfericos
         T[i], _, _, rho[i], _, Mach[i], _, _, Kn, _, _, R = simulacao.planeta.modelo_atmosferico.calcula(h[i], V[i],
                                                                                                          1.5, 10)
-        altitude = r[i] - simulacaoa.planeta.raio_equatorial
 
-        simulacaoa.foguete.modelo_aerodinamico.atualizar_parametros(altitude=altitude, numero_de_knudsen=Kn,
+        simulacao.foguete.modelo_aerodinamico.atualizar_parametros(altitude=h[i], numero_de_knudsen=Kn,
                                                                     numero_de_mach=Mach[i],
                                                                     temperatura=T[i], constante_do_gas_ideal=R,
                                                                     velocidade=V[i])
         # Forcas aerodinamicas
         areas_de_referencia_para_calculo_do_arrasto, comprimento_caracteristico, fator_correcao = (
-            simulacaoa.foguete.modelo_estrutural.calcula())
+            simulacao.foguete.modelo_estrutural.calcula())
         D[i], _, _ = simulacao.foguete.modelo_aerodinamico.aerodinamica_multiplos_estagios(t[i], V[i],
                                                                                            areas_de_referencia_para_calculo_do_arrasto,
                                                                                            simulacao.foguete.modelo_propulsivo.tempos_de_separacao,
@@ -101,9 +98,9 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     P = 2 * np.pi * np.sqrt((Requat + hfq[0]) ** 3 / mut)
     print('*** Parametros da Orbita Obtida ***')
     print('Velocidade no momento da insercao orbital (km/s)', Vfq[0] / 1e3)
-    print('Altitude no momento da insercao orbital (km)', hfq[0] / 1e3)
-    print('Distancia radial no momento da insercao orbital (km)', (hfq[0] + Requat) / 1e3)
-    print('Semi eixo maior (km)', a[ifq] / 1e3)
+    print('Altitude no momento da insercao orbital (km)', hfq[0])
+    print('Distancia radial no momento da insercao orbital (km)', (hfq[0] + Requat))
+    print('Semi eixo maior (km)', a[ifq])
     print('Periodo(min): ', P / 60)
     # Raio do perigeu
     rp = a[ifq] * (1 - e[ifq])
@@ -292,12 +289,12 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('q (N/m^2)')
 
-    # plt.subplot(324)
+    plt.subplot(324)
     # plt.plot(t, M, linewidth=2)
-    # plt.grid(True)
-    # plt.axis('tight')
-    # plt.xlabel('t (s)')
-    # plt.ylabel('M (-)')
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xlabel('t (s)')
+    plt.ylabel('M (-)')
 
     plt.subplot(325)
     plt.plot(t, T - 273.15, linewidth=2)
@@ -356,12 +353,12 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03A9 (º)')
 
-    # plt.subplot(338)
+    plt.subplot(338)
     # plt.plot(t, inclinacao * 180 / np.pi, linewidth=2)
-    # plt.grid(True)
-    # plt.axis('tight')
-    # plt.xlabel('t (s)')
-    # plt.ylabel('i (º)')
+    plt.grid(True)
+    plt.axis('tight')
+    plt.xlabel('t (s)')
+    plt.ylabel('i (º)')
 
     plt.subplot(339)
     plt.plot(t, om * 180 / np.pi, linewidth=2)
@@ -401,14 +398,3 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.show()
 
 
-with open('resposta_simulacao.pkl', 'rb') as f:
-    loaded_resposta = pickle.load(f)
-
-with open('simulacao.pkl', 'rb') as f:
-    simulacaoa = pickle.load(f)
-
-print(loaded_resposta)
-t = loaded_resposta.t
-X = loaded_resposta.y
-resp = t, X
-plotaresultados(resp, simulacaoa)

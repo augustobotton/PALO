@@ -10,7 +10,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
 
     def __init__(self):
         self.achou_apogeu = 0
-        self.sinal_phi_inercial = np.sign
+        self.sinal_phi_inercial = 0
 
     def parametros_manobra_adquire_gso(self, t, m, X, orbita_transferencia: Orbita,
                                        modelo_propulsivo: ModeloPropulsivo, planeta):
@@ -46,7 +46,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
 
         # Realização de uma sequência de testes para verificar a ocorrência do apogeu da órbita GTO.
         # Quando ele ocorre, determina os parâmetros da manobra.
-        if r > 0.9 * orbita_transferencia.semi_eixo_maior:
+        if r > 0.99 * orbita_transferencia.semi_eixo_maior:
             if not self.achou_apogeu:
                 if np.sign(phii) != self.sinal_phi_inercial:
                     # Se o sinal for diferente, phii passou por zero, o foguete chegou no apogeu
@@ -56,13 +56,13 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
                     mp32 = (m * np.exp(dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g)) - m) / np.exp(
                         dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g))
                     modelo_propulsivo.tempos_de_fim_de_queima[-1] = modelo_propulsivo.tempos_de_ignicao[
-                                                                        -1] + mp32 / modelo_propulsivo.massa_total_propelente_terceiro_estagio
+                                                                        -1] + mp32 / modelo_propulsivo.massa_propelente_estagios[2]
                     if modelo_propulsivo.tempos_de_fim_de_queima[2] + modelo_propulsivo.tempos_de_fim_de_queima[
                         3] > modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio:
                         modelo_propulsivo.tempos_de_fim_de_queima[
                             3] = modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio - \
                                  modelo_propulsivo.tempos_de_fim_de_queima[2]
-
+                        print('manobra')
                     modelo_propulsivo.tempos_de_fim_de_queima[-1] = modelo_propulsivo.tempos_de_fim_de_queima[-1] + \
                                                                     modelo_propulsivo.tempos_de_fim_de_queima[
                                                                         3]

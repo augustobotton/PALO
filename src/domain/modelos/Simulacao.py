@@ -29,7 +29,7 @@ class Simulacao:
         :param foguete: Objeto que representa o foguete.
         :param condicoes_iniciais: Lista de condições iniciais para a simulação.
         """
-        self.distancia_radial_inicial = foguete.modelo_propulsivo.distancia_radial_inicial
+        self.distancia_radial_inicial = planeta.raio_equatorial + base_de_lancamento.altitude_base_de_lancamento
         self.tempo_simulacao = condicoes_iniciais[0]
         self.velocidade_inicial = condicoes_iniciais[1]
         self.angulo_elevacao_inicial = condicoes_iniciais[2]
@@ -102,6 +102,7 @@ class Simulacao:
                               self.distancia_radial_inicial, self.latitude_inicial, self.longitude_inicial]
 
         opcoes_integracao = {'rtol': 1e-8, 'atol': 1e-10, 'max_step': 1}
+
         print(f'Simulando por {self.tempo_simulacao} segundos')
 
         with tqdm(total=self.tempo_simulacao) as bar:
@@ -120,7 +121,7 @@ class Simulacao:
             )
 
         # Salvar a resposta em um arquivo
-        with open('../construtorderesultados/resposta_simulacao.pkl', 'wb') as f:
+        with open('resposta_simulacao.pkl', 'wb') as f:
             pickle.dump(resposta_simulacao, f)
 
         return resposta_simulacao.t, resposta_simulacao.y
