@@ -12,7 +12,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
         self.achou_apogeu = 0
         self.sinal_phi_inercial = 0
 
-    def parametros_manobra_adquire_gso(self, t, m, X, orbita_transferencia: Orbita,
+    def parametros_manobra_adquire_gso(self, tempo, m, X, orbita_transferencia: Orbita,
                                        modelo_propulsivo: ModeloPropulsivo, planeta):
         """
         Função para calcular os parâmetros da manobra mono impulsiva de aquisição de órbita GSO.
@@ -34,7 +34,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
         velocidade_orbital_desejada = calculos_orbitais.calcula_velocidade_orbital(planeta.mut,
                                                                                    orbita_transferencia.semi_eixo_maior)
 
-        # Desmenbra o vetor de estado
+        # Desmembrar o vetor de estado
         V = X[0]
         A = X[1]
         phi = X[2]
@@ -46,32 +46,36 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
 
         # Realização de uma sequência de testes para verificar a ocorrência do apogeu da órbita GTO.
         # Quando ele ocorre, determina os parâmetros da manobra.
-        if r > 0.99 * orbita_transferencia.semi_eixo_maior:
+        if r > 0.9 * orbita_transferencia.semi_eixo_maior:
             if not self.achou_apogeu:
                 if np.sign(phii) != self.sinal_phi_inercial:
                     # Se o sinal for diferente, phii passou por zero, o foguete chegou no apogeu
                     self.achou_apogeu = True  # Encontrou o apogeu, ao setar essa variável, só vai entrar aqui uma vez
-                    modelo_propulsivo.tempos_de_ignicao[-1] = t  # Guarda o tempo de ignição
+                    print('manobra')
+                    modelo_propulsivo.tempos_de_ignicao[3] = tempo + 1  # Guarda o tempo de ignição
                     dv_transferencia = velocidade_orbital_desejada - Vi
-                    mp32 = (m * np.exp(dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g)) - m) / np.exp(
+                    mp32 = (m * np.exp(dv_transferencia/ (modelo_propulsivo.impulso_especifico[2] * g)) - m) / np.exp(
                         dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g))
-                    modelo_propulsivo.tempos_de_fim_de_queima[-1] = modelo_propulsivo.tempos_de_ignicao[
-                                                                        -1] + mp32 / modelo_propulsivo.massa_propelente_estagios[2]
-                    if modelo_propulsivo.tempos_de_fim_de_queima[2] + modelo_propulsivo.tempos_de_fim_de_queima[
-                        3] > modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio:
-                        modelo_propulsivo.tempos_de_fim_de_queima[
-                            3] = modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio - \
-                                 modelo_propulsivo.tempos_de_fim_de_queima[2]
-                        print('manobra')
-                    modelo_propulsivo.tempos_de_fim_de_queima[-1] = modelo_propulsivo.tempos_de_fim_de_queima[-1] + \
-                                                                    modelo_propulsivo.tempos_de_fim_de_queima[
-                                                                        3]
-                    modelo_propulsivo.tempos_de_separacao[-1] = modelo_propulsivo.tempos_de_fim_de_queima[-1] + \
-                                                                modelo_propulsivo.tempos_de_separacao[2]
-                modelo_propulsivo.calcular_sequenciamento()
+
+                    # Duração da queima necessária
+                    Tq32 = modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio * mp32 / \
+                           modelo_propulsivo.massa_propelente_estagios[3]
+
+                    if modelo_propulsivo.duracao_da_primeira_queima_3_estagio + Tq32 > modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio:
+                        Tq32 = modelo_propulsivo.duracao_total_de_queima_do_terceiro_estagio - \
+                               modelo_propulsivo.duracao_da_primeira_queima_3_estagio
+
+                    modelo_propulsivo.tempos_de_fim_de_queima[3] = modelo_propulsivo.tempos_de_ignicao[3] + Tq32
+                    modelo_propulsivo.tempos_de_separacao[2] = modelo_propulsivo.tempos_de_fim_de_queima[3] + \
+                                                               modelo_propulsivo.tempos_de_separacao[2]
+
+                    print('tempos de ignicao', modelo_propulsivo.tempos_de_ignicao)
+                    print('tempos de fim de queima', modelo_propulsivo.tempos_de_fim_de_queima)
+                    print('tempos de separacao', modelo_propulsivo.tempos_de_separacao)
+
+
         self.sinal_phi_inercial = np.sign(
             phii)  # Guarda o sinal de phi inercial para verificar mudança na próxima iteração
-        return 0
 
 
 "ti  = lista tempo de ignicao"

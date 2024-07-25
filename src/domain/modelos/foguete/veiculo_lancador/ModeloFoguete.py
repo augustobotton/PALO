@@ -23,10 +23,7 @@ class ModeloFoguete:
         self.massa_inicial_do_foguete = self.massa_inicial()
         self.modelo_propulsivo.massa_inicial_do_foguete = self.massa_inicial()
         self.impulso_especifico_por_estagio = modelo_propulsivo.impulso_especifico
-        self.areas_referencia = [modelo_estrutural.area_secao_transversal_1_estagio,
-                                 modelo_estrutural.area_secao_transversal_2_estagio,
-                                 modelo_estrutural.area_secao_transversal_3_estagio,
-                                 modelo_estrutural.area_secao_transversal_carga_util]
+        self.areas_referencia = self.modelo_estrutural.areas_de_referencia_para_calculo_do_arrasto
 
     def _estudo_delta_v(self, planeta):
         """

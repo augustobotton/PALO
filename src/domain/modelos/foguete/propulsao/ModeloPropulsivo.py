@@ -31,46 +31,54 @@ class ModeloPropulsivo:
         self.tempo_espera_ignicao_2_estagio = builder.tempo_espera_ignicao[0]
         self.tempo_espera_ignicao_3_estagio = builder.tempo_espera_ignicao[1]
         self.duracao_da_primeira_queima_3_estagio = builder.tempo_primeira_queima_terceiro_estagio
+        self.numero_motores_por_estagio = builder.numero_motores_por_estagio
 
         self.massa_de_carga_util = builder.massa_de_carga_util
         self.h0 = builder.h0
         self.planeta = builder.planeta
         self.calcular_sequenciamento()
-
+        self.__str__()
     def calcular_sequenciamento(self) -> None:
         """
         Calcula os tempos de ignição, queima e separação para os estágios do foguete.
         """
-        self.duracao_da_segunda_queima_3_estagio = self.duracao_total_de_queima_do_terceiro_estagio - self.duracao_da_primeira_queima_3_estagio
+        # Duração da segunda queima do terceiro estágio
+        self.duracao_da_segunda_queima_3_estagio = (
+                self.duracao_total_de_queima_do_terceiro_estagio - self.duracao_da_primeira_queima_3_estagio
+        )
 
-        self.tempos_de_fim_de_queima = np.zeros(5)
+        # Inicializar vetores de tempos
+        self.tempos_de_fim_de_queima = np.zeros(4)
         self.tempos_de_separacao = np.zeros(3)
-        self.tempos_de_ignicao = np.zeros(5)
+        self.tempos_de_ignicao = np.zeros(4)
 
-        self.tempos_de_ignicao[0] = 0
+        # Calcular os tempos de ignição, queima e separação
+        self.tempos_de_ignicao[0] = 0  # Tempo de ignição do primeiro estágio
         self.tempos_de_fim_de_queima[0] = self.tempos_de_ignicao[0] + self.duracao_de_queima_primeiro_estagio
         self.tempos_de_separacao[0] = self.tempos_de_fim_de_queima[0] + self.tempo_de_espera_separacao_1_2
+
         self.tempos_de_ignicao[1] = self.tempos_de_separacao[0] + self.tempo_espera_ignicao_2_estagio
         self.tempos_de_fim_de_queima[1] = self.tempos_de_ignicao[1] + self.duracao_de_queima_segundo_estagio
         self.tempos_de_separacao[1] = self.tempos_de_fim_de_queima[1] + self.tempo_de_espera_separacao_2_3
-        self.tempos_de_ignicao[2] = self.tempos_de_separacao[
-                                        1] + self.tempo_espera_ignicao_3_estagio
+
+        self.tempos_de_ignicao[2] = self.tempos_de_separacao[1] + self.tempo_espera_ignicao_3_estagio
         self.tempos_de_fim_de_queima[2] = self.tempos_de_ignicao[2] + self.duracao_da_primeira_queima_3_estagio
-        self.tempos_de_ignicao[3] = TEMPO_DE_IGNICAO_3_ESTAGIO
-        self.tempos_de_fim_de_queima[3] = self.tempos_de_ignicao[
-                                              3] + self.duracao_da_segunda_queima_3_estagio
+
+        # Ignicao do terceiro estágio é um valor predefinido (1e10 no original)
+        self.tempos_de_ignicao[3] = 1e10
+        self.tempos_de_fim_de_queima[3] = self.tempos_de_ignicao[3] + self.duracao_da_segunda_queima_3_estagio
         self.tempos_de_separacao[2] = self.tempos_de_fim_de_queima[3] + self.tempo_de_espera_separacao_3_4
 
-        self.massa_propelente_estagios[2] = (
-                self.massa_propelente_estagios[2] * self.duracao_da_primeira_queima_3_estagio /
-                self.duracao_total_de_queima_do_terceiro_estagio
-        )
-        self.massa_propelente_estagios = np.append(self.massa_propelente_estagios,
-                                                   self.massa_propelente_estagios[
-                                                       2] * self.duracao_da_segunda_queima_3_estagio /
-                                                   self.duracao_total_de_queima_do_terceiro_estagio
-                                                   )
+        # Cálculo das massas de propelente
+        mp32 = self.massa_propelente_estagios[2]
 
+        self.massa_propelente_estagios[2] = (
+                mp32 * self.duracao_da_primeira_queima_3_estagio / self.duracao_total_de_queima_do_terceiro_estagio
+        )
+        self.massa_propelente_estagios = np.append(
+            self.massa_propelente_estagios,
+            mp32 * self.duracao_da_segunda_queima_3_estagio / self.duracao_total_de_queima_do_terceiro_estagio
+        )
 
     def __str__(self):
         return f"impulso_especifico: {self.impulso_especifico}\n" \
@@ -139,7 +147,7 @@ class ModeloPropulsivo:
                                              self.impulso_especifico, self.massa_propelente_estagios,
                                              modeloestrutural.massa_estrutural_por_estagio,
                                              self.massa_inicial_do_foguete,
-                                             self.massa_de_carga_util, self.planeta.gravidade)
+                                             self.massa_de_carga_util, self.numero_motores_por_estagio, self.planeta.gravidade)
 
         # Para altitudes acima de 200km, alinha o vetor de tração com a velocidade inercial ao invés da relativa
         # Desmembra o vetor de estado
