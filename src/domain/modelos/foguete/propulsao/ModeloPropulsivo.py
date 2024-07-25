@@ -24,15 +24,13 @@ class ModeloPropulsivo:
         self.massa_propelente_estagios = np.array(builder.massa_propelente_estagios)
         self.duracao_de_queima_primeiro_estagio = builder.duracao_queima_estagios[0]
         self.duracao_de_queima_segundo_estagio = builder.duracao_queima_estagios[1]
-        self.duracao_total_de_queima_do_terceiro_estagio = builder.duracao_queima_estagios[2]
+        self.duracao_total_de_queima_do_terceiro_estagio = None if len(self.impulso_especifico) < 3 else builder.duracao_queima_estagios[2]
         self.tempo_de_espera_separacao_1_2 = builder.tempo_espera_separacao[0]
         self.tempo_de_espera_separacao_2_3 = builder.tempo_espera_separacao[1]
         self.tempo_de_espera_separacao_3_4 = builder.tempo_espera_separacao[2]
         self.tempo_espera_ignicao_2_estagio = builder.tempo_espera_ignicao[0]
         self.tempo_espera_ignicao_3_estagio = builder.tempo_espera_ignicao[1]
         self.duracao_da_primeira_queima_3_estagio = builder.tempo_primeira_queima_terceiro_estagio
-        self.numero_motores_por_estagio = builder.numero_motores_por_estagio
-
         self.massa_de_carga_util = builder.massa_de_carga_util
         self.h0 = builder.h0
         self.planeta = builder.planeta
@@ -147,7 +145,7 @@ class ModeloPropulsivo:
                                              self.impulso_especifico, self.massa_propelente_estagios,
                                              modeloestrutural.massa_estrutural_por_estagio,
                                              self.massa_inicial_do_foguete,
-                                             self.massa_de_carga_util, self.numero_motores_por_estagio, self.planeta.gravidade)
+                                             self.massa_de_carga_util, self.planeta.gravidade)
 
         # Para altitudes acima de 200km, alinha o vetor de tração com a velocidade inercial ao invés da relativa
         # Desmembra o vetor de estado
