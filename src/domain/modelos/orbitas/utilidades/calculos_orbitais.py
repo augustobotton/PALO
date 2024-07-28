@@ -34,7 +34,25 @@ def excentricidade_orbital(periapsis, apoapsis):
     return (apoapsis / eixo) - 1
 
 
+def calcula_inclinacao_heliosincrona(a, e, J2, R_e, mu, OMpm):
+    # Calcular o movimento médio
+    n = np.sqrt(mu / a ** 3)
 
+    # Calcular o parâmetro orbital específico p
+    p = a * (1 - e ** 2)
+
+    # Calcular o cosseno da inclinação necessária
+    cos_i = -OMpm * (2 / (3 * n * J2)) * (p / R_e) ** 2
+
+    # Verificar se o valor calculado está dentro do domínio do arco cosseno [-1, 1]
+    if cos_i < -1 or cos_i > 1:
+        raise ValueError("Valor de cosseno fora do intervalo [-1, 1]. Verifique os parâmetros de entrada.")
+
+    # Calcular a inclinação a partir do cosseno
+    inclination = np.arccos(cos_i)
+
+    # Converter a inclinação de radianos para graus
+    return np.rad2deg(inclination)
 
 
 def calcula_distancia_radial(posicao_celeste):

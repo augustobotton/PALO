@@ -113,7 +113,7 @@ velocidade_inicial = 0.5
 angulo_elevacao_inicial = np.deg2rad(85)
 
 # Criar uma órbita alvo
-orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
+orbita_alvo = Orbita.circular(1e6, np.deg2rad(5))
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 

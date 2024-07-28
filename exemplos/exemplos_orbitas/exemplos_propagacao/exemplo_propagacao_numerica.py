@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.domain.construtorderesultados.plots_orbitais import plota_orbita
+from src.construtorderesultados.plots_orbitais import plota_orbita
 from src.domain.modelos.orbitas.Orbita import Orbita
 from src.domain.modelos.orbitas.propagacao.numerica.propagadores.propagacao_numerica import propagacao_numerica
 from src.domain.modelos.orbitas.utilidades.calculos_orbitais import calcular_periodo_orbital

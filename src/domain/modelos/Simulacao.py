@@ -5,7 +5,7 @@ from scipy.integrate import solve_ivp
 from tqdm import tqdm
 
 from src.domain.modelos.foguete.ModeloDinamica import dinamica_foguete
-from src.domain.modelos.manobras.parametros_manobra_adquire_gso import ParametrosManobraAdquireOrbitaDeTransferencia
+from src.domain.modelos.manobras.manobra_GSO import manobras_orbitais
 from src.domain.modelos.planeta.Planeta import ModeloPlaneta as Planeta
 
 
@@ -96,7 +96,7 @@ class Simulacao:
 
         :return: Vetores de tempo (t) e estados (y) da simulação.
         """
-        parametros_apogeu = ParametrosManobraAdquireOrbitaDeTransferencia()
+        parametros_apogeu = manobras_orbitais()
 
         condicoes_iniciais = [self.velocidade_inicial, self.azimute_inicial, self.angulo_elevacao_inicial,
                               self.distancia_radial_inicial, self.latitude_inicial, self.longitude_inicial]

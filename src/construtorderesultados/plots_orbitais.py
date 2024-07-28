@@ -53,52 +53,50 @@ def plota_variacao_elementos_orbitais(tsave, y, orbita):
         TA[j] = coe[5]
         h[j] = coe[6]
 
+    font_size = 14
+
+    # Gráfico 1: Variação da Ascensão Reta
     plt.figure(figsize=(10, 8))
-
-    # Variação da Ascensão Reta
-    plt.subplot(2, 1, 1)
     plt.plot(np.array(tsave) / 3600, np.rad2deg(RA - RA0))
-    plt.title('Variação da Ascensão Reta')
-    plt.xlabel('Horas')
-    plt.ylabel(r'$\Delta\Omega$ (graus)')
+    plt.title('Variação da Ascensão Reta', fontsize = font_size )
+    plt.xlabel('Horas', fontsize = font_size)
+    plt.ylabel(r'$\Delta\Omega$ (graus)', fontsize = font_size)
     plt.grid(True)
 
-    # Variação do Argumento do Perigeu
-    plt.subplot(2, 1, 2)
+    # Gráfico 2: Variação do Argumento do Perigeu
+    plt.figure(figsize=(10, 8))
     plt.plot(np.array(tsave) / 3600, np.rad2deg(w - w0))
-    plt.title('Variação do Argumento do Perigeu')
-    plt.xlabel('Horas')
-    plt.ylabel(r'$\Delta\omega$ (graus)')
+    plt.title('Variação do Argumento do Perigeu', fontsize = font_size)
+    plt.xlabel('Horas', fontsize = font_size)
+    plt.ylabel(r'$\Delta\omega$ (graus)', fontsize = font_size)
     plt.grid(True)
 
-    plt.tight_layout()
-    plt.show()
 
-    plt.figure(figsize=(10, 12))
-
-    # Variação do Momento Angular
-    plt.subplot(3, 1, 1)
+    # Gráfico 3: Variação do Momento Angular
+    plt.figure(figsize=(10, 8))
     plt.plot(np.array(tsave) / 3600, h - h0)
-    plt.title('Variação do Momento Angular')
-    plt.xlabel('Horas')
-    plt.ylabel(r'$\Delta h$ (km²/s)')
+    plt.title('Variação do Momento Angular', fontsize = font_size)
+    plt.xlabel('Horas', fontsize = font_size)
+    plt.ylabel(r'$\Delta h$ (km²/s)', fontsize = font_size)
     plt.grid(True)
 
-    # Variação da Excentricidade
-    plt.subplot(3, 1, 2)
+
+    # Gráfico 4: Variação da Excentricidade
+    plt.figure(figsize=(10, 8))
     plt.plot(np.array(tsave) / 3600, e - e0)
-    plt.title('Variação da Excentricidade')
-    plt.xlabel('Horas')
-    plt.ylabel(r'$\Delta e$')
-    plt.grid(True)
+    plt.title('Variação da Excentricidade', fontsize = font_size)
+    plt.xlabel('Horas', fontsize = font_size)
+    plt.ylabel(r'$\Delta e$', fontsize = font_size)
 
-    # Variação da Inclinação
-    plt.subplot(3, 1, 3)
+
+    # Gráfico 5: Variação da Inclinação
+    plt.figure(figsize=(10, 8))
     plt.plot(np.array(tsave) / 3600, np.rad2deg(i - i0))
-    plt.title('Variação da Inclinação')
-    plt.xlabel('Horas')
-    plt.ylabel(r'$\Delta i$ (graus)')
-    plt.grid(True)
+    plt.title('Variação da Inclinação', fontsize = font_size)
+    plt.xlabel('Horas', fontsize = font_size)
+    plt.ylabel(r'$\Delta i$ (graus)', fontsize = font_size)
+
+
 
     plt.tight_layout()
     plt.show()
@@ -168,7 +166,7 @@ def plota_orbita(y, raio_equatorial, r0):
     plt.show()
 
 
-def constroi_resultados(t, y, RE, r0, v0):
+def plota_extremos_orbita(t, y, RE, r0, v0):
     y = np.asarray(y)
     if y.ndim == 1:
         raise ValueError("A matriz 'y' deve ser 2-dimensional.")

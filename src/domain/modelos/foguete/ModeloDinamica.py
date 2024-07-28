@@ -86,7 +86,7 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
 
     # Modelagem do trilho de lançamento
     altura_relativa = altitude - base_de_lancamento.altitude_base_de_lancamento
-    if altura_relativa <= base_de_lancamento.comprimento_do_trilho and vetor_tempo <= 10:
+    if altura_relativa <= base_de_lancamento.comprimento_do_trilho and vetor_tempo <= 100:
         Ap = 0
         phip = 0
 

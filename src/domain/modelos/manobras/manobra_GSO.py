@@ -6,7 +6,7 @@ from src.domain.modelos.orbitas.utilidades import calculos_orbitais
 from src.domain.modelos.orbitas.utilidades.funcoes_conversao import componentes_vel_relativa_para_inercial
 
 
-class ParametrosManobraAdquireOrbitaDeTransferencia():
+class manobras_orbitais():
 
     def __init__(self):
         self.achou_apogeu = 0
@@ -52,7 +52,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
                     # Se o sinal for diferente, phii passou por zero, o foguete chegou no apogeu
                     self.achou_apogeu = True  # Encontrou o apogeu, ao setar essa variável, só vai entrar aqui uma vez
                     print('manobra')
-                    modelo_propulsivo.tempos_de_ignicao[3] = tempo + 1  # Guarda o tempo de ignição
+                    modelo_propulsivo.tempos_de_ignicao[3] = tempo  # Guarda o tempo de ignição
                     dv_transferencia = velocidade_orbital_desejada - Vi
                     mp32 = (m * np.exp(dv_transferencia/ (modelo_propulsivo.impulso_especifico[2] * g)) - m) / np.exp(
                         dv_transferencia / (modelo_propulsivo.impulso_especifico[2] * g))
@@ -69,9 +69,7 @@ class ParametrosManobraAdquireOrbitaDeTransferencia():
                     modelo_propulsivo.tempos_de_separacao[2] = modelo_propulsivo.tempos_de_fim_de_queima[3] + \
                                                                modelo_propulsivo.tempos_de_separacao[2]
 
-                    print('tempos de ignicao', modelo_propulsivo.tempos_de_ignicao)
-                    print('tempos de fim de queima', modelo_propulsivo.tempos_de_fim_de_queima)
-                    print('tempos de separacao', modelo_propulsivo.tempos_de_separacao)
+                    modelo_propulsivo.mp32 = mp32
 
 
         self.sinal_phi_inercial = np.sign(

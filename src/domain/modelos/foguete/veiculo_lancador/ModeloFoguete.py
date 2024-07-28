@@ -33,7 +33,7 @@ class ModeloFoguete:
         """
         massa_prop_por_estagio = np.array(
             [self.modelo_propulsivo.massa_propelente_estagios[0], self.modelo_propulsivo.massa_propelente_estagios[1],
-             self.modelo_propulsivo.massa_propelente_estagios[2]])
+             (self.modelo_propulsivo.massa_propelente_estagios[2] + self.modelo_propulsivo.massa_propelente_estagios[3])])
         razoes_estruturais = self.modelo_estrutural.massa_estrutural_por_estagio / (
                 self.modelo_estrutural.massa_estrutural_por_estagio + massa_prop_por_estagio)
 
@@ -41,11 +41,11 @@ class ModeloFoguete:
                                              self.modelo_propulsivo.massa_propelente_estagios[
                                                  1] + \
                                              self.modelo_estrutural.massa_estrutural_por_estagio[2] + \
-                                             self.modelo_propulsivo.massa_propelente_estagios[
-                                                 2] + self.massa_de_carga_util
+                                             (self.modelo_propulsivo.massa_propelente_estagios[
+                                                 2] +self.modelo_propulsivo.massa_propelente_estagios[3]) + self.massa_de_carga_util
         massa_total_na_ignicao_3_estagio = self.modelo_estrutural.massa_estrutural_por_estagio[2] + \
-                                           self.modelo_propulsivo.massa_propelente_estagios[
-                                               2] + self.massa_de_carga_util
+                                           (self.modelo_propulsivo.massa_propelente_estagios[
+                                               2] +self.modelo_propulsivo.massa_propelente_estagios[3])+ self.massa_de_carga_util
 
         razao_carga_util_primeiro_estagio = massa_total_na_ignicacao_2_estagio / self.massa_inicial_do_foguete
         razao_carga_util_segundo_estagio = massa_total_na_ignicao_3_estagio / massa_total_na_ignicacao_2_estagio

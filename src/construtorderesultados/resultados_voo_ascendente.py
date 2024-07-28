@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.domain.construtorderesultados.plots_orbitais import plota_orbita
+from src.construtorderesultados.plots_orbitais import plota_orbita
 # Supondo que você tenha importado as funções de conversão corretamente
 from src.domain.modelos.Simulacao import Simulacao
 from src.domain.modelos.orbitas.utilidades import calculos_orbitais
@@ -101,9 +101,9 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     P = 2 * np.pi * np.sqrt((Requat + hfq) ** 3 / mut)
     print('*** Parametros da Orbita Obtida ***')
     print('Velocidade no momento da insercao orbital (km/s)', Vfq / 1e3)
-    print('Altitude no momento da insercao orbital (km)', hfq)
-    print('Distancia radial no momento da insercao orbital (km)', (hfq + Requat))
-    print('Semi eixo maior (km)', a[ifq])
+    print('Altitude no momento da insercao orbital (km)', hfq/1e3)
+    print('Distancia radial no momento da insercao orbital (km)', (hfq + Requat)/1e3)
+    print('Semi eixo maior (km)', a[ifq]/1e3)
     print('Periodo(min): ', P / 60)
     # Raio do perigeu
     rp = a[ifq] * (1 - e[ifq])
@@ -143,40 +143,57 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     DVgso = vgso - vagto
     print(DVgso / 1e3)
     print('Massa de propelente requerida para circularizacao da orbita (kg)')
+    mp32 = (m[ifq] * np.exp(DVgso / (simulacao.foguete.modelo_propulsivo.impulso_especifico[2] * simulacao.planeta.gravidade)) - m[ifq]) / np.exp(DVgso / (simulacao.foguete.modelo_propulsivo.impulso_especifico[2] * simulacao.planeta.gravidade))
+    print(mp32)
+    print('Massa de propelente disponivel para o 3º disparo (kg)', simulacao.foguete.modelo_propulsivo.massa_propelente_estagios[3] - 52.55827392093705)
+
+
     print('****** PARAMETROS DA ORBITA FINAL ******')
     print('Periodo (min)')
     P = 2 * np.pi * np.sqrt((a[-1] ** 3) / mut)
     print(P / 60)
-    print('Semi eixo maior (km)', a[-1])
+    print('Semi eixo maior (km)', a[-1]/1e3)
     print('Excentricidade', e[-1])
     print('Inclinacao (º)', in_[-1] * 180 / np.pi)
 
     plt.close('all')
-    plt.figure(1)
 
-    plt.subplot(231)
+    # Figura 1
+    plt.figure()
     plt.plot(t, V, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('V (m/s)')
+    plt.title('Velocidade')
+    plt.savefig('velocidade.png', dpi=300)
+    plt.show()
 
-    plt.subplot(232)
+    # Figura 2
+    plt.figure()
     plt.plot(t, A * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('A (º)')
+    plt.title('Azimute')
+    plt.savefig('azimute.png', dpi=300)
+    plt.show()
 
-    plt.subplot(233)
+    # Figura 3
+    plt.figure()
     plt.plot(t, phi * 180 / np.pi, linewidth=2)
     plt.plot(tfq, phi[ifq - 1] * 180 / np.pi, '*')
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('phi (º)')
+    plt.title('Elevação')
+    plt.savefig('elevacao.png', dpi=300)
+    plt.show()
 
-    plt.subplot(234)
+    # Figura 4
+    plt.figure()
     plt.plot(t, h / 1e3, linewidth=2)
     plt.plot(t, np.full(N, hfq / 1e3), '--')
     plt.plot([tfq], [hfq / 1e3], '*')
@@ -185,114 +202,170 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('h (km)')
     plt.legend(['altitude', 'altitude no fim da queima do 3º estágio'])
+    plt.title('Altitude')
+    plt.savefig('altitude.png', dpi=300)
+    plt.show()
 
-    plt.subplot(235)
+    # Figura 5
+    plt.figure()
     plt.plot(t, delta * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('delta (º)')
+    plt.title('Delta')
+    plt.savefig('delta.png', dpi=300)
+    plt.show()
 
-    plt.figure(2)
-    plt.subplot(221)
+    # Figura 6
+    plt.figure()
     plt.plot(t, Vi, linewidth=2)
     plt.plot(t, Vir, '--')
     plt.plot(t, np.full(N, Vfq), '-.')
     plt.grid(True)
     plt.xlabel('t (s)')
     plt.ylabel('V_i (m/s)')
-    plt.legend(['Velocidade inercial', 'Velocidade de perigeu da órbita GTO requerida',
+    plt.legend(['Velocidade inercial', 'Velocidade de apogeu da órbita GTO requerida',
                 'Velocidade no fim da queima do terceiro estágio'])
+    plt.title('Velocidade Inercial')
+    plt.savefig('velocidade_inercial.png', dpi=300)
+    plt.show()
 
-    plt.subplot(222)
+    # Figura 7
+    plt.figure()
     plt.plot(t, Ai * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('A_i (º)')
+    plt.title('Azimute Inercial')
+    plt.savefig('Azimute_inercial.png', dpi=300)
+    plt.show()
 
-    plt.subplot(223)
+    # Figura 8
+    plt.figure()
     plt.plot(t, phii * 180 / np.pi, linewidth=2)
     plt.plot(tfq, phii[ifq - 1] * 180 / np.pi, '*')
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('phi_i (º)')
+    plt.title('Ângulo phi Inercial')
+    plt.savefig('angulo_phi_inercial.png', dpi=300)
+    plt.show()
 
-    plt.subplot(224)
+    # Figura 9
+    plt.figure()
     plt.plot(t, longc * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('lambda (º)')
+    plt.title('Longitude')
+    plt.savefig('longitude.png', dpi=300)
+    plt.show()
 
-    plt.figure(3)
-    plt.subplot(221)
+    # Figura 10
+    plt.figure()
     plt.plot(t, ft, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('f_t (N)')
+    plt.title('Força de empuxo')
+    plt.savefig('forca_empuxo.png', dpi=300)
+    plt.show()
 
-    plt.subplot(222)
+    # Figura 11
+    plt.figure()
     plt.plot(t, m, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('m (kg)')
+    plt.title('Massa')
+    plt.savefig('massa.png', dpi=300)
+    plt.show()
 
-    plt.subplot(223)
+    # Figura 12
+    plt.figure()
     plt.plot(t, mu * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('\u03BC (º)')
+    plt.title('Ângulo μ')
+    plt.savefig('angulo_mu.png', dpi=300)
+    plt.show()
 
-    plt.subplot(224)
+    # Figura 13
+    plt.figure()
     plt.plot(t, epsl * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('\u03B5 (º)')
+    plt.title('Ângulo ε')
+    plt.savefig('angulo_epsilon.png', dpi=300)
+    plt.show()
 
-    plt.figure(4)
-    plt.subplot(311)
+    # Figura 14
+    plt.figure()
     plt.plot(t, D, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('D (N)')
+    plt.title('Arrasto')
+    plt.savefig('arrasto.png', dpi=300)
+    plt.show()
 
-    plt.subplot(323)
+    # Figura 15
+    plt.figure()
     plt.plot(t, q, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('q (N/m^2)')
+    plt.title('Pressão dinâmica')
+    plt.savefig('pressao_dinamica.png', dpi=300)
+    plt.show()
 
-    plt.subplot(324)
+    # Figura 16
+    plt.figure()
     plt.plot(t, Mach, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('M (-)')
+    plt.title('Número de Mach')
+    plt.savefig('numero_mach.png', dpi=300)
+    plt.show()
 
-    plt.subplot(325)
+    # Figura 17
+    plt.figure()
     plt.plot(t, T - 273.15, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('T (ºC)')
+    plt.title('Temperatura')
+    plt.savefig('temperatura.png', dpi=300)
+    plt.show()
 
-    plt.subplot(326)
+    # Figura 18
+    plt.figure()
     plt.plot(t, rho, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('rho (kg/m^3)')
+    plt.title('Densidade')
+    plt.savefig('densidade.png', dpi=300)
+    plt.show()
 
-    plt.figure(5)
-    plt.subplot(311)
+    # Figura 19
+    plt.figure()
     plt.plot(t, ee, linewidth=2)
     plt.plot(t, eer, '--', linewidth=2)
     plt.plot(t, eegso, '--', linewidth=2)
@@ -301,8 +374,12 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.ylabel('\u03B5 (J/kg)')
     plt.legend(['Energia específica', 'Energia específica da órbita GTO requerida',
                 'Energia específica da órbita GSO requerida'])
+    plt.title('Energia específica')
+    plt.savefig('energia_especifica.png', dpi=300)
+    plt.show()
 
-    plt.subplot(334)
+    # Figura 20
+    plt.figure()
     plt.plot(t, a / 1e3, linewidth=2)
     plt.plot(t, ar / 1e3, '--')
     plt.plot(t, Requat * np.ones([N, 1]) / 1e3, '-.')
@@ -310,43 +387,67 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('a (km)')
     plt.legend(['Semi eixo maior', 'Semi eixo maior da órbita GTO requerida', 'Raio da Terra'])
+    plt.title('Semi eixo maior')
+    plt.savefig('semi_eixo_maior.png', dpi=300)
+    plt.show()
 
-    plt.subplot(335)
+    # Figura 21
+    plt.figure()
     plt.plot(t, e, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('e (-)')
+    plt.title('Excentricidade')
+    plt.savefig('excentricidade.png', dpi=300)
+    plt.show()
 
-    plt.subplot(336)
+    # Figura 22
+    plt.figure()
     plt.plot(t, tau, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('\u03C4 (s)')
+    plt.title('Período orbital')
+    plt.savefig('periodo_orbital.png', dpi=300)
+    plt.show()
 
-    plt.subplot(337)
+    # Figura 23
+    plt.figure()
     plt.plot(t, OM * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('\u03A9 (º)')
+    plt.title('Longitude do nodo ascendente')
+    plt.savefig('longitude_nodo_ascendente.png', dpi=300)
+    plt.show()
 
-    plt.subplot(338)
+    # Figura 24
+    plt.figure()
     plt.plot(t, in_ * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('i (º)')
+    plt.title('Inclinação')
+    plt.savefig('inclinacao.png', dpi=300)
+    plt.show()
 
-    plt.subplot(339)
+    # Figura 25
+    plt.figure()
     plt.plot(t, om * 180 / np.pi, linewidth=2)
     plt.grid(True)
     plt.axis('tight')
     plt.xlabel('t (s)')
     plt.ylabel('\u03C9 (º)')
+    plt.title('Argumento do perigeu')
+    plt.savefig('argumento_perigeu.png', dpi=300)
+    plt.show()
 
-    plt.figure(7)
+    # Figura 26
+    plt.figure()
     ax = plt.axes(projection="3d")
     u = np.linspace(0, 2 * np.pi, 100)
     v = np.linspace(0, np.pi, 100)
@@ -362,11 +463,11 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     ax.set_xlabel('x (km)')
     ax.set_ylabel('y (km)')
     ax.set_zlabel('z (km)')
+    plt.title('Órbita 3D')
+    plt.savefig('orbita_3d.png', dpi=300)
+    plt.show()
 
-    #quero extrair a norma do primeiro vetor r0
-
-    x,y,z = R0[0,:]
-
-    r0 = np.array([x,y,z])
+    x, y, z = R0[0, :]
+    r0 = np.array([x, y, z])
     plota_orbita(R0, simulacao.planeta.raio_equatorial, r0)
     plt.show()

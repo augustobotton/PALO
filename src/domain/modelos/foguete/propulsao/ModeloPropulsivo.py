@@ -35,6 +35,7 @@ class ModeloPropulsivo:
         self.h0 = builder.h0
         self.planeta = builder.planeta
         self.calcular_sequenciamento()
+        self.mp32 = 0
         self.__str__()
     def calcular_sequenciamento(self) -> None:
         """
@@ -69,7 +70,6 @@ class ModeloPropulsivo:
 
         # Cálculo das massas de propelente
         mp32 = self.massa_propelente_estagios[2]
-
         self.massa_propelente_estagios[2] = (
                 mp32 * self.duracao_da_primeira_queima_3_estagio / self.duracao_total_de_queima_do_terceiro_estagio
         )

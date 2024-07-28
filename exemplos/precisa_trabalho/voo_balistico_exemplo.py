@@ -29,10 +29,8 @@ terra = (ConstrutorPlaneta()
 
 meuModeloPropulsivo = ConstrutorModeloPropulsivo().com_impulso_especifico([260.6, 261.1]).com_massa_propelente_estagios(
     [677, 898]).com_duracao_queima_estagios([62, 64.62]).com_tempo_espera_separacao(
-    [2, 2]).com_tempo_espera_ignicao([5]).com_massa_estrutural_por_estagio(
-    [284, 320]).com_massa_de_carga_util(400).com_h0(0.0).com_planeta(terra).construir()
+    [2, 2]).com_tempo_espera_ignicao([5]).com_massa_de_carga_util(400).com_h0(0.0).com_planeta(terra).construir()
 
-#TODO estou criando dois atributos para dois modelos diferentes, mas o que eu quero é criar um atributo que seja comum para os dois modelos.
 
 meuModeloEstrutural = ConstrutorModeloEstrutural().com_massa_estrutural_por_estagio(
     [284, 320]).com_massa_de_carga_util(400).com_area_secao_transversal_1_estagio(np.pi*(0.557/2)**2).com_area_secao_transversal_2_estagio(
@@ -61,6 +59,6 @@ orbita_alvo = Orbita.circular(42.164140e6, np.deg2rad(5))
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo, phi_inicial]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
-with open('../../src/domain/construtorderesultados/simulacao.pkl', 'wb') as f:
+with open('../../src/construtorderesultados/simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()

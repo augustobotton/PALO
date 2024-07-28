@@ -1,6 +1,6 @@
 import pickle
 
-from src.domain.construtorderesultados.resultados_voo_ascendente import plotaresultados
+from src.construtorderesultados.resultados_voo_ascendente import plotaresultados
 
 with open('resposta_simulacao.pkl', 'rb') as f:
     loaded_resposta = pickle.load(f)
