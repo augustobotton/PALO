@@ -3,7 +3,20 @@ import numpy as np
 from src.domain.modelos.orbitas.utilidades.coeficientes_de_lagrange import f_and_g, fDot_and_gDot
 from src.domain.modelos.orbitas.utilidades.kepler_universal import kepler_U
 
+"""
+Universidade: Universidade Federal de Santa Maria
+Curso: Engenharia Aeroespacial
+Projeto:  DESENVOLVIMENTO DE UMABIBLIOTECA PYTHON PARA CÁLCULOS DE MECÂNICA ORBITAL E SIMULAÇÃO DE VOO ASCENDENTE
+Autor: Augusto Botton Pozzebon
+Orientador: Prof. André Luis da Silva
+Data: 2024/1
+Baseado em: "Orbital Mechanics for Engineering Students" de Howard D. Curtis 3ed
+Número do Algoritmo: 3.4
 
+Informações de Contato:
+
+GitHub: https://github.com/augustobotton/PALO
+"""
 def rv_from_r0v0(R0, V0, delta_t, mu):
     """
     Calcula o vetor de posição final e o vetor de velocidade final dado um vetor de posição inicial,

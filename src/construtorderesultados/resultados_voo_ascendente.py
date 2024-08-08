@@ -166,7 +166,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('V (m/s)')
     plt.title('Velocidade')
-    plt.savefig('velocidade.png', dpi=300)
     plt.show()
 
     # Figura 2
@@ -177,7 +176,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('A (º)')
     plt.title('Azimute')
-    plt.savefig('azimute.png', dpi=300)
     plt.show()
 
     # Figura 3
@@ -189,7 +187,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('phi (º)')
     plt.title('Elevação')
-    plt.savefig('elevacao.png', dpi=300)
     plt.show()
 
     # Figura 4
@@ -203,7 +200,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.ylabel('h (km)')
     plt.legend(['altitude', 'altitude no fim da queima do 3º estágio'])
     plt.title('Altitude')
-    plt.savefig('altitude.png', dpi=300)
     plt.show()
 
     # Figura 5
@@ -214,7 +210,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('delta (º)')
     plt.title('Delta')
-    plt.savefig('delta.png', dpi=300)
     plt.show()
 
     # Figura 6
@@ -228,7 +223,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.legend(['Velocidade inercial', 'Velocidade de apogeu da órbita GTO requerida',
                 'Velocidade no fim da queima do terceiro estágio'])
     plt.title('Velocidade Inercial')
-    plt.savefig('velocidade_inercial.png', dpi=300)
     plt.show()
 
     # Figura 7
@@ -239,7 +233,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('A_i (º)')
     plt.title('Azimute Inercial')
-    plt.savefig('Azimute_inercial.png', dpi=300)
     plt.show()
 
     # Figura 8
@@ -251,7 +244,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('phi_i (º)')
     plt.title('Ângulo phi Inercial')
-    plt.savefig('angulo_phi_inercial.png', dpi=300)
     plt.show()
 
     # Figura 9
@@ -262,7 +254,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('lambda (º)')
     plt.title('Longitude')
-    plt.savefig('longitude.png', dpi=300)
     plt.show()
 
     # Figura 10
@@ -273,7 +264,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('f_t (N)')
     plt.title('Força de empuxo')
-    plt.savefig('forca_empuxo.png', dpi=300)
     plt.show()
 
     # Figura 11
@@ -284,7 +274,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('m (kg)')
     plt.title('Massa')
-    plt.savefig('massa.png', dpi=300)
     plt.show()
 
     # Figura 12
@@ -295,7 +284,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03BC (º)')
     plt.title('Ângulo μ')
-    plt.savefig('angulo_mu.png', dpi=300)
     plt.show()
 
     # Figura 13
@@ -306,7 +294,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03B5 (º)')
     plt.title('Ângulo ε')
-    plt.savefig('angulo_epsilon.png', dpi=300)
     plt.show()
 
     # Figura 14
@@ -317,7 +304,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('D (N)')
     plt.title('Arrasto')
-    plt.savefig('arrasto.png', dpi=300)
     plt.show()
 
     # Figura 15
@@ -328,7 +314,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('q (N/m^2)')
     plt.title('Pressão dinâmica')
-    plt.savefig('pressao_dinamica.png', dpi=300)
     plt.show()
 
     # Figura 16
@@ -339,7 +324,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('M (-)')
     plt.title('Número de Mach')
-    plt.savefig('numero_mach.png', dpi=300)
     plt.show()
 
     # Figura 17
@@ -350,7 +334,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('T (ºC)')
     plt.title('Temperatura')
-    plt.savefig('temperatura.png', dpi=300)
     plt.show()
 
     # Figura 18
@@ -361,7 +344,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('rho (kg/m^3)')
     plt.title('Densidade')
-    plt.savefig('densidade.png', dpi=300)
     plt.show()
 
     # Figura 19
@@ -375,7 +357,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.legend(['Energia específica', 'Energia específica da órbita GTO requerida',
                 'Energia específica da órbita GSO requerida'])
     plt.title('Energia específica')
-    plt.savefig('energia_especifica.png', dpi=300)
     plt.show()
 
     # Figura 20
@@ -388,7 +369,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.ylabel('a (km)')
     plt.legend(['Semi eixo maior', 'Semi eixo maior da órbita GTO requerida', 'Raio da Terra'])
     plt.title('Semi eixo maior')
-    plt.savefig('semi_eixo_maior.png', dpi=300)
     plt.show()
 
     # Figura 21
@@ -399,7 +379,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('e (-)')
     plt.title('Excentricidade')
-    plt.savefig('excentricidade.png', dpi=300)
     plt.show()
 
     # Figura 22
@@ -410,7 +389,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03C4 (s)')
     plt.title('Período orbital')
-    plt.savefig('periodo_orbital.png', dpi=300)
     plt.show()
 
     # Figura 23
@@ -421,7 +399,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03A9 (º)')
     plt.title('Longitude do nodo ascendente')
-    plt.savefig('longitude_nodo_ascendente.png', dpi=300)
     plt.show()
 
     # Figura 24
@@ -432,7 +409,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('i (º)')
     plt.title('Inclinação')
-    plt.savefig('inclinacao.png', dpi=300)
     plt.show()
 
     # Figura 25
@@ -443,7 +419,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     plt.xlabel('t (s)')
     plt.ylabel('\u03C9 (º)')
     plt.title('Argumento do perigeu')
-    plt.savefig('argumento_perigeu.png', dpi=300)
     plt.show()
 
     # Figura 26
@@ -464,7 +439,6 @@ def plotaresultados(resposta_sim, simulacao: Simulacao):
     ax.set_ylabel('y (km)')
     ax.set_zlabel('z (km)')
     plt.title('Órbita 3D')
-    plt.savefig('orbita_3d.png', dpi=300)
     plt.show()
 
     x, y, z = R0[0, :]

@@ -1,5 +1,20 @@
 import numpy as np
-# Usa Algoritimo 4.1 de Orbital Mechanics for Engineering Students  (Curtis, 2020)
+
+"""
+Universidade: Universidade Federal de Santa Maria
+Curso: Engenharia Aeroespacial
+Projeto:  DESENVOLVIMENTO DE UMABIBLIOTECA PYTHON PARA CÁLCULOS DE MECÂNICA ORBITAL E SIMULAÇÃO DE VOO ASCENDENTE
+Autor: Augusto Botton Pozzebon
+Orientador: Prof. André Luis da Silva
+Data: 2024/1
+Baseado em: "Orbital Mechanics for Engineering Students" de Howard D. Curtis 3ed
+Número do Algoritmo: 4.1
+
+Informações de Contato:
+
+GitHub: https://github.com/augustobotton/PALO
+"""
+
 def vetor_de_estados_para_coe(R, V, mu):
     """
     Calcula os elementos orbitais clássicos a partir do vetor de estado (R, V).
