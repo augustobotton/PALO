@@ -1,6 +1,19 @@
 import numpy as np
 
+"""
+Universidade: Universidade Federal de Santa Maria
+Curso: Engenharia Aeroespacial
+Projeto:  DESENVOLVIMENTO DE UMABIBLIOTECA PYTHON PARA CÁLCULOS DE MECÂNICA ORBITAL E SIMULAÇÃO DE VOO ASCENDENTE
+Autor: Augusto Botton Pozzebon
+Orientador: Prof. André Luis da Silva
+Data: 2024/1
+Baseado em: "Orbital Mechanics for Engineering Students" de Howard D. Curtis 3ed
+Número do Algoritmo: 4.5 (Conversão de Elementos Orbitais Clássicos para Vetor de Estado)
 
+Informações de Contato:
+
+GitHub: https://github.com/augustobotton/PALO
+"""
 def coe_para_vetor_de_estados(coe, mu):
     """
     This function computes the state vector (r, v) from the classical orbital elements (coe).

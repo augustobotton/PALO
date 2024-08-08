@@ -1,5 +1,19 @@
 import numpy as np
 
+"""
+Universidade: Universidade Federal de Santa Maria
+Curso: Engenharia Aeroespacial
+Projeto:  DESENVOLVIMENTO DE UMABIBLIOTECA PYTHON PARA CÁLCULOS DE MECÂNICA ORBITAL E SIMULAÇÃO DE VOO ASCENDENTE
+Autor: Augusto Botton Pozzebon
+Orientador: Prof. André Luis da Silva
+Data: 2024/1
+Baseado em: "Orbital Mechanics for Engineering Students" de Howard D. Curtis 3ed
+Equações 3.52 e 3.53 
+Informações de Contato:
+GitHub: https://github.com/augustobotton/PALO
+"""
+
+
 
 def stumpC(z):
     """
@@ -11,7 +25,7 @@ def stumpC(z):
     Retorna:
         float: Resultado da função Stumpff C(z).
     """
-    # Evaluate the Stumpff function C(z)
+
     if z > 0:
         c = (1 - np.cos(np.sqrt(z))) / z
     elif z < 0:

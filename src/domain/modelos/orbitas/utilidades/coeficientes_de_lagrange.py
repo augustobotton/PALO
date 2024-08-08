@@ -2,6 +2,18 @@ import numpy as np
 
 from src.domain.modelos.orbitas.utilidades.funcoes_stump import stumpC, stumpS
 
+"""
+Universidade: Universidade Federal de Santa Maria
+Curso: Engenharia Aeroespacial
+Projeto:  DESENVOLVIMENTO DE UMABIBLIOTECA PYTHON PARA CÁLCULOS DE MECÂNICA ORBITAL E SIMULAÇÃO DE VOO ASCENDENTE
+Autor: Augusto Botton Pozzebon
+Orientador: Prof. André Luis da Silva
+Data: 2024/1
+Baseado em: "Orbital Mechanics for Engineering Students" de Howard D. Curtis 3ed
+Equações 3.69 
+Informações de Contato:
+GitHub: https://github.com/augustobotton/PALO
+"""
 
 def f_and_g(x, t, ro, a, mu):
     """

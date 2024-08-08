@@ -17,6 +17,7 @@ class ConstrutorModeloPropulsivo:
         self.massa_de_carga_util = 0.0
         self.planeta = None
         self.h0 = 0.0
+        self.numero_motores_por_estagio = np.array([])
 
     def com_impulso_especifico(self, impulso_especifico: list) -> 'ConstrutorModeloPropulsivo':
         """
@@ -110,6 +111,7 @@ class ConstrutorModeloPropulsivo:
         """
         self.planeta = planeta
         return self
+
 
     def construir(self) -> ModeloPropulsivo:
         """
