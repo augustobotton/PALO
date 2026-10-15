@@ -5,3 +5,4 @@
 *.pkl
 *.xml
 *.patch
+__pycache__/
