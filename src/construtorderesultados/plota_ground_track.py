@@ -1,40 +1,37 @@
-import astropy.units as u
+import numpy as np
 import plotly.graph_objects as go
-from astropy.coordinates import EarthLocation, CartesianRepresentation
+
+from src.domain.modelos.planeta.ConstrutorPlaneta import terra
 
 
-def cartesian_to_geographic(x, y, z):
-    # Converter de coordenadas cartesianas para locação na Terra
-    cart_rep = CartesianRepresentation(x * u.km, y * u.km, z * u.km)
-    earth_loc = EarthLocation.from_geocentric(cart_rep.x, cart_rep.y, cart_rep.z)
+def inercial_para_geografica(t, trajetorias, planeta=terra):
+    """
+    Converte posições inerciais (ECI) em latitude e longitude fixas no planeta.
 
-    return earth_loc.lat.deg, earth_loc.lon.deg, earth_loc.height.to(u.km)
+    A longitude fixa no planeta é a longitude inercial menos o ângulo de rotação
+    acumulado do meridiano de referência: ωE·(t − t_g), onde t_g é o instante em
+    que a longitude celeste do meridiano de referência é nula.
+
+    :param t: Vetor de tempos [s].
+    :param trajetorias: Matriz de estados (N x >=3), posições em km nas 3 primeiras colunas.
+    :param planeta: Planeta com velocidade_inercial_de_rotacao [rad/s] e tempo_longitude_celeste_nula [s].
+    :return: Latitude geocêntrica [deg], longitude em [-180, 180) [deg], raio [km].
+    """
+    t = np.asarray(t, dtype=float)
+    x, y, z = (np.asarray(trajetorias)[:, i] for i in range(3))
+
+    r = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+    lat = np.degrees(np.arcsin(z / r))
+
+    angulo_rotacao = planeta.velocidade_inercial_de_rotacao * (t - planeta.tempo_longitude_celeste_nula)
+    lon = np.degrees(np.arctan2(y, x) - angulo_rotacao)
+    lon = (lon + 180.0) % 360.0 - 180.0  # Garante que a longitude fique em [-180, 180)
+
+    return lat, lon, r
 
 
-def ground_track(t, trajetorias):
-    # Constante de rotação da Terra (graus por segundo)
-    taxa_rotacao_terra = 360 / 86400  # 360 graus em 86400 segundos (24 horas)
-
-    # Listas para armazenar latitudes, longitudes e altitudes
-    lats = []
-    lons = []
-    alts = []
-
-    # Iterar sobre cada conjunto de posições na matriz de trajetórias
-    for i in range(trajetorias.shape[0]):
-        x = trajetorias[i, 0]
-        y = trajetorias[i, 1]
-        z = trajetorias[i, 2]
-        lat, lon, alt = cartesian_to_geographic(x, y, z)
-
-        # Ajustar a longitude de acordo com a rotação da Terra
-        tempo_passado = t[i]  # Tempo em segundos desde o início da propagação
-        ajuste_longitude = taxa_rotacao_terra * tempo_passado
-        lon_ajustada = (lon + ajuste_longitude) % 360  # Garante que a longitude fique entre 0 e 360
-
-        lats.append(lat)
-        lons.append(lon_ajustada)
-        alts.append(alt)
+def ground_track(t, trajetorias, planeta=terra):
+    lats, lons, _ = inercial_para_geografica(t, trajetorias, planeta)
 
     # Plotar o ground track usando Plotly
     fig = go.Figure(go.Scattergeo(

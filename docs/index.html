@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PALO · Lançamento e Órbitas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="PALO: biblioteca Python para simulação de voo ascendente de foguetes, propagação orbital e manobras.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Saira+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: console de campo de lançamento. Faixas largas por capacidade, cada uma com texto curto à esquerda
+   e o instrumento (gráfico, calculadora) à direita; o rótulo de cada faixa é o caminho real do módulo. */
+:root {
+  --papel: #eef1f0;
+  --painel: #f8faf9;
+  --tinta: #13202b;
+  --sutil: #56676f;
+  --linha: #c8d1d2;
+  --sinal: #d4470c;
+  --orbita: #0b7a75;
+  --terra: #2d5d86;
+  --ok: #2f7d32;
+  --display: "Saira Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --texto: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --raio: 4px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #0c1418; --painel: #111c21; --tinta: #dde6e8; --sutil: #8fa3ab; --linha: #263840;
+    --sinal: #ff7a3d; --orbita: #3dc9be; --terra: #5d93c4; --ok: #6cc070; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #0c1418; --painel: #111c21; --tinta: #dde6e8; --sutil: #8fa3ab; --linha: #263840;
+  --sinal: #ff7a3d; --orbita: #3dc9be; --terra: #5d93c4; --ok: #6cc070; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body {
+  margin: 0; background: var(--papel); color: var(--tinta);
+  font: 400 16px/1.6 var(--texto);
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: inherit; text-decoration-color: var(--sinal); text-underline-offset: 3px; }
+a:hover { color: var(--sinal); }
+:focus-visible { outline: 2px solid var(--sinal); outline-offset: 2px; }
+code, pre, .mono { font-family: var(--mono); font-size: 0.875em; }
+p code { overflow-wrap: anywhere; }
+
+.faixa { border-top: 1px solid var(--linha); }
+.miolo {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 64px;
+}
+
+/* Topo */
+.topo .miolo { padding-block: 18px; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.marca { font: 700 22px/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; }
+.marca span { color: var(--sinal); }
+.topo nav { display: flex; gap: 20px; flex-wrap: wrap; font-size: 14px; }
+.topo nav a { text-decoration: none; color: var(--sutil); }
+.topo nav a:hover { color: var(--tinta); }
+
+/* Abertura */
+.abertura .miolo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 48px; align-items: center; padding-block: 40px 64px; }
+.rotulo { font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; color: var(--sutil); text-transform: uppercase; }
+h1 {
+  font: 700 clamp(36px, 5.4vw, 72px)/0.92 var(--display); text-transform: uppercase; letter-spacing: 0.01em;
+  margin: 12px 0 20px; text-wrap: balance; overflow-wrap: anywhere; hyphens: auto;
+}
+h1 em { font-style: normal; color: var(--sinal); }
+.lede { font-size: 18px; max-width: 34em; margin: 0 0 28px; color: var(--tinta); }
+.instalar { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.comando {
+  display: flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%;
+  background: var(--painel); border: 1px solid var(--linha); border-radius: var(--raio); padding: 10px 12px;
+}
+.comando code { white-space: nowrap; overflow-x: auto; }
+.comando code::before { content: "$ "; color: var(--sutil); }
+button, .botao {
+  font: 500 14px/1 var(--texto); cursor: pointer; border-radius: var(--raio);
+  border: 1px solid var(--linha); background: var(--painel); color: var(--tinta); padding: 10px 14px;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+button:hover, .botao:hover { border-color: var(--tinta); color: var(--tinta); }
+.botao.primario { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.botao.primario:hover { background: var(--sinal); border-color: var(--sinal); color: #fff; }
+
+.console { background: var(--painel); border: 1px solid var(--linha); border-radius: var(--raio); overflow: hidden; }
+.console-cab { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--linha); flex-wrap: wrap; }
+.console canvas { display: block; width: 100%; aspect-ratio: 1 / 0.82; max-width: 100%; }
+.leituras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--linha); }
+.leitura { padding: 10px 14px; border-left: 1px solid var(--linha); min-width: 0; }
+.leitura:first-child { border-left: 0; }
+.leitura b { display: block; font: 600 22px/1.2 var(--display); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; white-space: nowrap; }
+.leitura span { font: 500 11px/1.3 var(--mono); color: var(--sutil); text-transform: uppercase; letter-spacing: 0.06em; }
+.fase { font: 600 13px/1.4 var(--mono); color: var(--sinal); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Seções */
+.secao-cab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: end; margin-bottom: 32px; }
+h2 { font: 700 clamp(32px, 4.4vw, 52px)/0.98 var(--display); text-transform: uppercase; margin: 8px 0 0; text-wrap: balance; }
+.secao-cab p { margin: 0; color: var(--sutil); max-width: 36em; }
+h3 { font: 600 20px/1.2 var(--display); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 8px; }
+
+.numeros { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--painel); margin-bottom: 24px; }
+.numero { padding: 16px 18px; border-left: 1px solid var(--linha); min-width: 0; }
+.numero:first-child { border-left: 0; }
+.numero b { display: block; font: 700 34px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.numero b small { font-size: 0.55em; font-weight: 600; color: var(--sutil); margin-left: 2px; }
+.numero span { font-size: 13px; color: var(--sutil); }
+
+.grade-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.cartao { background: var(--painel); border: 1px solid var(--linha); border-radius: var(--raio); padding: 16px; min-width: 0; }
+.cartao > p { margin: 0 0 8px; color: var(--sutil); font-size: 14px; }
+.grafico { width: 100%; height: 320px; }
+.grafico.alto { height: 420px; }
+.grafico.mais-alto { height: 560px; }
+.cartao.inteiro { grid-column: 1 / -1; }
+.sem-webgl { height: 100%; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--sutil); font-size: 14px; border: 1px dashed var(--linha); border-radius: var(--raio); }
+
+.tabela-rolagem { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--linha); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 500 11px/1.3 var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--sutil); }
+
+/* Calculadora */
+.calc { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.presets button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); border-color: var(--tinta); }
+.vetores { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); gap: 8px; align-items: center; }
+.vetores .eixo { font: 500 12px var(--mono); color: var(--sutil); text-align: center; }
+.vetores label { font: 600 15px var(--display); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.vetores label small { font: 400 12px var(--mono); color: var(--sutil); text-transform: none; letter-spacing: 0; }
+.vetores input {
+  width: 100%; min-width: 0; font: 400 14px var(--mono); padding: 8px; border-radius: var(--raio);
+  border: 1px solid var(--linha); background: var(--papel); color: var(--tinta); font-variant-numeric: tabular-nums;
+}
+.vetores input:focus { border-color: var(--sinal); outline: none; }
+.tipo-orbita { margin: 16px 0 8px; font: 600 15px var(--mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--orbita); }
+.elementos td:nth-child(2) { font-family: var(--mono); }
+.confere { color: var(--ok); font: 500 12px var(--mono); }
+.confere.difere { color: var(--sinal); }
+.nota { font-size: 13px; color: var(--sutil); margin: 10px 0 0; }
+#esboco { width: 100%; aspect-ratio: 1 / 0.8; display: block; max-width: 100%; }
+
+/* Código */
+pre {
+  margin: 0; background: var(--painel); border: 1px solid var(--linha); border-radius: var(--raio);
+  padding: 16px; overflow-x: auto; line-height: 1.55; font-size: 13px;
+}
+.c { color: var(--sutil); }
+.k { color: var(--sinal); }
+.s { color: var(--orbita); }
+.arvore li { font-family: var(--mono); font-size: 13px; }
+.arvore ul { list-style: none; margin: 0; padding-left: 16px; border-left: 1px solid var(--linha); }
+.arvore > ul { padding-left: 0; border: 0; }
+.arvore li { padding: 3px 0; }
+.arvore li span { color: var(--sutil); font-family: var(--texto); font-size: 13px; margin-left: 6px; }
+
+.passos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.passos p { color: var(--sutil); margin: 0 0 12px; font-size: 15px; }
+
+.rodape .miolo { padding-block: 32px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--sutil); }
+
+@media (max-width: 900px) {
+  .abertura .miolo, .secao-cab, .grade-2, .calc, .passos { grid-template-columns: minmax(0, 1fr); }
+  .numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .numero:nth-child(3) { border-left: 0; }
+  .numero:nth-child(n+3) { border-top: 1px solid var(--linha); }
+  .miolo { padding-block: 48px; }
+}
+@media (max-width: 520px) {
+  .leituras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .leitura:nth-child(3) { border-left: 0; }
+  .leitura:nth-child(n+3) { border-top: 1px solid var(--linha); }
+  .grafico { height: 280px; }
+  .grafico.alto { height: 340px; }
+  .grafico.mais-alto { height: 400px; }
+  .topo nav { gap: 14px; }
+}
+</style>
+</head>
+<body>
+
+<header class="faixa topo" style="border-top:0">
+  <div class="miolo">
+    <div class="marca">PA<span>L</span>O</div>
+    <nav aria-label="Seções">
+      <a href="#elementos">Elementos orbitais</a>
+      <a href="#lancamento">Lançamento</a>
+      <a href="#perturbacoes">Perturbações</a>
+      <a href="#planeta">Modelos de planeta</a>
+      <a href="#comecar">Começar</a>
+      <a href="https://github.com/augustobotton/PALO">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="abertura">
+  <div class="miolo">
+    <div>
+      <div class="rotulo">Pacote de Análise de Lançamento e Órbitas · Python</div>
+      <h1>Da rampa em Alcântara à <em>órbita geoestacionária</em></h1>
+      <p class="lede">PALO simula o voo ascendente de foguetes multiestágio, propaga órbitas com perturbações de J2 e arrasto atmosférico e calcula manobras. Todos os gráficos desta página foram calculados pela própria biblioteca.</p>
+      <div class="instalar">
+        <div class="comando"><code id="cmd-instalar">pip install -e .</code></div>
+        <button type="button" id="copiar">Copiar</button>
+        <a class="botao primario" href="https://github.com/augustobotton/PALO">Ver no GitHub</a>
+      </div>
+    </div>
+    <figure class="console" style="margin:0">
+      <div class="console-cab">
+        <span class="rotulo">Missão de exemplo · plano equatorial, referencial inercial</span>
+        <span class="fase" id="fase">1º estágio</span>
+      </div>
+      <canvas id="missao" aria-label="Animação da trajetória simulada: subida a partir de Alcântara, órbita de transferência e circularização na altitude geoestacionária"></canvas>
+      <div class="leituras" aria-live="off">
+        <div class="leitura"><b id="l-t">T+0 s</b><span>Tempo</span></div>
+        <div class="leitura"><b id="l-h">0 km</b><span>Altitude</span></div>
+        <div class="leitura"><b id="l-v">0 m/s</b><span>Vel. relativa</span></div>
+        <div class="leitura"><b id="l-m">0 kg</b><span>Massa</span></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section class="faixa" id="elementos">
+  <div class="miolo">
+    <div class="secao-cab">
+      <div>
+        <div class="rotulo">src/domain/modelos/orbitas</div>
+        <h2>Do vetor de estado aos elementos orbitais</h2>
+      </div>
+      <p>Informe posição e velocidade inerciais e veja os seis elementos clássicos. A conta abaixo é uma tradução direta de <code>vetor_de_estados_para_coe</code>. Nos exemplos prontos, cada valor é comparado ao que a biblioteca em Python devolve.</p>
+    </div>
+    <div class="calc">
+      <div class="cartao">
+        <div class="presets" id="presets" role="group" aria-label="Exemplos"></div>
+        <div class="vetores">
+          <span></span><span class="eixo">x</span><span class="eixo">y</span><span class="eixo">z</span>
+          <label for="rx">r <small>km</small></label>
+          <input id="rx" inputmode="decimal" aria-label="Posição x (km)">
+          <input id="ry" inputmode="decimal" aria-label="Posição y (km)">
+          <input id="rz" inputmode="decimal" aria-label="Posição z (km)">
+          <label for="vx">v <small>km/s</small></label>
+          <input id="vx" inputmode="decimal" aria-label="Velocidade x (km/s)">
+          <input id="vy" inputmode="decimal" aria-label="Velocidade y (km/s)">
+          <input id="vz" inputmode="decimal" aria-label="Velocidade z (km/s)">
+        </div>
+        <div class="tipo-orbita" id="tipo">—</div>
+        <div class="tabela-rolagem">
+          <table class="elementos">
+            <thead><tr><th>Elemento</th><th>Valor</th><th>PALO (Python)</th></tr></thead>
+            <tbody id="tabela-elementos"></tbody>
+          </table>
+        </div>
+        <p class="nota">μ = 398 600,4418 km³/s² (Terra). Ângulos em graus.</p>
+      </div>
+      <div class="cartao">
+        <h3>Geometria no plano orbital</h3>
+        <p>Referencial perifocal: o eixo horizontal aponta para o periastro. O ponto laranja marca a posição informada.</p>
+        <canvas id="esboco" aria-label="Esboço da órbita no plano perifocal"></canvas>
+        <div class="tabela-rolagem">
+          <table>
+            <tbody id="tabela-derivados"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa" id="lancamento">
+  <div class="miolo">
+    <div class="secao-cab">
+      <div>
+        <div class="rotulo">src/domain/modelos/foguete · Simulacao.py</div>
+        <h2>Voo ascendente de um lançador de três estágios</h2>
+      </div>
+      <p>Dinâmica de translação em coordenadas esféricas num planeta girante, com gravidade até J4, atmosfera padrão, arrasto por número de Mach e Knudsen, trilho de lançamento e dupla ignição do 3º estágio. O caso é <code>exemplos/exemplos_simulacao_voo/adquire_gso_exemplo.py</code>: saída de Alcântara rumo a uma órbita circular de 42 164 km de raio.</p>
+    </div>
+    <div class="numeros" id="numeros-lancamento"></div>
+    <div class="cartao" style="margin-bottom:24px">
+      <h3>Trajetória em 3D, referencial inercial</h3>
+      <p>Da subida à órbita final, colorida pelo tempo de voo. O anel tracejado é a órbita geoestacionária. Arraste para girar e use a roda do mouse para aproximar.</p>
+      <div class="grafico mais-alto" id="g-lanc-3d"></div>
+    </div>
+    <div class="grade-2">
+      <div class="cartao">
+        <h3>Subida: altitude e velocidade</h3>
+        <p>Primeiros 900 s. As linhas verticais marcam fim de queima e separação de estágios.</p>
+        <div class="grafico" id="g-subida"></div>
+      </div>
+      <div class="cartao">
+        <h3>Massa do veículo</h3>
+        <p>Cada degrau é um estágio descartado. A última queima é a circularização no apogeu.</p>
+        <div class="grafico" id="g-massa"></div>
+      </div>
+      <div class="cartao">
+        <h3>Missão completa: altitude</h3>
+        <p>Costa na órbita de transferência e circularização perto da altitude geoestacionária (35 786 km).</p>
+        <div class="grafico" id="g-missao"></div>
+      </div>
+      <div class="cartao">
+        <h3>Veículo simulado</h3>
+        <p>Parâmetros de entrada dos construtores <code>ConstrutorModeloPropulsivo</code> e <code>ConstrutorModeloEstrutural</code>.</p>
+        <div class="tabela-rolagem">
+          <table>
+            <thead><tr><th>Estágio</th><th>Isp (s)</th><th>Propelente (kg)</th><th>Estrutura (kg)</th><th>Queima (s)</th><th>Δv ideal (m/s)</th></tr></thead>
+            <tbody id="tabela-veiculo"></tbody>
+          </table>
+        </div>
+        <p class="nota" id="nota-veiculo"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa" id="perturbacoes">
+  <div class="miolo">
+    <div class="secao-cab">
+      <div>
+        <div class="rotulo">src/domain/modelos/orbitas/propagacao</div>
+        <h2>Propagação com perturbações</h2>
+      </div>
+      <p>Três propagadores: analítico (equação de Kepler e variáveis universais), Cowell e Encke. As dinâmicas perturbadas incluem achatamento terrestre (J2), arrasto atmosférico e terceiro corpo.</p>
+    </div>
+    <div class="grade-2">
+      <div class="cartao">
+        <h3>Encke com J2, 48 horas</h3>
+        <p id="txt-j2">Arraste para girar.</p>
+        <div class="grafico alto" id="g-3d"></div>
+      </div>
+      <div class="cartao">
+        <h3>Deriva nodal por J2</h3>
+        <p id="txt-deriva"></p>
+        <div class="grafico alto" id="g-deriva"></div>
+      </div>
+      <div class="cartao inteiro">
+        <h3>Traço no solo</h3>
+        <p>Latitude e longitude geocêntricas das 48 h propagadas. Cada passagem cai a oeste da anterior porque a Terra gira por baixo da órbita.</p>
+        <div class="grafico" id="g-traco"></div>
+      </div>
+      <div class="cartao">
+        <h3>Cowell com arrasto em 3D</h3>
+        <p id="txt-cowell-3d">As três primeiras revoluções (verde-azulado) e as três últimas antes de o perigeu cruzar 200 km (laranja), vistas de cima do plano orbital.</p>
+        <div class="grafico alto" id="g-cowell-3d"></div>
+      </div>
+      <div class="cartao">
+        <h3>Cowell com arrasto: decaimento</h3>
+        <p id="txt-arrasto"></p>
+        <div class="grafico alto" id="g-arrasto"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa" id="planeta">
+  <div class="miolo">
+    <div class="secao-cab">
+      <div>
+        <div class="rotulo">src/domain/modelos/planeta</div>
+        <h2>Modelos de planeta</h2>
+      </div>
+      <p>O planeta é montado com <code>ConstrutorPlaneta</code>: raio, rotação, μ, coeficientes J2 a J4 e um modelo atmosférico lido de JSON. Trocar de corpo celeste é trocar esses parâmetros.</p>
+    </div>
+    <div class="grade-2">
+      <div class="cartao">
+        <h3>Atmosfera padrão</h3>
+        <p>Densidade e temperatura cinética de 0 a 1 000 km, de <code>ModeloAtmosferico.calcula</code>.</p>
+        <div class="grafico" id="g-atm"></div>
+      </div>
+      <div class="cartao">
+        <h3>Gravidade axissimétrica na superfície</h3>
+        <p id="txt-grav">Componente radial com J2, J3 e J4, comparada ao modelo esférico μ/R².</p>
+        <div class="grafico" id="g-grav"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa" id="comecar">
+  <div class="miolo">
+    <div class="secao-cab">
+      <div>
+        <div class="rotulo">Começar</div>
+        <h2>Construtores fluentes, um objeto por modelo</h2>
+      </div>
+      <p>Cada parte do problema (planeta, base, propulsão, estrutura, aerodinâmica, órbita) é um objeto montado por um construtor. A simulação só junta as peças.</p>
+    </div>
+    <div class="grade-2">
+      <pre><code><span class="k">from</span> src.domain.modelos.orbitas.Orbita <span class="k">import</span> Orbita
+<span class="k">from</span> src.domain.modelos.orbitas.propagacao.numerica.propagadores.propagacao_encke <span class="k">import</span> propagacao_encke
+
+<span class="c"># Vetor de estado inercial em km e km/s</span>
+orbita = Orbita.criar_pelo_vetor_de_estado(
+    r0, v0, <span class="s">398600.4418</span>)
+
+<span class="c"># 48 h de propagação com perturbação J2</span>
+t, estados = propagacao_encke(<span class="s">0</span>, <span class="s">48</span> * <span class="s">3600</span>, orbita)
+
+<span class="c"># Órbita alvo e simulação de lançamento</span>
+alvo = Orbita.circular(<span class="s">42.164140e6</span>, np.deg2rad(<span class="s">8</span>))
+simulacao = Simulacao(terra, alcantara, foguete,
+    [<span class="s">120000</span>, <span class="s">1</span>, np.deg2rad(<span class="s">80</span>), alvo])
+t, X = simulacao.simular()</code></pre>
+      <div class="cartao arvore">
+        <h3>Organização do código</h3>
+        <ul>
+          <li>src/domain/modelos
+            <ul>
+              <li>foguete/ <span>propulsão, estrutura, aerodinâmica, dinâmica</span></li>
+              <li>orbitas/ <span>Orbita, propagação analítica e numérica, manobras</span></li>
+              <li>planeta/ <span>planeta, atmosfera, gravidade, base de lançamento</span></li>
+              <li>manobras/ <span>aquisição de órbita geoestacionária</span></li>
+              <li>Simulacao.py <span>integração do voo ascendente</span></li>
+            </ul>
+          </li>
+          <li>src/construtorderesultados <span>gráficos de voo, órbita e traço no solo</span></li>
+          <li>exemplos/ <span>scripts prontos para rodar</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="passos" style="margin-top:32px">
+      <div>
+        <h3>Instale</h3>
+        <p>Clone o repositório e instale as dependências científicas.</p>
+        <pre><code>git clone https://github.com/augustobotton/PALO
+cd PALO
+pip install numpy scipy matplotlib tqdm plotly astropy</code></pre>
+      </div>
+      <div>
+        <h3>Rode um exemplo</h3>
+        <p>Execute da raiz para que o pacote <code>src</code> seja encontrado.</p>
+        <pre><code>PYTHONPATH=. python exemplos/exemplos_orbitas/\
+exemplos_propagacao/exemplo_propagacao_ecken.py</code></pre>
+      </div>
+      <div>
+        <h3>Regenere esta página</h3>
+        <p>Os dados vêm de um script que chama a biblioteca. Tudo leva alguns minutos por causa da simulação de lançamento; passe nomes de etapas para recalcular só parte.</p>
+        <pre><code>python docs/gerar_dados_pagina.py
+python docs/gerar_dados_pagina.py arrasto j2</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="faixa rodape">
+  <div class="miolo">
+    <span>PALO · Augusto Botton Pozzebon · Licença MIT</span>
+    <span id="gerado-em"></span>
+  </div>
+</footer>
+
+<script src="assets/dados.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var D = window.PALO_DADOS;
+  var MU = 398600.4418, RE = 6378.137, G0 = 9.80665;
+  var reduzirMovimento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fmt = function (v, c) { return Number(v).toLocaleString("pt-BR", { minimumFractionDigits: c, maximumFractionDigits: c }); };
+  var graus = function (rad) { return rad * 180 / Math.PI; };
+  function cor(nome) { return getComputedStyle(document.documentElement).getPropertyValue(nome).trim(); }
+  function $(id) { return document.getElementById(id); }
+
+  // Copiar comando de instalação
+  $("copiar").addEventListener("click", function () {
+    var b = this, texto = $("cmd-instalar").textContent;
+    var ok = function () { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(ok, selecionar);
+    } else { selecionar(); }
+    function selecionar() { var r = document.createRange(); r.selectNodeContents($("cmd-instalar")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+  });
+
+  if (!D) {
+    document.querySelector(".lede").insertAdjacentHTML("afterend", '<p class="nota">Dados não encontrados. Rode <code>python docs/gerar_dados_pagina.py</code> para gerar <code>docs/assets/dados.js</code>.</p>');
+    return;
+  }
+  $("gerado-em").textContent = "Dados gerados em " + D.gerado_em.split("-").reverse().join("/");
+
+  /* ---------- Elementos orbitais (tradução de vetor_de_estados_para_coe) ---------- */
+  function cruz(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  function ponto(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function norma(a) { return Math.sqrt(ponto(a, a)); }
+  function acos(x) { return Math.acos(Math.max(-1, Math.min(1, x))); }
+
+  function coe(R, V, mu) {
+    var eps = 1e-10, r = norma(R), v = norma(V), vr = ponto(R, V) / r;
+    var H = cruz(R, V), h = norma(H), incl = acos(H[2] / h);
+    var N = cruz([0, 0, 1], H), n = norma(N);
+    var RA = 0;
+    if (n !== 0) { RA = acos(N[0] / n); if (N[1] < 0) RA = 2 * Math.PI - RA; }
+    var k = v * v - mu / r;
+    var E = [0, 1, 2].map(function (i) { return (k * R[i] - r * vr * V[i]) / mu; });
+    var e = norma(E), w = 0;
+    if (n !== 0 && e > eps) { w = acos(ponto(N, E) / (n * e)); if (E[2] < 0) w = 2 * Math.PI - w; }
+    var TA;
+    if (e > eps) { TA = acos(ponto(E, R) / (e * r)); if (vr < 0) TA = 2 * Math.PI - TA; }
+    else { var cp = cruz(N, R); TA = cp[2] >= 0 ? acos(ponto(N, R) / (n * r)) : 2 * Math.PI - acos(ponto(N, R) / (n * r)); }
+    var a = h * h / mu / (1 - e * e);
+    return { a: a, e: e, i: incl, raan: RA, w: w, theta: TA, h: h, r: r, v: v };
+  }
+
+  var campos = ["rx", "ry", "rz", "vx", "vy", "vz"];
+  var presetAtivo = "leo";
+  var botoesPreset = {};
+  Object.keys(D.elementos).forEach(function (chave) {
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = D.elementos[chave].nome;
+    b.addEventListener("click", function () { carregarPreset(chave); });
+    $("presets").appendChild(b); botoesPreset[chave] = b;
+  });
+  function carregarPreset(chave) {
+    presetAtivo = chave;
+    var p = D.elementos[chave];
+    campos.forEach(function (c, i) { $(c).value = (i < 3 ? p.r[i] : p.v[i - 3]); });
+    Object.keys(botoesPreset).forEach(function (k) { botoesPreset[k].setAttribute("aria-pressed", k === chave ? "true" : "false"); });
+    calcular();
+  }
+  campos.forEach(function (c) {
+    $(c).addEventListener("input", function () {
+      presetAtivo = null;
+      Object.keys(botoesPreset).forEach(function (k) { botoesPreset[k].setAttribute("aria-pressed", "false"); });
+      calcular();
+    });
+  });
+
+  var ultimo = null;
+  function calcular() {
+    var vals = campos.map(function (c) { return parseFloat(String($(c).value).replace(",", ".")); });
+    if (vals.some(isNaN)) { $("tipo").textContent = "Preencha os seis componentes"; return; }
+    var R = vals.slice(0, 3), V = vals.slice(3);
+    if (norma(R) === 0 || norma(cruz(R, V)) === 0) { $("tipo").textContent = "Vetores degenerados (r nulo ou r paralelo a v)"; return; }
+    var o = coe(R, V, MU);
+    ultimo = o;
+    var ref = presetAtivo ? D.elementos[presetAtivo].palo : null;
+    var tipo = o.e < 1e-6 ? "Circular" : o.e < 1 ? "Elíptica" : o.e === 1 ? "Parabólica" : "Hiperbólica";
+    var perigeu = o.a * (1 - o.e);
+    if (o.e < 1 && perigeu < RE) tipo += " · intercepta a Terra";
+    $("tipo").textContent = tipo;
+
+    var linhas = [
+      ["Semieixo maior a", "a", o.a, function (x) { return fmt(x, 2) + " km"; }, 1e-6],
+      ["Excentricidade e", "e", o.e, function (x) { return fmt(x, 6); }, 1e-8],
+      ["Inclinação i", "i", o.i, function (x) { return fmt(graus(x), 4) + "°"; }, 1e-8],
+      ["Ascensão reta do nó Ω", "raan", o.raan, function (x) { return fmt(graus(x), 4) + "°"; }, 1e-8],
+      ["Argumento do periastro ω", "w", o.w, function (x) { return fmt(graus(x), 4) + "°"; }, 1e-6],
+      ["Anomalia verdadeira θ", "theta", o.theta, function (x) { return fmt(graus(x), 4) + "°"; }, 1e-6],
+      ["Momento angular h", "h", o.h, function (x) { return fmt(x, 2) + " km²/s"; }, 1e-8]
+    ];
+    $("tabela-elementos").innerHTML = linhas.map(function (l) {
+      var cel = "<span class=\"confere\">—</span>";
+      if (ref) {
+        var rv = ref[l[1]], dif = Math.abs(rv - l[2]) / Math.max(1, Math.abs(rv));
+        cel = dif < l[4] ? '<span class="confere">✓ idêntico</span>' : '<span class="confere difere">' + l[3](rv) + "</span>";
+      }
+      return "<tr><td>" + l[0] + "</td><td>" + l[3](l[2]) + "</td><td>" + cel + "</td></tr>";
+    }).join("");
+
+    var energia = o.v * o.v / 2 - MU / o.r;
+    var der = [["Raio atual", fmt(o.r, 1) + " km"], ["Velocidade", fmt(o.v, 3) + " km/s"],
+      ["Energia específica", fmt(energia, 3) + " km²/s²"], ["Altitude do periastro", fmt(perigeu - RE, 1) + " km"]];
+    if (o.e < 1) {
+      der.push(["Altitude do apoastro", fmt(o.a * (1 + o.e) - RE, 1) + " km"]);
+      der.push(["Período", fmt(2 * Math.PI * Math.sqrt(Math.pow(o.a, 3) / MU) / 60, 2) + " min"]);
+    } else {
+      der.push(["Velocidade de excesso hiperbólico", fmt(Math.sqrt(2 * energia), 3) + " km/s"]);
+    }
+    $("tabela-derivados").innerHTML = der.map(function (d) { return "<tr><td>" + d[0] + "</td><td>" + d[1] + "</td></tr>"; }).join("");
+    desenharEsboco();
+  }
+
+  function prepararCanvas(cv) {
+    var dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    var ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  function desenharEsboco() {
+    var o = ultimo; if (!o) return;
+    var c = prepararCanvas($("esboco")), ctx = c.ctx, w = c.w, h = c.h;
+    ctx.clearRect(0, 0, w, h);
+    var p = o.h * o.h / MU, pts = [], thMax = o.e < 1 ? Math.PI : Math.acos(-1 / o.e) - 0.02;
+    var rLim = o.e < 1 ? o.a * (1 + o.e) : Math.max(o.r * 1.6, 4 * RE);
+    for (var k = 0; k <= 720; k++) {
+      var th = -thMax + 2 * thMax * k / 720, rr = p / (1 + o.e * Math.cos(th));
+      if (rr > 0 && rr <= rLim * 1.05) pts.push([rr * Math.cos(th), rr * Math.sin(th)]);
+    }
+    var xs = pts.map(function (q) { return q[0]; }).concat([-RE, RE]), ys = pts.map(function (q) { return q[1]; }).concat([-RE, RE]);
+    var xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs), ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys);
+    var esc = Math.min((w - 40) / (xmax - xmin), (h - 40) / (ymax - ymin));
+    var cx = w / 2 - esc * (xmin + xmax) / 2, cy = h / 2 + esc * (ymin + ymax) / 2;
+    var X = function (x) { return cx + esc * x; }, Y = function (y) { return cy - esc * y; };
+
+    ctx.strokeStyle = cor("--linha"); ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(10, cy); ctx.lineTo(w - 10, cy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = cor("--terra"); ctx.globalAlpha = 0.85;
+    ctx.beginPath(); ctx.arc(X(0), Y(0), RE * esc, 0, 2 * Math.PI); ctx.fill(); ctx.globalAlpha = 1;
+    ctx.strokeStyle = cor("--orbita"); ctx.lineWidth = 2;
+    ctx.beginPath(); pts.forEach(function (q, i) { i ? ctx.lineTo(X(q[0]), Y(q[1])) : ctx.moveTo(X(q[0]), Y(q[1])); }); ctx.stroke();
+    var rp = p / (1 + o.e);
+    ctx.fillStyle = cor("--tinta"); ctx.beginPath(); ctx.arc(X(rp), Y(0), 3.5, 0, 2 * Math.PI); ctx.fill();
+    ctx.font = "500 11px " + cor("--mono"); ctx.textBaseline = "bottom";
+    ctx.fillText("periastro", Math.min(X(rp) + 6, w - 60), Y(0) - 4);
+    if (o.e < 1 && o.e > 1e-6) { var ra = p / (1 - o.e); ctx.beginPath(); ctx.arc(X(-ra), Y(0), 3.5, 0, 2 * Math.PI); ctx.fill(); ctx.fillText("apoastro", Math.max(X(-ra) + 6, 4), Y(0) - 4); }
+    var rr0 = p / (1 + o.e * Math.cos(o.theta));
+    ctx.fillStyle = cor("--sinal"); ctx.beginPath(); ctx.arc(X(rr0 * Math.cos(o.theta)), Y(rr0 * Math.sin(o.theta)), 6, 0, 2 * Math.PI); ctx.fill();
+  }
+
+  carregarPreset("leo");
+
+  /* ---------- Missão: animação do herói ---------- */
+  var L = D.lancamento, ev = L.eventos;
+  function fase(t) {
+    var ig = ev.ignicao, fq = ev.fim_queima;
+    if (t < fq[0]) return "1º estágio em queima";
+    if (t < ig[1]) return "Separação do 1º estágio";
+    if (t < fq[1]) return "2º estágio em queima";
+    if (t < ig[2]) return "Costa · separação do 2º estágio";
+    if (t < fq[2]) return "3º estágio · 1ª queima";
+    if (ig.length > 3 && t < ig[3]) return "Costa na órbita de transferência";
+    if (fq.length > 3 && t < fq[3]) return "3º estágio · circularização";
+    return "Órbita final";
+  }
+  function relogio(t) {
+    if (t < 3600) return "T+" + Math.round(t) + " s";
+    var hh = Math.floor(t / 3600), mm = Math.floor((t % 3600) / 60);
+    return "T+" + hh + " h " + String(mm).padStart(2, "0") + " min";
+  }
+  var cvM = $("missao"), quadro = 0, ultimoQuadro = 0;
+  var rMax = Math.max.apply(null, L.altitude_km) + RE;
+  function desenharMissao(ate) {
+    var c = prepararCanvas(cvM), ctx = c.ctx, w = c.w, h = c.h;
+    ctx.clearRect(0, 0, w, h);
+    var esc = (Math.min(w, h) / 2 - 14) / rMax, cx = w / 2, cy = h / 2;
+    // anel geoestacionário
+    ctx.strokeStyle = cor("--linha"); ctx.setLineDash([3, 5]); ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, 42164.14 * esc, 0, 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = cor("--sutil"); ctx.font = "500 10px " + cor("--mono");
+    ctx.fillText("GEO 35 786 km", cx + 42164.14 * esc * 0.71 + 4, cy - 42164.14 * esc * 0.71);
+    // Terra girando, com Alcântara
+    var t = L.t[ate], rot = L.base.longitude_graus * Math.PI / 180 + 7.292115e-5 * t;
+    ctx.fillStyle = cor("--terra"); ctx.beginPath(); ctx.arc(cx, cy, RE * esc, 0, 2 * Math.PI); ctx.fill();
+    ctx.fillStyle = cor("--painel"); ctx.beginPath(); ctx.arc(cx + RE * esc * Math.cos(rot), cy - RE * esc * Math.sin(rot), 2.5, 0, 2 * Math.PI); ctx.fill();
+    // trajetória
+    ctx.strokeStyle = cor("--orbita"); ctx.lineWidth = 1.6; ctx.beginPath();
+    for (var i = 0; i <= ate; i++) {
+      var rr = (L.altitude_km[i] + RE) * esc, lam = L.longitude_inercial_rad[i];
+      var x = cx + rr * Math.cos(lam), y = cy - rr * Math.sin(lam);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+    var rA = (L.altitude_km[ate] + RE) * esc, lA = L.longitude_inercial_rad[ate];
+    ctx.fillStyle = cor("--sinal"); ctx.beginPath(); ctx.arc(cx + rA * Math.cos(lA), cy - rA * Math.sin(lA), 4.5, 0, 2 * Math.PI); ctx.fill();
+
+    $("l-t").textContent = relogio(t);
+    $("l-h").textContent = fmt(L.altitude_km[ate], 0) + " km";
+    $("l-v").textContent = fmt(L.velocidade_ms[ate], 0) + " m/s";
+    $("l-m").textContent = fmt(L.massa_kg[ate], 0) + " kg";
+    $("fase").textContent = fase(t);
+  }
+  var n = L.t.length;
+  function animar(ts) {
+    if (ts - ultimoQuadro > 16) {
+      ultimoQuadro = ts;
+      // a subida (amostrada a cada 2 s) passa mais devagar que a costa (a cada 60 s)
+      quadro += L.t[quadro] < 1000 ? 2 : 4;
+      if (quadro >= n + 120) quadro = 0;
+      desenharMissao(Math.min(quadro, n - 1));
+    }
+    requestAnimationFrame(animar);
+  }
+  if (reduzirMovimento) { desenharMissao(n - 1); } else { requestAnimationFrame(animar); }
+
+  /* ---------- Números do lançamento ---------- */
+  var V = L.veiculo, dvs = [], dvTotal = 0;
+  for (var s = 0; s < 3; s++) {
+    var m0 = V.carga_util_kg;
+    for (var q = s; q < 3; q++) m0 += V.propelente_kg[q] + V.estrutura_kg[q];
+    var dv = V.isp_s[s] * G0 * Math.log(m0 / (m0 - V.propelente_kg[s]));
+    dvs.push(dv); dvTotal += dv;
+  }
+  var tFim = ev.fim_queima[ev.fim_queima.length - 1];
+  var altFinal = L.altitude_km.slice(-200);
+  var altMed = altFinal.reduce(function (a, b) { return a + b; }, 0) / altFinal.length;
+  $("numeros-lancamento").innerHTML = [
+    [fmt(V.massa_inicial_kg / 1000, 1), "t", "massa na decolagem"],
+    [fmt(dvTotal / 1000, 2), "km/s", "Δv ideal dos três estágios"],
+    [fmt(tFim / 3600, 2), "h", "até o fim da circularização"],
+    [fmt(altMed, 0), "km", "altitude média na órbita final"]
+  ].map(function (x) { return '<div class="numero"><b>' + x[0] + "<small>" + x[1] + "</small></b><span>" + x[2] + "</span></div>"; }).join("");
+  $("tabela-veiculo").innerHTML = [0, 1, 2].map(function (s) {
+    return "<tr><td>" + (s + 1) + "º</td><td>" + V.isp_s[s] + "</td><td>" + fmt(V.propelente_kg[s], 0) + "</td><td>" + fmt(V.estrutura_kg[s], 0) +
+      "</td><td>" + fmt(V.queima_s[s], 1) + "</td><td>" + fmt(dvs[s], 0) + "</td></tr>";
+  }).join("");
+  $("nota-veiculo").textContent = "Carga útil de " + V.carga_util_kg + " kg. Base: " + L.base.nome + " (" + fmt(L.base.latitude_graus, 2) + "°, " +
+    fmt(L.base.longitude_graus, 2) + "°). Azimute inercial final de " + fmt(L.azimute_final_graus, 1) + "° para a inclinação de " + L.alvo.inclinacao_graus + "°.";
+
+  /* ---------- Gráficos (Plotly), refeitos ao trocar de tema ---------- */
+  var J = D.j2, A = D.arrasto, M = D.modelos;
+  var periodoS = J.periodo_min * 60;
+  var nMedio = 2 * Math.PI / periodoS, pJ = J.a_km * (1 - J.e * J.e), iJ = J.inclinacao_graus * Math.PI / 180;
+  var taxaTeorica = -1.5 * nMedio * 1.08263e-3 * Math.pow(RE / pJ, 2) * Math.cos(iJ) * 86400 * 180 / Math.PI;
+  var taxaSimulada = J.delta_raan_graus[J.delta_raan_graus.length - 1] / (J.t_h[J.t_h.length - 1] / 24);
+  $("txt-j2").textContent = "Órbita de " + fmt(J.a_km, 0) + " km de semieixo, e = " + fmt(J.e, 3) + ", i = " + fmt(J.inclinacao_graus, 1) +
+    "°, período de " + fmt(J.periodo_min, 1) + " min. Arraste para girar.";
+  $("txt-deriva").textContent = "Ω simulado varia " + fmt(taxaSimulada, 3) + "°/dia. A teoria secular de primeira ordem prevê " + fmt(taxaTeorica, 3) +
+    "°/dia. O perigeu também gira (ω).";
+  $("txt-arrasto").textContent = "Satélite de 100 kg, Cd 2,2, área de 0,785 m², partindo de perigeu " + fmt(A.perigeu_inicial_km, 0) + " km e apogeu " +
+    fmt(A.apogeu_inicial_km, 0) + " km. O arrasto, concentrado no perigeu, derruba o apogeu para " + fmt(A.apogeu_km[A.apogeu_km.length - 1], 0) +
+    " km; em " + fmt(A.dias_ate_200km, 1) + " dias o perigeu cruza a altitude crítica de 200 km e a propagação para.";
+
+  function base(extra) {
+    var tinta = cor("--tinta"), linha = cor("--linha"), sutil = cor("--sutil");
+    var eixo = { gridcolor: linha, zerolinecolor: linha, linecolor: linha, tickfont: { color: sutil, size: 11 }, title: { font: { color: sutil, size: 12 } } };
+    var lay = {
+      paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+      font: { family: cor("--texto"), color: tinta, size: 12 },
+      margin: { l: 56, r: 16, t: 8, b: 44 }, showlegend: true,
+      legend: { orientation: "h", x: 0, y: 1.12, font: { size: 11, color: sutil } },
+      xaxis: JSON.parse(JSON.stringify(eixo)), yaxis: JSON.parse(JSON.stringify(eixo)),
+      hoverlabel: { font: { family: cor("--mono") } }
+    };
+    Object.keys(extra || {}).forEach(function (k) {
+      if (typeof extra[k] === "object" && lay[k] && !Array.isArray(extra[k])) Object.assign(lay[k], extra[k]); else lay[k] = extra[k];
+    });
+    return lay;
+  }
+  var cfg = { displayModeBar: false, responsive: true };
+  function linhasEventos(ate) {
+    var formas = [], lst = ev.fim_queima.concat(ev.separacao).filter(function (t) { return t > 0 && t < ate; });
+    lst.forEach(function (t) { formas.push({ type: "line", x0: t, x1: t, yref: "paper", y0: 0, y1: 1, line: { color: cor("--linha"), width: 1, dash: "dot" } }); });
+    return formas;
+  }
+
+  var webgl = (function () {
+    try { var c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); }
+    catch (e) { return false; }
+  })();
+
+  // Cena 3D com a Terra; sem WebGL, avisa em vez de deixar o quadro vazio
+  function plot3d(id, tracos, olho, legenda) {
+    var el = $(id);
+    if (!webgl) {
+      el.innerHTML = '<div class="sem-webgl">Este gráfico 3D precisa de WebGL, que está desativado ou indisponível neste navegador.</div>';
+      return;
+    }
+    var sutil = cor("--sutil"), linha = cor("--linha"), terra = cor("--terra");
+    var su = [], sv = [], sw = [], nu = 36, nv = 18;
+    for (var a = 0; a <= nv; a++) {
+      var ru = [], rv = [], rw = [], fi = Math.PI * a / nv;
+      for (var b = 0; b <= nu; b++) { var la = 2 * Math.PI * b / nu; ru.push(RE * Math.sin(fi) * Math.cos(la)); rv.push(RE * Math.sin(fi) * Math.sin(la)); rw.push(RE * Math.cos(fi)); }
+      su.push(ru); sv.push(rv); sw.push(rw);
+    }
+    var esfera = { type: "surface", x: su, y: sv, z: sw, showscale: false, colorscale: [[0, terra], [1, terra]], hoverinfo: "skip", name: "Terra", showlegend: false,
+      lighting: { ambient: 0.85, diffuse: 0.35, specular: 0.05, roughness: 0.9 } };
+    var eixo3 = function (t) { return { title: { text: t, font: { color: sutil, size: 11 } }, showbackground: false, gridcolor: linha, zerolinecolor: linha, tickfont: { color: sutil, size: 10 } }; };
+    Plotly.react(el, [esfera].concat(tracos), base({ showlegend: !!legenda, margin: { l: 0, r: 0, t: 0, b: 0 },
+      legend: { orientation: "h", x: 0, y: 1, font: { size: 11, color: sutil } },
+      scene: { aspectmode: "data", xaxis: eixo3("x (km)"), yaxis: eixo3("y (km)"), zaxis: eixo3("z (km)"), camera: { eye: olho, projection: { type: "orthographic" } } } }), cfg);
+  }
+
+  function graficos() {
+    if (!window.Plotly) return;
+    var orb = cor("--orbita"), sinal = cor("--sinal"), terra = cor("--terra"), sutil = cor("--sutil");
+    var corte = L.t.findIndex(function (t) { return t > 900; });
+    var tS = L.t.slice(0, corte);
+    Plotly.react("g-subida", [
+      { x: tS, y: L.altitude_km.slice(0, corte), name: "Altitude (km)", line: { color: orb, width: 2 }, hovertemplate: "%{y:.0f} km<extra></extra>" },
+      { x: tS, y: L.velocidade_ms.slice(0, corte), name: "Velocidade relativa (m/s)", yaxis: "y2", line: { color: sinal, width: 2 }, hovertemplate: "%{y:.0f} m/s<extra></extra>" }
+    ], base({ xaxis: { title: { text: "tempo (s)" } }, yaxis: { title: { text: "altitude (km)" } },
+      yaxis2: { overlaying: "y", side: "right", showgrid: false, tickfont: { color: sutil, size: 11 }, title: { text: "m/s", font: { color: sutil, size: 12 } } },
+      margin: { l: 56, r: 52, t: 8, b: 44 }, shapes: linhasEventos(900) }), cfg);
+
+    var corteM = L.t.findIndex(function (t) { return t > tFim + 200; });
+    Plotly.react("g-massa", [
+      { x: L.t.slice(0, corteM).map(function (t) { return t / 60; }), y: L.massa_kg.slice(0, corteM), name: "Massa", line: { color: orb, width: 2, shape: "hv" }, showlegend: false, hovertemplate: "%{y:,.0f} kg<extra></extra>" }
+    ], base({ xaxis: { title: { text: "tempo (min)" } }, yaxis: { title: { text: "massa (kg)" }, type: "log" }, separators: ",." }), cfg);
+
+    Plotly.react("g-missao", [
+      { x: L.t.map(function (t) { return t / 3600; }), y: L.altitude_km, name: "Altitude", line: { color: orb, width: 2 }, showlegend: false, hovertemplate: "%{x:.2f} h · %{y:,.0f} km<extra></extra>" }
+    ], base({ xaxis: { title: { text: "tempo (h)" } }, yaxis: { title: { text: "altitude (km)" } }, separators: ",.",
+      shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 35786, y1: 35786, line: { color: sinal, width: 1, dash: "dash" } }],
+      annotations: [{ xref: "paper", x: 1, y: 35786, text: "GEO", showarrow: false, xanchor: "right", yanchor: "bottom", font: { color: sinal, size: 11 } }] }), cfg);
+
+    plot3d("g-3d", [
+      { type: "scatter3d", mode: "lines", x: J.x, y: J.y, z: J.z, line: { color: J.t_h, colorscale: [[0, orb], [1, sinal]], width: 3 }, name: "Órbita", hoverinfo: "skip" }
+    ], { x: 1.4, y: 1.3, z: 0.7 });
+
+    // Lançamento: (raio, latitude, longitude inercial) -> cartesiano inercial
+    var lx = [], ly = [], lz = [], lt = [], lh = [];
+    for (var k3 = 0; k3 < L.t.length; k3++) {
+      var rr3 = L.altitude_km[k3] + RE, la3 = L.latitude_graus[k3] * Math.PI / 180, lo3 = L.longitude_inercial_rad[k3];
+      lx.push(rr3 * Math.cos(la3) * Math.cos(lo3)); ly.push(rr3 * Math.cos(la3) * Math.sin(lo3)); lz.push(rr3 * Math.sin(la3));
+      lt.push(L.t[k3] / 3600); lh.push(relogio(L.t[k3]) + " · " + fmt(L.altitude_km[k3], 0) + " km · " + fase(L.t[k3]));
+    }
+    var gx = [], gy = [], gz = [];
+    for (var g3 = 0; g3 <= 120; g3++) { var a3 = 2 * Math.PI * g3 / 120; gx.push(42164.14 * Math.cos(a3)); gy.push(42164.14 * Math.sin(a3)); gz.push(0); }
+    plot3d("g-lanc-3d", [
+      { type: "scatter3d", mode: "lines", x: gx, y: gy, z: gz, line: { color: sutil, width: 2, dash: "dash" }, name: "GEO", hoverinfo: "skip" },
+      { type: "scatter3d", mode: "lines", x: lx, y: ly, z: lz, text: lh, hovertemplate: "%{text}<extra></extra>",
+        line: { color: lt, colorscale: [[0, sinal], [0.15, orb], [1, orb]], width: 4 }, name: "Trajetória" },
+      { type: "scatter3d", mode: "markers", x: [lx[0]], y: [ly[0]], z: [lz[0]], marker: { color: sinal, size: 5 }, name: "Alcântara", hovertemplate: "Alcântara<extra></extra>" }
+    ], { x: 1.1, y: -1.5, z: 1.1 });
+
+    var oi = A.orbitas_iniciais, of = A.orbitas_finais;
+    if (oi && of) {
+      // câmera na direção da normal ao plano orbital (produto vetorial de dois pontos da primeira órbita)
+      var q = Math.floor(oi.x.length / 8);
+      var nrm = cruz([oi.x[0], oi.y[0], oi.z[0]], [oi.x[q], oi.y[q], oi.z[q]]), mn = norma(nrm) / 1.9;
+      plot3d("g-cowell-3d", [
+        { type: "scatter3d", mode: "lines", x: oi.x, y: oi.y, z: oi.z, line: { color: orb, width: 3 }, name: "Início", hoverinfo: "skip" },
+        { type: "scatter3d", mode: "lines", x: of.x, y: of.y, z: of.z, line: { color: sinal, width: 3 }, name: "Antes da reentrada", hoverinfo: "skip" }
+      ], { x: nrm[0] / mn, y: nrm[1] / mn, z: nrm[2] / mn }, true);
+    }
+
+    Plotly.react("g-deriva", [
+      { x: J.t_h, y: J.delta_raan_graus, name: "ΔΩ (°)", line: { color: orb, width: 2 }, hovertemplate: "%{y:.3f}°<extra>ΔΩ</extra>" },
+      { x: J.t_h, y: J.delta_w_graus, name: "Δω (°)", line: { color: sinal, width: 2 }, hovertemplate: "%{y:.3f}°<extra>Δω</extra>" }
+    ], base({ xaxis: { title: { text: "tempo (h)" } }, yaxis: { title: { text: "variação (graus)" } }, separators: ",." }), cfg);
+
+    // traço no solo: quebra a linha onde a longitude salta de -180 para 180
+    var tx = [], ty = [];
+    for (var k = 0; k < J.lon.length; k++) {
+      if (k && Math.abs(J.lon[k] - J.lon[k - 1]) > 180) { tx.push(null); ty.push(null); }
+      tx.push(J.lon[k]); ty.push(J.lat[k]);
+    }
+    Plotly.react("g-traco", [
+      { x: tx, y: ty, mode: "lines", line: { color: orb, width: 1.5 }, name: "Traço", showlegend: false, hovertemplate: "%{x:.1f}°, %{y:.1f}°<extra></extra>" },
+      { x: [J.lon[0]], y: [J.lat[0]], mode: "markers", marker: { color: sinal, size: 9 }, name: "Início", showlegend: false, hoverinfo: "skip" }
+    ], base({ xaxis: { title: { text: "longitude (°)" }, range: [-180, 180], dtick: 60 }, yaxis: { title: { text: "latitude (°)" }, range: [-90, 90], dtick: 30 } }), cfg);
+
+    Plotly.react("g-arrasto", [
+      { x: A.dias, y: A.apogeu_km, name: "Apogeu", line: { color: sinal, width: 2 }, hovertemplate: "%{y:.0f} km<extra>apogeu</extra>" },
+      { x: A.dias, y: A.perigeu_km, name: "Perigeu", line: { color: orb, width: 2 }, hovertemplate: "%{y:.0f} km<extra>perigeu</extra>" }
+    ], base({ xaxis: { title: { text: "dias" } }, yaxis: { title: { text: "altitude (km)" } }, separators: ",." }), cfg);
+
+    Plotly.react("g-atm", [
+      { x: M.atmosfera.densidade, y: M.atmosfera.altitude_km, name: "Densidade (kg/m³)", line: { color: orb, width: 2 }, hovertemplate: "%{x:.2e} kg/m³<extra></extra>" },
+      { x: M.atmosfera.temperatura_K, y: M.atmosfera.altitude_km, name: "Temperatura (K)", xaxis: "x2", line: { color: sinal, width: 2 }, hovertemplate: "%{x:.0f} K<extra></extra>" }
+    ], base({ xaxis: { title: { text: "densidade (kg/m³)" }, type: "log", exponentformat: "power" }, yaxis: { title: { text: "altitude (km)" } },
+      xaxis2: { overlaying: "x", side: "top", showgrid: false, tickfont: { color: sutil, size: 11 } }, margin: { l: 56, r: 16, t: 28, b: 44 },
+      legend: { orientation: "h", x: 0, y: -0.25, font: { size: 11, color: sutil } } }), cfg);
+
+    var G = M.gravidade;
+    Plotly.react("g-grav", [
+      { x: G.latitude_graus, y: G.radial.map(function (g) { return Math.abs(g); }), name: "Axissimétrico (J2–J4)", line: { color: orb, width: 2 }, hovertemplate: "%{y:.4f} m/s²<extra></extra>" },
+      { x: G.latitude_graus, y: G.latitude_graus.map(function () { return G.esferica; }), name: "Esférico μ/R²", line: { color: sutil, width: 1.5, dash: "dash" }, hovertemplate: "%{y:.4f} m/s²<extra></extra>" }
+    ], base({ xaxis: { title: { text: "latitude (°)" }, dtick: 30 }, yaxis: { title: { text: "gravidade radial (m/s²)" } }, separators: ",." }), cfg);
+  }
+  graficos();
+
+  // Redesenha ao mudar o tema (sistema ou atributo data-theme)
+  var redesenhar = function () { graficos(); desenharEsboco(); if (reduzirMovimento) desenharMissao(n - 1); };
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    (mq.addEventListener ? mq.addEventListener("change", redesenhar) : mq.addListener(redesenhar));
+  }
+  new MutationObserver(redesenhar).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  window.addEventListener("resize", function () { desenharEsboco(); if (reduzirMovimento) desenharMissao(n - 1); });
+})();
+</script>
+</body>
+</html>
