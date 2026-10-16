@@ -95,5 +95,5 @@ def dinamica_foguete(vetor_tempo, vetor_de_estados_foguete, base_de_lancamento, 
                                                      planeta)
 
     # Derivada do vetor de estado
-    Xp = np.array([float(Vp), Ap, phip, rp, deltap, lonp])
+    Xp = np.array([np.asarray(Vp).item(), Ap, phip, rp, deltap, lonp])
     return Xp
