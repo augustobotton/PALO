@@ -216,7 +216,18 @@ def decaimento_por_arrasto():
             perigeus.append(altitude[janela].min())
         inicio += periodo
     passo = max(1, len(dias) // 600)
+
+    # Trechos 3D: as três primeiras e as três últimas revoluções
+    inicio_3d = t <= 3 * periodo
+    fim_3d = t >= t[-1] - 3 * periodo
+
+    def trecho(mascara):
+        pts = y[mascara, :3]
+        p = max(1, len(pts) // 600)
+        return {"x": r(pts[::p, 0], 1), "y": r(pts[::p, 1], 1), "z": r(pts[::p, 2], 1)}
+
     return {
+        "orbitas_iniciais": trecho(inicio_3d), "orbitas_finais": trecho(fim_3d),
         "dias": r(dias[::passo], 3), "apogeu_km": r(apogeus[::passo], 2), "perigeu_km": r(perigeus[::passo], 2),
         "dias_ate_200km": round(float(t[-1] / 86400), 2),
         "apogeu_inicial_km": round(float(apogeus[0]), 1), "perigeu_inicial_km": round(float(perigeus[0]), 1),
@@ -250,16 +261,29 @@ def modelos_planeta():
 
 
 def main():
-    dados = {"gerado_em": time.strftime("%Y-%m-%d")}
-    etapas = [("elementos", elementos_orbitais), ("modelos", modelos_planeta), ("j2", perturbacao_j2),
-              ("arrasto", decaimento_por_arrasto), ("lancamento", lancamento)]
-    for chave, funcao in etapas:
-        inicio = time.time()
-        print(f"[{chave}] calculando...")
-        dados[chave] = funcao()
-        print(f"[{chave}] ok em {time.time() - inicio:.0f} s")
+    etapas = {"elementos": elementos_orbitais, "modelos": modelos_planeta, "j2": perturbacao_j2,
+              "arrasto": decaimento_por_arrasto, "lancamento": lancamento}
+    # Uso: python docs/gerar_dados_pagina.py [etapa ...]  (sem argumentos, recalcula todas)
+    escolhidas = sys.argv[1:] or list(etapas)
+    invalidas = [e for e in escolhidas if e not in etapas]
+    if invalidas:
+        sys.exit(f"Etapas desconhecidas: {invalidas}. Opções: {list(etapas)}")
 
     destino = os.path.join(RAIZ, "docs", "assets", "dados.js")
+    dados = {}
+    if set(escolhidas) != set(etapas) and os.path.exists(destino):
+        # Recálculo parcial: mantém as demais etapas do arquivo existente
+        with open(destino, encoding="utf-8") as f:
+            texto = f.read()
+        dados = json.loads(texto[texto.index("=") + 1:].strip().rstrip(";"))
+    dados["gerado_em"] = time.strftime("%Y-%m-%d")
+
+    for chave in escolhidas:
+        inicio = time.time()
+        print(f"[{chave}] calculando...")
+        dados[chave] = etapas[chave]()
+        print(f"[{chave}] ok em {time.time() - inicio:.0f} s")
+
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     with open(destino, "w", encoding="utf-8") as f:
         f.write("// Arquivo gerado por docs/gerar_dados_pagina.py. Não edite à mão.\n")

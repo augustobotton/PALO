@@ -122,6 +122,9 @@ h3 { font: 600 20px/1.2 var(--display); text-transform: uppercase; letter-spacin
 .cartao > p { margin: 0 0 8px; color: var(--sutil); font-size: 14px; }
 .grafico { width: 100%; height: 320px; }
 .grafico.alto { height: 420px; }
+.grafico.mais-alto { height: 560px; }
+.cartao.inteiro { grid-column: 1 / -1; }
+.sem-webgl { height: 100%; display: grid; place-items: center; text-align: center; padding: 16px; color: var(--sutil); font-size: 14px; border: 1px dashed var(--linha); border-radius: var(--raio); }
 
 .tabela-rolagem { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
@@ -181,6 +184,7 @@ pre {
   .leitura:nth-child(n+3) { border-top: 1px solid var(--linha); }
   .grafico { height: 280px; }
   .grafico.alto { height: 340px; }
+  .grafico.mais-alto { height: 400px; }
   .topo nav { gap: 14px; }
 }
 </style>
@@ -285,6 +289,11 @@ pre {
       <p>Dinâmica de translação em coordenadas esféricas num planeta girante, com gravidade até J4, atmosfera padrão, arrasto por número de Mach e Knudsen, trilho de lançamento e dupla ignição do 3º estágio. O caso é <code>exemplos/exemplos_simulacao_voo/adquire_gso_exemplo.py</code>: saída de Alcântara rumo a uma órbita circular de 42 164 km de raio.</p>
     </div>
     <div class="numeros" id="numeros-lancamento"></div>
+    <div class="cartao" style="margin-bottom:24px">
+      <h3>Trajetória em 3D, referencial inercial</h3>
+      <p>Da subida à órbita final, colorida pelo tempo de voo. O anel tracejado é a órbita geoestacionária. Arraste para girar e use a roda do mouse para aproximar.</p>
+      <div class="grafico mais-alto" id="g-lanc-3d"></div>
+    </div>
     <div class="grade-2">
       <div class="cartao">
         <h3>Subida: altitude e velocidade</h3>
@@ -336,15 +345,20 @@ pre {
         <p id="txt-deriva"></p>
         <div class="grafico alto" id="g-deriva"></div>
       </div>
-      <div class="cartao">
+      <div class="cartao inteiro">
         <h3>Traço no solo</h3>
         <p>Latitude e longitude geocêntricas das 48 h propagadas. Cada passagem cai a oeste da anterior porque a Terra gira por baixo da órbita.</p>
         <div class="grafico" id="g-traco"></div>
       </div>
       <div class="cartao">
+        <h3>Cowell com arrasto em 3D</h3>
+        <p id="txt-cowell-3d">As três primeiras revoluções (verde-azulado) e as três últimas antes de o perigeu cruzar 200 km (laranja), vistas de cima do plano orbital.</p>
+        <div class="grafico alto" id="g-cowell-3d"></div>
+      </div>
+      <div class="cartao">
         <h3>Cowell com arrasto: decaimento</h3>
         <p id="txt-arrasto"></p>
-        <div class="grafico" id="g-arrasto"></div>
+        <div class="grafico alto" id="g-arrasto"></div>
       </div>
     </div>
   </div>
@@ -432,8 +446,9 @@ exemplos_propagacao/exemplo_propagacao_ecken.py</code></pre>
       </div>
       <div>
         <h3>Regenere esta página</h3>
-        <p>Os dados vêm de um script que chama a biblioteca. Leva alguns minutos por causa da simulação de lançamento.</p>
-        <pre><code>python docs/gerar_dados_pagina.py</code></pre>
+        <p>Os dados vêm de um script que chama a biblioteca. Tudo leva alguns minutos por causa da simulação de lançamento; passe nomes de etapas para recalcular só parte.</p>
+        <pre><code>python docs/gerar_dados_pagina.py
+python docs/gerar_dados_pagina.py arrasto j2</code></pre>
       </div>
     </div>
   </div>
@@ -705,7 +720,8 @@ exemplos_propagacao/exemplo_propagacao_ecken.py</code></pre>
   $("txt-deriva").textContent = "Ω simulado varia " + fmt(taxaSimulada, 3) + "°/dia. A teoria secular de primeira ordem prevê " + fmt(taxaTeorica, 3) +
     "°/dia. O perigeu também gira (ω).";
   $("txt-arrasto").textContent = "Satélite de 100 kg, Cd 2,2, área de 0,785 m², partindo de perigeu " + fmt(A.perigeu_inicial_km, 0) + " km e apogeu " +
-    fmt(A.apogeu_inicial_km, 0) + " km. O arrasto no perigeu baixa o apogeu até a órbita circularizar e cair a 200 km em " + fmt(A.dias_ate_200km, 1) + " dias.";
+    fmt(A.apogeu_inicial_km, 0) + " km. O arrasto, concentrado no perigeu, derruba o apogeu para " + fmt(A.apogeu_km[A.apogeu_km.length - 1], 0) +
+    " km; em " + fmt(A.dias_ate_200km, 1) + " dias o perigeu cruza a altitude crítica de 200 km e a propagação para.";
 
   function base(extra) {
     var tinta = cor("--tinta"), linha = cor("--linha"), sutil = cor("--sutil");
@@ -728,6 +744,33 @@ exemplos_propagacao/exemplo_propagacao_ecken.py</code></pre>
     var formas = [], lst = ev.fim_queima.concat(ev.separacao).filter(function (t) { return t > 0 && t < ate; });
     lst.forEach(function (t) { formas.push({ type: "line", x0: t, x1: t, yref: "paper", y0: 0, y1: 1, line: { color: cor("--linha"), width: 1, dash: "dot" } }); });
     return formas;
+  }
+
+  var webgl = (function () {
+    try { var c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); }
+    catch (e) { return false; }
+  })();
+
+  // Cena 3D com a Terra; sem WebGL, avisa em vez de deixar o quadro vazio
+  function plot3d(id, tracos, olho, legenda) {
+    var el = $(id);
+    if (!webgl) {
+      el.innerHTML = '<div class="sem-webgl">Este gráfico 3D precisa de WebGL, que está desativado ou indisponível neste navegador.</div>';
+      return;
+    }
+    var sutil = cor("--sutil"), linha = cor("--linha"), terra = cor("--terra");
+    var su = [], sv = [], sw = [], nu = 36, nv = 18;
+    for (var a = 0; a <= nv; a++) {
+      var ru = [], rv = [], rw = [], fi = Math.PI * a / nv;
+      for (var b = 0; b <= nu; b++) { var la = 2 * Math.PI * b / nu; ru.push(RE * Math.sin(fi) * Math.cos(la)); rv.push(RE * Math.sin(fi) * Math.sin(la)); rw.push(RE * Math.cos(fi)); }
+      su.push(ru); sv.push(rv); sw.push(rw);
+    }
+    var esfera = { type: "surface", x: su, y: sv, z: sw, showscale: false, colorscale: [[0, terra], [1, terra]], hoverinfo: "skip", name: "Terra", showlegend: false,
+      lighting: { ambient: 0.85, diffuse: 0.35, specular: 0.05, roughness: 0.9 } };
+    var eixo3 = function (t) { return { title: { text: t, font: { color: sutil, size: 11 } }, showbackground: false, gridcolor: linha, zerolinecolor: linha, tickfont: { color: sutil, size: 10 } }; };
+    Plotly.react(el, [esfera].concat(tracos), base({ showlegend: !!legenda, margin: { l: 0, r: 0, t: 0, b: 0 },
+      legend: { orientation: "h", x: 0, y: 1, font: { size: 11, color: sutil } },
+      scene: { aspectmode: "data", xaxis: eixo3("x (km)"), yaxis: eixo3("y (km)"), zaxis: eixo3("z (km)"), camera: { eye: olho, projection: { type: "orthographic" } } } }), cfg);
   }
 
   function graficos() {
@@ -753,20 +796,36 @@ exemplos_propagacao/exemplo_propagacao_ecken.py</code></pre>
       shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 35786, y1: 35786, line: { color: sinal, width: 1, dash: "dash" } }],
       annotations: [{ xref: "paper", x: 1, y: 35786, text: "GEO", showarrow: false, xanchor: "right", yanchor: "bottom", font: { color: sinal, size: 11 } }] }), cfg);
 
-    // Esfera da Terra para o 3D
-    var su = [], sv = [], sw = [], nu = 36, nv = 18;
-    for (var a = 0; a <= nv; a++) {
-      var ru = [], rv = [], rw = [], fi = Math.PI * a / nv;
-      for (var b = 0; b <= nu; b++) { var la = 2 * Math.PI * b / nu; ru.push(RE * Math.sin(fi) * Math.cos(la)); rv.push(RE * Math.sin(fi) * Math.sin(la)); rw.push(RE * Math.cos(fi)); }
-      su.push(ru); sv.push(rv); sw.push(rw);
-    }
-    var eixo3 = { showbackground: false, gridcolor: cor("--linha"), zerolinecolor: cor("--linha"), tickfont: { color: sutil, size: 10 }, title: { font: { color: sutil, size: 11 } } };
-    Plotly.react("g-3d", [
-      { type: "surface", x: su, y: sv, z: sw, showscale: false, colorscale: [[0, terra], [1, terra]], opacity: 0.9, hoverinfo: "skip", name: "Terra" },
+    plot3d("g-3d", [
       { type: "scatter3d", mode: "lines", x: J.x, y: J.y, z: J.z, line: { color: J.t_h, colorscale: [[0, orb], [1, sinal]], width: 3 }, name: "Órbita", hoverinfo: "skip" }
-    ], base({ showlegend: false, margin: { l: 0, r: 0, t: 0, b: 0 },
-      scene: { aspectmode: "data", xaxis: Object.assign({ title: { text: "x (km)" } }, eixo3), yaxis: Object.assign({ title: { text: "y (km)" } }, eixo3),
-        zaxis: Object.assign({ title: { text: "z (km)" } }, eixo3), camera: { eye: { x: 1.4, y: 1.3, z: 0.7 } } } }), cfg);
+    ], { x: 1.4, y: 1.3, z: 0.7 });
+
+    // Lançamento: (raio, latitude, longitude inercial) -> cartesiano inercial
+    var lx = [], ly = [], lz = [], lt = [], lh = [];
+    for (var k3 = 0; k3 < L.t.length; k3++) {
+      var rr3 = L.altitude_km[k3] + RE, la3 = L.latitude_graus[k3] * Math.PI / 180, lo3 = L.longitude_inercial_rad[k3];
+      lx.push(rr3 * Math.cos(la3) * Math.cos(lo3)); ly.push(rr3 * Math.cos(la3) * Math.sin(lo3)); lz.push(rr3 * Math.sin(la3));
+      lt.push(L.t[k3] / 3600); lh.push(relogio(L.t[k3]) + " · " + fmt(L.altitude_km[k3], 0) + " km · " + fase(L.t[k3]));
+    }
+    var gx = [], gy = [], gz = [];
+    for (var g3 = 0; g3 <= 120; g3++) { var a3 = 2 * Math.PI * g3 / 120; gx.push(42164.14 * Math.cos(a3)); gy.push(42164.14 * Math.sin(a3)); gz.push(0); }
+    plot3d("g-lanc-3d", [
+      { type: "scatter3d", mode: "lines", x: gx, y: gy, z: gz, line: { color: sutil, width: 2, dash: "dash" }, name: "GEO", hoverinfo: "skip" },
+      { type: "scatter3d", mode: "lines", x: lx, y: ly, z: lz, text: lh, hovertemplate: "%{text}<extra></extra>",
+        line: { color: lt, colorscale: [[0, sinal], [0.15, orb], [1, orb]], width: 4 }, name: "Trajetória" },
+      { type: "scatter3d", mode: "markers", x: [lx[0]], y: [ly[0]], z: [lz[0]], marker: { color: sinal, size: 5 }, name: "Alcântara", hovertemplate: "Alcântara<extra></extra>" }
+    ], { x: 1.1, y: -1.5, z: 1.1 });
+
+    var oi = A.orbitas_iniciais, of = A.orbitas_finais;
+    if (oi && of) {
+      // câmera na direção da normal ao plano orbital (produto vetorial de dois pontos da primeira órbita)
+      var q = Math.floor(oi.x.length / 8);
+      var nrm = cruz([oi.x[0], oi.y[0], oi.z[0]], [oi.x[q], oi.y[q], oi.z[q]]), mn = norma(nrm) / 1.9;
+      plot3d("g-cowell-3d", [
+        { type: "scatter3d", mode: "lines", x: oi.x, y: oi.y, z: oi.z, line: { color: orb, width: 3 }, name: "Início", hoverinfo: "skip" },
+        { type: "scatter3d", mode: "lines", x: of.x, y: of.y, z: of.z, line: { color: sinal, width: 3 }, name: "Antes da reentrada", hoverinfo: "skip" }
+      ], { x: nrm[0] / mn, y: nrm[1] / mn, z: nrm[2] / mn }, true);
+    }
 
     Plotly.react("g-deriva", [
       { x: J.t_h, y: J.delta_raan_graus, name: "ΔΩ (°)", line: { color: orb, width: 2 }, hovertemplate: "%{y:.3f}°<extra>ΔΩ</extra>" },
