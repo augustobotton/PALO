@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 
 from src.domain.modelos.Simulacao import Simulacao
 from src.domain.modelos.foguete.aerodinamica.ModeloAerodinamico import ModeloAerodinamico
@@ -10,7 +11,8 @@ from src.domain.modelos.planeta.ConstrutorBaseDeLancamento import ConstrutorBase
 from src.domain.modelos.planeta.ConstrutorPlaneta import ConstrutorPlaneta
 from src.domain.modelos.planeta.ModeloAtmosferico import ModeloAtmosferico
 
-json_modelo_atm_terrestre = r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'
+RAIZ_REPO = Path(__file__).resolve().parents[2]
+json_modelo_atm_terrestre = RAIZ_REPO / 'src' / 'domain' / 'modelos' / 'planeta' / 'dados_JSON_planetas' / 'dados_atmosfericos_terra.json'
 terra = (ConstrutorPlaneta()
          .com_delta_temperatura_atm(10)
          .com_raio_equatorial(6378.1370e3)

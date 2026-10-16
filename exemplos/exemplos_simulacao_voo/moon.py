@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 
 import numpy as np
 
@@ -68,7 +69,8 @@ print("Área da seção transversal (m^2):", area_cross)
 print("Tempo de queima (s):", burn_time)
 
 
-json_modelo_atm_terrestre = r'C:\Users\gt_po\Documents\tcc\mecvooespacial\src\domain\modelos\planeta\dados_JSON_planetas\dados_atmosfericos_terra.json'
+RAIZ_REPO = Path(__file__).resolve().parents[2]
+json_modelo_atm_terrestre = RAIZ_REPO / 'src' / 'domain' / 'modelos' / 'planeta' / 'dados_JSON_planetas' / 'dados_atmosfericos_terra.json'
 terra = (ConstrutorPlaneta()
          .com_delta_temperatura_atm(10)
          .com_raio_equatorial(6378.1370e3)
@@ -117,7 +119,7 @@ orbita_alvo = Orbita.circular(1e6, np.deg2rad(5))
 condicoes_iniciais = [tempo_simulacao, velocidade_inicial, angulo_elevacao_inicial, orbita_alvo]
 simulacao = Simulacao(terra, alcantara, fogueteConceitual, condicoes_iniciais)
 
-with open('../../exemplos/exemplos_simulacao_voo/simulacao.pkl', 'wb') as f:
+with open(Path(__file__).resolve().parent / 'simulacao.pkl', 'wb') as f:
     pickle.dump(simulacao, f)
 resposta = simulacao.simular()
 
